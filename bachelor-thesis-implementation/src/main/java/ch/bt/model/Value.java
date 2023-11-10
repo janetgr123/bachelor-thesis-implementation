@@ -1,7 +1,7 @@
 package ch.bt.model;
 
 public class Value {
-    private byte[] value;
+    private final byte[] value;
 
     public Value(final byte[] value){
         this.value = value;

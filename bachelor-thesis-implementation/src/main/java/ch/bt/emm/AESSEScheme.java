@@ -23,7 +23,7 @@ public class AESSEScheme implements SEScheme {
         this.secureRandom = secureRandom;
         this.key = generateKey(securityParameter);
         if (key instanceof SecretKeySingle) {
-            this.init(this.key.getKey().getKeys().get(0).getBytes());
+            this.init(this.key.getKey().keys().get(0).getBytes());
         }
     }
 
@@ -31,7 +31,7 @@ public class AESSEScheme implements SEScheme {
         this.secureRandom = secureRandom;
         this.key = key;
         if (key instanceof SecretKeySingle) {
-            this.init(this.key.getKey().getKeys().get(0).getBytes());
+            this.init(this.key.getKey().keys().get(0).getBytes());
         }
     }
 

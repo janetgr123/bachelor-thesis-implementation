@@ -42,22 +42,7 @@ public class BasicEMMTest {
         final var expectedValues = multimap.get(searchLabel);
         Assert.assertEquals(expectedValues.size(), values.size());
         for (Value value : values) {
-            Assert.assertEquals(1, expectedValues.stream().filter(el -> equal(el.getValue(), value.getValue())).toList().size());
+            Assert.assertEquals(1, expectedValues.stream().filter(el -> Arrays.equals(el.getValue(), value.getValue())).toList().size());
         }
-    }
-
-    private boolean equal(byte[] a, byte[] b) {
-        if (a.length != b.length) {
-            return false;
-        }
-        int i = 0;
-        int length = a.length;
-        while (i < length) {
-            if (a[i] != b[i]) {
-                return false;
-            }
-            i++;
-        }
-        return true;
     }
 }

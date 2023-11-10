@@ -3,7 +3,7 @@ package ch.bt.crypto;
 import java.util.List;
 
 public class SecretKeySingle implements SecretKey {
-    private byte[] key;
+    private final byte[] key;
 
     public SecretKeySingle(final byte[] key) {
         this.key = key;

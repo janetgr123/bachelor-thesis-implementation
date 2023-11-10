@@ -12,8 +12,6 @@ import java.util.*;
  * based on the SSE scheme Pi_bas from Cash et al. 2014
  */
 public class BasicEMM implements EMM {
-
-    private static final int CAPACITY = 1000; // TODO: set
     private final SecureRandom secureRandom;
 
     private final HKDFDerivator keyDerivator = new HKDFDerivator();
@@ -28,7 +26,7 @@ public class BasicEMM implements EMM {
         this.secureRandom = secureRandom;
         this.key = this.setup(securityParameter);
         if (this.key instanceof SecretKeyPair) {
-            final var keyPair = this.key.getKey().getKeys();
+            final var keyPair = this.key.getKey().keys();
             hash = new HMacHash(new KeyParameter(keyPair.get(0).getBytes()));
             //hash = new SHA256Hash(new KeyParameter(keyPair.get(0).getBytes()));
             SEScheme = new AESSEScheme(secureRandom, keyPair.get(1));
@@ -87,7 +85,7 @@ public class BasicEMM implements EMM {
     @Override
     public Set<Value> search(final SearchToken searchToken, final Map<EncryptedLabel, EncryptedValue> encryptedIndex) {
         Set<Value> encryptedValues = new HashSet<>();
-        final var matchingLabels = encryptedIndex.keySet().stream().filter(el -> el.getLabel().equals(hash.hash(searchToken.token()))).toList();
+        final var matchingLabels = encryptedIndex.keySet().stream().filter(el -> Arrays.equals(el.getLabel(), hash.hash(searchToken.token()))).toList();
         for(Label l : matchingLabels){
             encryptedValues.add(encryptedIndex.get(l));
         }
@@ -102,9 +100,7 @@ public class BasicEMM implements EMM {
     public Set<Value> result(final Set<Value> values) {
         Set<Value> plaintextValues = new HashSet<>();
         if (key instanceof SecretKeyPair) {
-            values.stream().forEach(encryptedValue -> {
-                plaintextValues.add(new PlaintextValue(SEScheme.decrypt(encryptedValue.getValue())));
-            });
+            values.forEach(encryptedValue -> plaintextValues.add(new PlaintextValue(SEScheme.decrypt(encryptedValue.getValue()))));
         }
         return plaintextValues;
     }

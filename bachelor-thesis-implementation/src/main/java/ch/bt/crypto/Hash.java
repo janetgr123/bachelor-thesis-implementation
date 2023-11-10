@@ -2,5 +2,5 @@ package ch.bt.crypto;
 
 public interface Hash {
 
-    public byte[] hash(final byte[] input);
+    byte[] hash(final byte[] input);
 }

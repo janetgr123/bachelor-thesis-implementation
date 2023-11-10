@@ -3,8 +3,8 @@ package ch.bt.crypto;
 import java.util.List;
 
 public class SecretKeyPair implements SecretKey {
-    private SecretKeySingle key1;
-    private SecretKeySingle key2;
+    private final SecretKeySingle key1;
+    private final SecretKeySingle key2;
 
 
     public SecretKeyPair(final SecretKeySingle key1, final SecretKeySingle key2) {

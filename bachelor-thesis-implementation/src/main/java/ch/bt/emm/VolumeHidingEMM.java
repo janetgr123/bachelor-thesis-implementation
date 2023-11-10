@@ -27,7 +27,6 @@ public class VolumeHidingEMM implements EMM {
     }
 
     /**
-     * @param secretKey 
      * @param label
      * @return
      */
@@ -47,7 +46,6 @@ public class VolumeHidingEMM implements EMM {
     }
 
     /**
-     * @param secretKey 
      * @param values
      * @return
      */

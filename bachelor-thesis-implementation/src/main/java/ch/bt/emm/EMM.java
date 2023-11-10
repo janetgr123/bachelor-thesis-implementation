@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.Set;
 
 public interface EMM {
-    public SecretKey setup(final int securityParameter);
+    SecretKey setup(final int securityParameter);
 
-    public Map<EncryptedLabel, EncryptedValue> buildIndex(final Map<PlaintextLabel, Set<PlaintextValue>> multiMap);
+    Map<EncryptedLabel, EncryptedValue> buildIndex(final Map<PlaintextLabel, Set<PlaintextValue>> multiMap);
 
-    public SearchToken trapdoor(final Label label);
+    SearchToken trapdoor(final Label label);
 
-    public Set<Value> search(final SearchToken searchToken, final Map<EncryptedLabel, EncryptedValue> encryptedIndex);
+    Set<Value> search(final SearchToken searchToken, final Map<EncryptedLabel, EncryptedValue> encryptedIndex);
 
-    public Set<Value> result(final Set<Value> values);
+    Set<Value> result(final Set<Value> values);
 }
