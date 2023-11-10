@@ -10,7 +10,7 @@ name: Build
 
 on:
   push:
-    branches: [ "*" ]
+    branches: "*"
   pull_request:
     branches: [ "main" ]
 
