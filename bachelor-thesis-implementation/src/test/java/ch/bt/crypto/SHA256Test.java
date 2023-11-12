@@ -1,5 +1,7 @@
 package ch.bt.crypto;
+
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -25,8 +27,8 @@ public class SHA256Test {
         final SHA256Hash sha256Hash1 = new SHA256Hash();
         final byte[] plaintext = new byte[securityParameter];
         new Random().nextBytes(plaintext);
-        assertTrue(Arrays.equals(sha256Hash.hash(plaintext), sha256Hash.hash(plaintext)));
-        assertTrue(Arrays.equals(sha256Hash.hash(plaintext), sha256Hash1.hash(plaintext)));
+        assertArrayEquals(sha256Hash.hash(plaintext), sha256Hash.hash(plaintext));
+        assertArrayEquals(sha256Hash.hash(plaintext), sha256Hash1.hash(plaintext));
 
     }
 }

@@ -24,8 +24,8 @@ public class SHA512Test {
         final SHA512Hash sha512Hash1 = new SHA512Hash();
         final byte[] plaintext = new byte[securityParameter];
         new Random().nextBytes(plaintext);
-        assertTrue(Arrays.equals(sha512Hash.hash(plaintext), sha512Hash.hash(plaintext)));
-        assertTrue(Arrays.equals(sha512Hash.hash(plaintext), sha512Hash1.hash(plaintext)));
+        assertArrayEquals(sha512Hash.hash(plaintext), sha512Hash.hash(plaintext));
+        assertArrayEquals(sha512Hash.hash(plaintext), sha512Hash1.hash(plaintext));
 
     }
 }
