@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -29,6 +30,5 @@ public class SHA256Test {
         new Random().nextBytes(plaintext);
         assertArrayEquals(sha256Hash.hash(plaintext), sha256Hash.hash(plaintext));
         assertArrayEquals(sha256Hash.hash(plaintext), sha256Hash1.hash(plaintext));
-
     }
 }
