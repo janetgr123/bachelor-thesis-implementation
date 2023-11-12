@@ -1,55 +1,72 @@
 package ch.bt.crypto;
 
 import org.bouncycastle.crypto.params.KeyParameter;
+
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class HMacTest {
-    @Test
-    public void testHash() {
-        final int securityParameter = 512;
-        final KeyGenerator keyGenerator = new KeyGenerator(new SecureRandom(), securityParameter);
-        final SecretKey key = keyGenerator.generateKey();
-        if (key instanceof SecretKeySingle) {
-            final HMacHash hMac = new HMacHash(new KeyParameter(key.getKey().keys().get(0).getBytes()));
-            final byte[] plaintext = new byte[securityParameter];
-            new Random().nextBytes(plaintext);
-            assertFalse(Arrays.equals(hMac.hash(plaintext), plaintext));
-        }
+    private final static List<Integer> SECURITY_PARAMETERS = List.of(128, 256, 512, 1024);
+    private static Map<Integer, SecretKey> keys = new HashMap<>();
+    private static Map<Integer, byte[]> plaintexts = new HashMap<>();
+    private static Map<Integer, HMacHash> hMacs = new HashMap<>();
+
+    @BeforeAll
+    public static void init() {
+        SECURITY_PARAMETERS.forEach(securityParameter -> {
+                    final KeyGenerator keyGenerator = new KeyGenerator(new SecureRandom(), securityParameter);
+                    final var key = keyGenerator.generateKey();
+                    keys.put(securityParameter, key);
+                    final var plaintext = new byte[securityParameter];
+                    new Random().nextBytes(plaintext);
+                    plaintexts.put(securityParameter, plaintext);
+                    final var hMac = new HMacHash(new KeyParameter(key.getKey().keys().get(0).getBytes()));
+                    hMacs.put(securityParameter, hMac);
+                }
+        );
+
     }
 
-    @Test
-    public void testDeterminism() {
-        final int securityParameter = 512;
-        final KeyGenerator keyGenerator = new KeyGenerator(new SecureRandom(), securityParameter);
-        final SecretKey key = keyGenerator.generateKey();
-        if (key instanceof SecretKeySingle) {
-            final HMacHash hMac = new HMacHash(new KeyParameter(key.getKey().keys().get(0).getBytes()));
-            final HMacHash hMac2 = new HMacHash(new KeyParameter(key.getKey().keys().get(0).getBytes()));
-            final byte[] plaintext = new byte[securityParameter];
-            new Random().nextBytes(plaintext);
-            assertFalse(Arrays.equals(hMac.hash(plaintext), plaintext));
-            assertTrue(Arrays.equals(hMac.hash(plaintext), hMac.hash(plaintext)));
-            assertTrue(Arrays.equals(hMac.hash(plaintext), hMac2.hash(plaintext)));
-        }
+    private static Stream<Integer> getSecurityParameters() {
+        return SECURITY_PARAMETERS.stream();
     }
 
-    @Test
-    public void testKeyDependency() {
-        final int securityParameter = 512;
+    @ParameterizedTest
+    @MethodSource("getSecurityParameters")
+    public void testHash(final int securityParameter) {
+        final var plaintext = plaintexts.get(securityParameter);
+        final var hMac = hMacs.get(securityParameter);
+        assertFalse(Arrays.equals(hMac.hash(plaintext), plaintext));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getSecurityParameters")
+    public void testDeterminism(final int securityParameter) {
+        final var key = keys.get(securityParameter);
+        final var plaintext = plaintexts.get(securityParameter);
+        final var hMac = hMacs.get(securityParameter);
+        final HMacHash hMac2 = new HMacHash(new KeyParameter(key.getKey().keys().get(0).getBytes()));
+        assertFalse(Arrays.equals(hMac.hash(plaintext), plaintext));
+        assertArrayEquals(hMac.hash(plaintext), hMac.hash(plaintext));
+        assertArrayEquals(hMac.hash(plaintext), hMac2.hash(plaintext));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getSecurityParameters")
+    public void testKeyDependency(final int securityParameter) {
+        final var key = keys.get(securityParameter);
+        final var plaintext = plaintexts.get(securityParameter);
+        final var hMac = hMacs.get(securityParameter);
         final KeyGenerator keyGenerator = new KeyGenerator(new SecureRandom(), securityParameter);
-        final SecretKey key = keyGenerator.generateKey();
         final SecretKey key2 = keyGenerator.generateKey();
-        if (key instanceof SecretKeySingle && key2 instanceof SecretKeySingle) {
-            final HMacHash hMac = new HMacHash(new KeyParameter(key.getKey().keys().get(0).getBytes()));
-            final HMacHash hMac2 = new HMacHash(new KeyParameter(key2.getKey().keys().get(0).getBytes()));
-            final byte[] plaintext = new byte[securityParameter];
-            new Random().nextBytes(plaintext);
-            assertFalse(Arrays.equals(hMac.hash(plaintext), hMac2.hash(plaintext)));
-        }
+        final HMacHash hMac2 = new HMacHash(new KeyParameter(key2.getKey().keys().get(0).getBytes()));
+        assertFalse(Arrays.equals(hMac.hash(plaintext), hMac2.hash(plaintext)));
     }
 }
