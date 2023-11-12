@@ -20,7 +20,7 @@ public class AESSEScheme implements SEScheme {
     private PaddedBufferedBlockCipher DECRYPTION_CIPHER;
     private final SecureRandom secureRandom;
 
-    private byte[] initialisationVector = new byte[16];
+    private final byte[] initialisationVector = new byte[16];
 
     private final SecretKey key;
 
