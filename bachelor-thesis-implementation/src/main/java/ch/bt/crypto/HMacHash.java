@@ -25,6 +25,8 @@ public class HMacHash implements Hash {
     @Override
     public byte[] hash(final byte[] input) {
         hMac.update(input, 0, keyParameter.getKey().length);
-        return input;
+        byte[] output = new byte[hMac.getMacSize()];
+        hMac.doFinal(output, 0);
+        return output;
     }
 }
