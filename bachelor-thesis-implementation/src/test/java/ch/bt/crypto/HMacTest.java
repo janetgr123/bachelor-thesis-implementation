@@ -14,9 +14,9 @@ import java.util.stream.Stream;
 
 public class HMacTest {
     private final static List<Integer> SECURITY_PARAMETERS = List.of(128, 256, 512, 1024);
-    private static Map<Integer, SecretKey> keys = new HashMap<>();
-    private static Map<Integer, byte[]> plaintexts = new HashMap<>();
-    private static Map<Integer, HMacHash> hMacs = new HashMap<>();
+    private final static Map<Integer, SecretKey> keys = new HashMap<>();
+    private final static Map<Integer, byte[]> plaintexts = new HashMap<>();
+    private final static Map<Integer, HMacHash> hMacs = new HashMap<>();
 
     @BeforeAll
     public static void init() {
@@ -61,7 +61,6 @@ public class HMacTest {
     @ParameterizedTest
     @MethodSource("getSecurityParameters")
     public void testKeyDependency(final int securityParameter) {
-        final var key = keys.get(securityParameter);
         final var plaintext = plaintexts.get(securityParameter);
         final var hMac = hMacs.get(securityParameter);
         final KeyGenerator keyGenerator = new KeyGenerator(new SecureRandom(), securityParameter);
