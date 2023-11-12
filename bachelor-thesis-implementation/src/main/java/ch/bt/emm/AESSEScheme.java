@@ -24,6 +24,9 @@ public class AESSEScheme implements SEScheme {
 
     private final SecretKey key;
 
+    private CipherParameters cipherParameters;
+
+
     public AESSEScheme(final SecureRandom secureRandom, final int securityParameter) {
         if (securityParameter > 256) {
             throw new IllegalArgumentException("security parameter too large");
@@ -56,6 +59,8 @@ public class AESSEScheme implements SEScheme {
 
     @Override
     public byte[] encrypt(byte[] input) {
+        secureRandom.nextBytes(initialisationVector);
+        cipherParameters = new ParametersWithIV(new KeyParameter(key.getKey().keys().get(0).getBytes()), initialisationVector);
         return processInput(true, input);
     }
 
@@ -74,9 +79,6 @@ public class AESSEScheme implements SEScheme {
             cipher = DECRYPTION_CIPHER;
             outputLengthReduction = initialisationVector.length;
         }
-        KeyParameter keyParameter = new KeyParameter(key.getKey().keys().get(0).getBytes());
-        secureRandom.nextBytes(initialisationVector);
-        CipherParameters cipherParameters = new ParametersWithIV(keyParameter, initialisationVector);
         cipher.init(isEncryption, cipherParameters);
         byte[] output = new byte[cipher.getOutputSize(input.length - outputLengthReduction)];
         final var blockSize = cipher.getBlockSize();
