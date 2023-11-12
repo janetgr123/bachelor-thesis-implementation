@@ -14,17 +14,17 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.security.SecureRandom;
+import java.util.*;
 
 public class AESSEScheme implements SEScheme {
     private PaddedBufferedBlockCipher ENCRYPTION_CIPHER;
     private PaddedBufferedBlockCipher DECRYPTION_CIPHER;
     private final SecureRandom secureRandom;
 
-    private final byte[] initialisationVector = new byte[16];
-
+    private static final int LENGTH_INTIALISATION_VECTOR = 16;
     private final SecretKey key;
 
-    private CipherParameters cipherParameters;
+    private final Map<byte[], CipherParameters> cipherParameters = new HashMap<>();
 
 
     public AESSEScheme(final SecureRandom secureRandom, final int securityParameter) {
@@ -37,7 +37,7 @@ public class AESSEScheme implements SEScheme {
     }
 
     public AESSEScheme(final SecureRandom secureRandom, final SecretKey key) {
-        if (key instanceof SecretKeySingle && key.getKey().keys().get(0).getBytes().length > 256) {
+        if (key instanceof SecretKeySingle && key.getKey().keys().get(0).getBytes().length > 32) {
             throw new IllegalArgumentException("security parameter too large");
         }
         this.secureRandom = secureRandom;
@@ -59,28 +59,29 @@ public class AESSEScheme implements SEScheme {
 
     @Override
     public byte[] encrypt(byte[] input) {
+        final var cipher = ENCRYPTION_CIPHER;
+        final var initialisationVector = new byte[LENGTH_INTIALISATION_VECTOR];
         secureRandom.nextBytes(initialisationVector);
-        cipherParameters = new ParametersWithIV(new KeyParameter(key.getKey().keys().get(0).getBytes()), initialisationVector);
-        return processInput(true, input);
+        final var cipherParameter = new ParametersWithIV(new KeyParameter(key.getKey().keys().get(0).getBytes()), initialisationVector);
+        cipher.init(true, cipherParameter);
+        final var output = new byte[cipher.getOutputSize(input.length)];
+        processInput(true, input, output);
+        cipherParameters.put(output, cipherParameter);
+        return output;
     }
 
     @Override
     public byte[] decrypt(byte[] input) {
-        return processInput(false, input);
+        final var cipher = DECRYPTION_CIPHER;
+        final var cipherParameter = cipherParameters.get(input);
+        cipher.init(false, cipherParameter);
+        final var output = new byte[cipher.getOutputSize(input.length - LENGTH_INTIALISATION_VECTOR)];
+        processInput(false, input, output);
+        return output;
     }
 
-    private byte[] processInput(final boolean isEncryption, final byte[] input) {
-        PaddedBufferedBlockCipher cipher;
-        int outputLengthReduction;
-        if (isEncryption) {
-            cipher = ENCRYPTION_CIPHER;
-            outputLengthReduction = 0;
-        } else {
-            cipher = DECRYPTION_CIPHER;
-            outputLengthReduction = initialisationVector.length;
-        }
-        cipher.init(isEncryption, cipherParameters);
-        byte[] output = new byte[cipher.getOutputSize(input.length - outputLengthReduction)];
+    private void processInput(final boolean isEncryption, final byte[] input, final byte[] output) {
+        final var cipher = isEncryption ? ENCRYPTION_CIPHER : DECRYPTION_CIPHER;
         final var blockSize = cipher.getBlockSize();
         final var numberOfBlocks = input.length / blockSize;
         int processedBytes = 0;
@@ -92,7 +93,6 @@ public class AESSEScheme implements SEScheme {
         } catch (InvalidCipherTextException e) {
             throw new RuntimeException(e);
         }
-        return output;
     }
 
 

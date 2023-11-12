@@ -48,8 +48,11 @@ public class AESSESchemeTest {
         final var aesseScheme = aesSESchemes.get(securityParameter);
         final var plaintext = plaintexts.get(securityParameter);
         final var ciphertext = aesseScheme.encrypt(plaintext);
+        final var ciphertext2 = aesseScheme.encrypt(plaintext);
         final var generatedPlaintext = aesseScheme.decrypt(ciphertext);
+        final var generatedPlaintext2 = aesseScheme.decrypt(ciphertext2);
         assertArrayEquals(plaintext, generatedPlaintext);
+        assertArrayEquals(plaintext, generatedPlaintext2);
     }
 
     @ParameterizedTest
