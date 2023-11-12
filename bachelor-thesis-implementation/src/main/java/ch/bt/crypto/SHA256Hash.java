@@ -11,7 +11,8 @@ public class SHA256Hash implements Hash {
 
     @Override
     public byte[] hash(final byte[] input) {
-        hash.update(input, 0, input.length);
-        return input;
+        byte[] output = new byte[hash.getDigestSize()];
+        hash.doFinal(output, 0);
+        return output;
     }
 }
