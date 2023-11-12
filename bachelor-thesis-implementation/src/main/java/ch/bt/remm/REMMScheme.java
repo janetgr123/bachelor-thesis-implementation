@@ -1,4 +1,4 @@
-package ch.bt.schemes;
+package ch.bt.remm;
 
 public interface REMMScheme {
 }
