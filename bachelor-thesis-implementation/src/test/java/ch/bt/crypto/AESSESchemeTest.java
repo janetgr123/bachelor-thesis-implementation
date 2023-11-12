@@ -16,7 +16,6 @@ public class AESSESchemeTest {
     private final static List<Integer> VALID_SECURITY_PARAMETERS = List.of(128, 256);
 
     private final static List<Integer> INVALID_SECURITY_PARAMETERS = List.of(512, 1024);
-    private final static Map<Integer, SecretKey> keys = new HashMap<>();
     private final static Map<Integer, byte[]> plaintexts = new HashMap<>();
     private final static Map<Integer, AESSEScheme> aesSESchemes = new HashMap<>();
 
@@ -25,7 +24,6 @@ public class AESSESchemeTest {
         VALID_SECURITY_PARAMETERS.forEach(securityParameter -> {
                     final KeyGenerator keyGenerator = new KeyGenerator(new SecureRandom(), securityParameter);
                     final var key = keyGenerator.generateKey();
-                    keys.put(securityParameter, key);
                     final var plaintext = new byte[securityParameter];
                     new Random().nextBytes(plaintext);
                     plaintexts.put(securityParameter, plaintext);
