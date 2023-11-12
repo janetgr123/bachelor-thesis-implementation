@@ -1,7 +1,6 @@
 package ch.bt.model;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class Value implements Comparable<Value> {
     private final byte[] value;
@@ -24,10 +23,9 @@ public class Value implements Comparable<Value> {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof Value)) {
+        if (!(o instanceof Value other)) {
             return false;
         }
-        final var other = (Value) o;
         return Arrays.equals(value, other.value);
     }
 }

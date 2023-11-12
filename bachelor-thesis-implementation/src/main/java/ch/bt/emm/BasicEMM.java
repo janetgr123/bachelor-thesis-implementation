@@ -17,8 +17,6 @@ public class BasicEMM implements EMM {
 
     private final HKDFDerivator keyDerivator;
 
-    private final SecretKey key;
-
     private final SEScheme SEScheme;
 
     private final Hash hMac;
@@ -28,8 +26,8 @@ public class BasicEMM implements EMM {
     public BasicEMM(final SecureRandom secureRandom, final int securityParameter) {
         this.secureRandom = secureRandom;
         this.keyDerivator = new HKDFDerivator(securityParameter);
-        this.key = this.setup(securityParameter);
-        final var keyPair = this.key.getKey().keys();
+        final var key = this.setup(securityParameter);
+        final var keyPair = key.getKey().keys();
         hMac = new HMacHash(new KeyParameter(keyPair.get(0).getBytes()));
         hash = new SHA512Hash();
         SEScheme = new AESSEScheme(secureRandom, keyPair.get(1));

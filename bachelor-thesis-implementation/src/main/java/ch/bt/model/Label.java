@@ -23,10 +23,9 @@ public class Label implements Comparable<Label> {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof Label)) {
+        if (!(o instanceof Label other)) {
             return false;
         }
-        final var other = (Label) o;
         return Arrays.equals(label, other.label);
     }
 }

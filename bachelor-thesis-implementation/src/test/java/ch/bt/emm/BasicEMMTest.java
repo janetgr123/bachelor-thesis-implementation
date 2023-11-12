@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class BasicEMMTest {
@@ -62,7 +63,7 @@ public class BasicEMMTest {
         final var ciphertexts = basicEMM.search(searchToken, encryptedIndex);
         final var values = basicEMM.result(ciphertexts).stream().sorted().toList();
         final var expectedValues = multimap.get(searchLabel).stream().sorted().toList();
-        assertTrue(values.equals(expectedValues));
+        assertEquals(values, expectedValues);
     }
 
     @ParameterizedTest
@@ -75,13 +76,13 @@ public class BasicEMMTest {
         final var encryptedIndex2 = basicEMM.buildIndex(multimap);
         final var labels = encryptedIndex.keySet().stream().sorted().toList();
         final var labels2 = encryptedIndex2.keySet().stream().sorted().toList();
-        assertTrue(labels.equals(labels2));
+        assertEquals(labels, labels2);
 
         final var token = basicEMM.getHMac().hash(searchLabel.getLabel());
         final var tokenAndCounter = org.bouncycastle.util.Arrays.concatenate(token, BigInteger.valueOf(0).toByteArray());
         final var encryptedLabel = basicEMM.getHash().hash(tokenAndCounter);
         final var matchingLabels = encryptedIndex.keySet().stream().filter(el -> Arrays.equals(el.getLabel(), encryptedLabel)).toList();
-        assertTrue (matchingLabels.size() == 1);
+        assertEquals(1, matchingLabels.size());
         final var values = encryptedIndex.values();
         Set<PlaintextValue> plaintexts = new HashSet<>();
         for(var el : values){
@@ -99,9 +100,7 @@ public class BasicEMMTest {
             }
             ++i;
         }
-        for(int j = 0; j < found.length; ++j){
-            assertTrue(found[j]);
-        }
+        IntStream.range(0, found.length).mapToObj(j -> found[j]).forEach(b -> assertTrue(b));
     }
 
     @ParameterizedTest
