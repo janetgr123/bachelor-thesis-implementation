@@ -1,7 +1,5 @@
 package ch.bt.crypto;
 
-import ch.bt.emm.AESSEScheme;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeAll;

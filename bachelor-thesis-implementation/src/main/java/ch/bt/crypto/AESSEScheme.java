@@ -1,4 +1,4 @@
-package ch.bt.emm;
+package ch.bt.crypto;
 
 import ch.bt.crypto.KeyGenerator;
 import ch.bt.crypto.SEScheme;
