@@ -1,9 +1,5 @@
 package ch.bt.crypto;
 
-import ch.bt.crypto.KeyGenerator;
-import ch.bt.crypto.SEScheme;
-import ch.bt.crypto.SecretKey;
-import ch.bt.crypto.SecretKeySingle;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;

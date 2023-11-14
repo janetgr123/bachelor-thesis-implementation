@@ -74,14 +74,16 @@ public class VolumeHidingEMMTest {
         final var table12 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(1);
         final var table21 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(0);
         final var table22 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(1);
-        var labelsTable11 = Arrays.stream(table11).map(Pair::getLabel).toList();
+        final var labelsTable11 = Arrays.stream(table11).map(Pair::getLabel).toList();
         final var labelsTable12 = Arrays.stream(table12).map(Pair::getLabel).toList();
-        labelsTable11.addAll(labelsTable12);
-        final var labels = labelsTable11.stream().distinct().sorted().toList();
-        var labelsTable21 = Arrays.stream(table21).map(Pair::getLabel).toList();
+        final var labelsTables = new ArrayList<>(labelsTable11);
+        labelsTables.addAll(labelsTable12);
+        final var labels = labelsTables.stream().distinct().sorted().toList();
+        final var labelsTable21 = Arrays.stream(table21).map(Pair::getLabel).toList();
         final var labelsTable22 = Arrays.stream(table22).map(Pair::getLabel).toList();
-        labelsTable21.addAll(labelsTable22);
-        final var labels2 = labelsTable21.stream().distinct().sorted().toList();
+        final var labelsTables2 = new ArrayList<>(labelsTable21);
+        labelsTables2.addAll(labelsTable22);
+        final var labels2 = labelsTables2.stream().distinct().sorted().toList();
         assertEquals(labels, labels2);
     }
 
