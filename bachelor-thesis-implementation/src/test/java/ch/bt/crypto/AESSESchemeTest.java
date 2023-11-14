@@ -55,6 +55,21 @@ public class AESSESchemeTest {
 
     @ParameterizedTest
     @MethodSource("getValidSecurityParameters")
+    public void testSchemeDeterminism(final int securityParameter) {
+        final var aesseScheme = aesSESchemes.get(securityParameter);
+        final var key = new KeyGenerator(new SecureRandom(), securityParameter).generateKey();
+        final var aesseScheme2 = new AESSEScheme(new SecureRandom(), key);
+        final var plaintext = plaintexts.get(securityParameter);
+        final var ciphertext = aesseScheme.encrypt(plaintext);
+        final var ciphertext2 = aesseScheme2.encrypt(plaintext);
+        final var generatedPlaintext = aesseScheme.decrypt(ciphertext);
+        final var generatedPlaintext2 = aesseScheme2.decrypt(ciphertext2);
+        assertArrayEquals(plaintext, generatedPlaintext);
+        assertArrayEquals(plaintext, generatedPlaintext2);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getValidSecurityParameters")
     public void testEncryptionIsProbabilistic(final int securityParameter) {
         final var aesseScheme = aesSESchemes.get(securityParameter);
         final var plaintext = plaintexts.get(securityParameter);

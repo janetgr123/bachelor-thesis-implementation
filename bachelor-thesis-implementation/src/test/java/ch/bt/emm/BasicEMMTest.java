@@ -58,7 +58,7 @@ public class BasicEMMTest {
         final Map<PlaintextLabel, Set<PlaintextValue>> multimap = new HashMap<>();
         PlaintextLabel searchLabel = null;
         Random random = new Random();
-        int index = (int) (MAX_NUMBER_OF_LABELS * Math.random());
+        int index = (int) (MAX_NUMBER_OF_LABELS * Math.random()) + 1;
         while (multimap.size() < MAX_NUMBER_OF_LABELS) {
             final var values = new HashSet<PlaintextValue>();
             int size = (int) (MAX_SIZE_VALUE_SET * Math.random()) + 1;

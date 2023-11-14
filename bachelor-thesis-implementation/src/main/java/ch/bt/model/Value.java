@@ -2,6 +2,7 @@ package ch.bt.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Arrays;
 
@@ -35,5 +36,10 @@ public class Value implements Comparable<Value> {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(value).toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this).append("value", value).toString();
     }
 }

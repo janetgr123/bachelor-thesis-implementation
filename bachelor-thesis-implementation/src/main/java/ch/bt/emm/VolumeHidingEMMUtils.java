@@ -95,9 +95,9 @@ public class VolumeHidingEMMUtils {
             throw new IllegalArgumentException("table sizes must match");
         }
         final var pairsTable1 =
-                Arrays.stream(table1).map(entry -> SEScheme.encrypt(entry)).toList();
+                Arrays.stream(table1).map(SEScheme::encrypt).toList();
         final var pairsTable2 =
-                Arrays.stream(table2).map(entry -> SEScheme.encrypt(entry)).toList();
+                Arrays.stream(table2).map(SEScheme::encrypt).toList();
         int i = 0;
         while (i < pairsTable1.size()) {
             encryptedTable1[i] = pairsTable1.get(i);

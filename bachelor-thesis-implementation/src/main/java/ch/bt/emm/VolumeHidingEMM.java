@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class VolumeHidingEMM implements EMM {
     private final SecureRandom secureRandom;
     private final SecureRandom secureRandomSE;
-    private final SEScheme SEScheme;
+    private final SEScheme seScheme;
     private final Hash hash;
 
     private final Map<PlaintextLabel, Set<PlaintextValue>> multiMap;
@@ -29,7 +29,7 @@ public class VolumeHidingEMM implements EMM {
         this.multiMap = multiMap;
         final var secretKey = this.setup(securityParameter);
         this.hash = new SHA512Hash();
-        this.SEScheme = new AESSEScheme(secureRandomSE, secretKey.getKey().keys().get(1));
+        this.seScheme = new AESSEScheme(secureRandomSE, secretKey.getKey().keys().get(1));
         final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multiMap);
         this.tableSize = (1 + alpha) * numberOfValues;
         this.maxStashSize = numberOfValues;
@@ -58,7 +58,7 @@ public class VolumeHidingEMM implements EMM {
 
         final Pair[] encryptedTable1 = new Pair[tableSize];
         final Pair[] encryptedTable2 = new Pair[tableSize];
-        VolumeHidingEMMUtils.encryptTables(table1, table2, encryptedTable1, encryptedTable2, SEScheme);
+        VolumeHidingEMMUtils.encryptTables(table1, table2, encryptedTable1, encryptedTable2, seScheme);
 
         return new EncryptedIndexTables(encryptedTable1, encryptedTable2);
     }
@@ -109,7 +109,7 @@ public class VolumeHidingEMM implements EMM {
      */
     @Override
     public Set<Value> result(final Set<Pair> values, final Label label) {
-        final var plaintexts = values.stream().map(el -> SEScheme.decrypt(el)).filter(el -> el.getLabel().equals(label)).collect(Collectors.toSet());
+        final var plaintexts = values.stream().map(el -> seScheme.decrypt(el)).filter(el -> el.getLabel().equals(label)).collect(Collectors.toSet());
         plaintexts.addAll(stash.stream().filter(el -> el.getLabel().equals(label)).collect(Collectors.toSet()));
         return plaintexts.stream().map(Pair::getValue).collect(Collectors.toSet());
     }
