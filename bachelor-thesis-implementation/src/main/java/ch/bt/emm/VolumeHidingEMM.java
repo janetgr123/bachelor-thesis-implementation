@@ -15,9 +15,6 @@ import java.util.stream.Collectors;
 public class VolumeHidingEMM implements EMM {
     private final SecureRandom secureRandom;
     private final SecureRandom secureRandomSE;
-
-    private final SecretKey secretKey;
-
     private final SEScheme SEScheme;
     private final Hash hash;
 
@@ -33,7 +30,7 @@ public class VolumeHidingEMM implements EMM {
         this.secureRandomSE = secureRandomSE;
         this.alpha = alpha;
         this.multiMap = multiMap;
-        secretKey = this.setup(securityParameter);
+        final var secretKey = this.setup(securityParameter);
         this.hash = new SHA512Hash();
         this.SEScheme = new AESSEScheme(secureRandomSE, secretKey.getKey().keys().get(1));
     }
@@ -116,7 +113,7 @@ public class VolumeHidingEMM implements EMM {
 
     private int getHash(final Label label, final int i, final int tableNo) {
         final var toHash = org.bouncycastle.util.Arrays.concatenate(label.getLabel(), BigInteger.valueOf(i).toByteArray(), BigInteger.valueOf(tableNo).toByteArray());
-        return hash.hash(toHash).hashCode();
+        return Arrays.hashCode(hash.hash(toHash));
     }
 
     private Pair insert(final Pair[] table, final int hash, final Pair pair) {

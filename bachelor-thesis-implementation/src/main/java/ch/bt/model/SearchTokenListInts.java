@@ -3,7 +3,7 @@ package ch.bt.model;
 import java.util.List;
 
 public class SearchTokenListInts implements SearchToken {
-    private List<SearchTokenInts> token;
+    private final List<SearchTokenInts> token;
 
     public SearchTokenListInts(final List<SearchTokenInts> token) {
         this.token = token;

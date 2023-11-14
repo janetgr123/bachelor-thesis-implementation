@@ -1,7 +1,7 @@
 package ch.bt.model;
 
 public class SearchTokenBytes implements SearchToken {
-    private byte[] token;
+    private final byte[] token;
 
     public SearchTokenBytes(final byte[] token) {
         this.token = token;

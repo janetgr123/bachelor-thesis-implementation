@@ -5,7 +5,6 @@ import ch.bt.model.Pair;
 import ch.bt.model.PlaintextLabel;
 import ch.bt.model.PlaintextValue;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -75,11 +74,11 @@ public class VolumeHidingEMMTest {
         final var table12 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(1);
         final var table21 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(0);
         final var table22 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(1);
-        final var labelsTable11 = Arrays.stream(table11).map(Pair::getLabel).toList();
+        var labelsTable11 = Arrays.stream(table11).map(Pair::getLabel).toList();
         final var labelsTable12 = Arrays.stream(table12).map(Pair::getLabel).toList();
         labelsTable11.addAll(labelsTable12);
         final var labels = labelsTable11.stream().distinct().sorted().toList();
-        final var labelsTable21 = Arrays.stream(table21).map(Pair::getLabel).toList();
+        var labelsTable21 = Arrays.stream(table21).map(Pair::getLabel).toList();
         final var labelsTable22 = Arrays.stream(table22).map(Pair::getLabel).toList();
         labelsTable21.addAll(labelsTable22);
         final var labels2 = labelsTable21.stream().distinct().sorted().toList();

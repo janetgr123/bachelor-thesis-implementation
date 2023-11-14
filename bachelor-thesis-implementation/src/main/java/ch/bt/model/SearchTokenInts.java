@@ -1,8 +1,8 @@
 package ch.bt.model;
 
 public class SearchTokenInts {
-    private int token1;
-    private int token2;
+    private final int token1;
+    private final int token2;
 
     public SearchTokenInts(final int token1, final int token2) {
         this.token1 = token1;
