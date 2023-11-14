@@ -21,17 +21,21 @@ public class VolumeHidingEMM implements EMM {
 
     private Stack<Pair> stash;
 
-    private final int alpha;
+    private final int maxStashSize;
+
+    private final int tableSize;
 
 
     public VolumeHidingEMM(final SecureRandom secureRandom, final SecureRandom secureRandomSE, final int securityParameter, final int alpha, final Map<PlaintextLabel, Set<PlaintextValue>> multiMap) {
         this.secureRandom = secureRandom;
         this.secureRandomSE = secureRandomSE;
-        this.alpha = alpha;
         this.multiMap = multiMap;
         final var secretKey = this.setup(securityParameter);
         this.hash = new SHA512Hash();
         this.SEScheme = new AESSEScheme(secureRandomSE, secretKey.getKey().keys().get(1));
+        final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multiMap);
+        this.tableSize = (1 + alpha) * numberOfValues;
+        this.maxStashSize = numberOfValues;
     }
 
     /**
@@ -47,17 +51,16 @@ public class VolumeHidingEMM implements EMM {
 
     @Override
     public EncryptedIndex buildIndex() {
-        final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multiMap);
-        final Pair[] table1 = new Pair[(alpha + 1) * numberOfValues];
-        final Pair[] table2 = new Pair[(alpha + 1) * numberOfValues];
+        final Pair[] table1 = new Pair[tableSize];
+        final Pair[] table2 = new Pair[tableSize];
         final Stack<Pair> stash = new Stack<>();
-        VolumeHidingEMMUtils.doCuckooHashingWithStash(numberOfValues, table1, table2, multiMap, stash, hash);
+        VolumeHidingEMMUtils.doCuckooHashingWithStash(maxStashSize, table1, table2, multiMap, stash, hash, tableSize);
         VolumeHidingEMMUtils.fillEmptyValues(table1);
         VolumeHidingEMMUtils.fillEmptyValues(table2);
         this.stash = stash;
 
-        final Pair[] encryptedTable1 = new Pair[(alpha + 1) * numberOfValues];
-        final Pair[] encryptedTable2 = new Pair[(alpha + 1) * numberOfValues];
+        final Pair[] encryptedTable1 = new Pair[tableSize];
+        final Pair[] encryptedTable2 = new Pair[tableSize];
         VolumeHidingEMMUtils.encryptTables(table1, table2, encryptedTable1, encryptedTable2, SEScheme);
 
         return new EncryptedIndexTables(encryptedTable1, encryptedTable2);
@@ -73,8 +76,8 @@ public class VolumeHidingEMM implements EMM {
         final var token = new ArrayList<SearchTokenInts>();
         int i = 0;
         while (i < valueSetSize) {
-            final var token1 = VolumeHidingEMMUtils.getHash(label, i, 0, hash);
-            final var token2 = VolumeHidingEMMUtils.getHash(label, i, 1, hash);
+            final var token1 = VolumeHidingEMMUtils.getHash(label, i, 0, hash, tableSize);
+            final var token2 = VolumeHidingEMMUtils.getHash(label, i, 1, hash, tableSize);
             token.add(new SearchTokenInts(token1, token2));
             i++;
         }
@@ -109,7 +112,7 @@ public class VolumeHidingEMM implements EMM {
      */
     @Override
     public Set<Value> result(final Set<Pair> values, final Label label) {
-        final var plaintexts = values.stream().map(el -> el.decrypt(SEScheme)).filter(el -> el.getLabel().equals(label)).collect(Collectors.toSet());
+        final var plaintexts = values.stream().map(el -> SEScheme.decrypt(el)).filter(el -> el.getLabel().equals(label)).collect(Collectors.toSet());
         plaintexts.addAll(stash.stream().filter(el -> el.getLabel().equals(label)).collect(Collectors.toSet()));
         return plaintexts.stream().map(Pair::getValue).collect(Collectors.toSet());
     }

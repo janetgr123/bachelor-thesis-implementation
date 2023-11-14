@@ -21,7 +21,7 @@ public class VolumeHidingEMMUtils {
         return n;
     }
 
-    public static void doCuckooHashingWithStash(final int numberOfValues, final Pair[] table1, final Pair[] table2, final Map<PlaintextLabel, Set<PlaintextValue>> multiMap, final Stack<Pair> stash, final Hash hash) {
+    public static void doCuckooHashingWithStash(final int numberOfValues, final Pair[] table1, final Pair[] table2, final Map<PlaintextLabel, Set<PlaintextValue>> multiMap, final Stack<Pair> stash, final Hash hash, final int n) {
         final var labels = multiMap.keySet();
         int evictionCounter = 0;
         for (final var label : labels) {
@@ -30,10 +30,10 @@ public class VolumeHidingEMMUtils {
             for (final var value : values) {
                 Pair toInsert = new Pair(label, value);
                 while (evictionCounter < Math.log(numberOfValues) && toInsert != null) {
-                    toInsert = insert(table1, getHash(toInsert.getLabel(), valueCounter, 0, hash), toInsert);
+                    toInsert = insert(table1, getHash(toInsert.getLabel(), valueCounter, 0, hash, n), toInsert);
                     if (toInsert != null) {
                         evictionCounter++;
-                        toInsert = insert(table2, getHash(toInsert.getLabel(), valueCounter, 1, hash), toInsert);
+                        toInsert = insert(table2, getHash(toInsert.getLabel(), valueCounter, 1, hash, n), toInsert);
                         if (toInsert != null) {
                             evictionCounter++;
                         }
@@ -51,9 +51,9 @@ public class VolumeHidingEMMUtils {
         }
     }
 
-    public static int getHash(final Label label, final int i, final int tableNo, final Hash hash) {
+    public static int getHash(final Label label, final int i, final int tableNo, final Hash hash, final int n) {
         final var toHash = org.bouncycastle.util.Arrays.concatenate(label.getLabel(), BigInteger.valueOf(i).toByteArray(), BigInteger.valueOf(tableNo).toByteArray());
-        return Arrays.hashCode(hash.hash(toHash));
+        return Math.floorMod(Arrays.hashCode(hash.hash(toHash)), n);
     }
 
     private static Pair insert(final Pair[] table, final int hash, final Pair pair) {
@@ -69,8 +69,8 @@ public class VolumeHidingEMMUtils {
         if (table1.length != table2.length) {
             throw new IllegalArgumentException("table sizes must match");
         }
-        final var pairsTable1 = Arrays.stream(table1).map(entry -> entry.encrypt(SEScheme)).toList();
-        final var pairsTable2 = Arrays.stream(table2).map(entry -> entry.encrypt(SEScheme)).toList();
+        final var pairsTable1 = Arrays.stream(table1).map(entry -> SEScheme.encrypt(entry)).toList();
+        final var pairsTable2 = Arrays.stream(table2).map(entry -> SEScheme.encrypt(entry)).toList();
         int i = 0;
         while (i < pairsTable1.size()) {
             encryptedTable1[i] = pairsTable1.get(i);

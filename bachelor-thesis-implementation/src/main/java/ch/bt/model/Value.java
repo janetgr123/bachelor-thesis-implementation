@@ -1,5 +1,8 @@
 package ch.bt.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.Arrays;
 
 public class Value implements Comparable<Value> {
@@ -19,13 +22,18 @@ public class Value implements Comparable<Value> {
     }
 
     @Override
-    public final boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (!(o instanceof Value other)) {
-            return false;
-        }
-        return Arrays.equals(value, other.value);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Value value1 = (Value) o;
+
+        return new EqualsBuilder().append(value, value1.value).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(value).toHashCode();
     }
 }

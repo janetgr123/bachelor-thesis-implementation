@@ -88,7 +88,7 @@ public class BasicEMMTest {
         final var values = encryptedIndex.values();
         Set<PlaintextValue> plaintexts = new HashSet<>();
         for (var el : values) {
-            plaintexts.add(new PlaintextValue(basicEMM.getSEScheme().decrypt(el.getValue())));
+            plaintexts.add(new PlaintextValue(basicEMM.getSeScheme().decrypt(el.getValue())));
         }
         final var expectedValues = multimap.get(searchLabel);
         boolean[] found = new boolean[expectedValues.size()];

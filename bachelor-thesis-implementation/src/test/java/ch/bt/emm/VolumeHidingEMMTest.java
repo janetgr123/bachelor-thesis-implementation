@@ -1,9 +1,6 @@
 package ch.bt.emm;
 
-import ch.bt.model.EncryptedIndexTables;
-import ch.bt.model.Pair;
-import ch.bt.model.PlaintextLabel;
-import ch.bt.model.PlaintextValue;
+import ch.bt.model.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

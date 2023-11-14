@@ -18,12 +18,4 @@ public class Pair {
     public Value getValue() {
         return value;
     }
-
-    public Pair encrypt(final SEScheme scheme) {
-        return new Pair(new EncryptedLabel(scheme.encrypt(label.getLabel())), new EncryptedValue(scheme.encrypt(value.getValue())));
-    }
-
-    public Pair decrypt(final SEScheme scheme) {
-        return new Pair(new PlaintextLabel(scheme.decrypt(label.getLabel())), new PlaintextValue(scheme.decrypt(value.getValue())));
-    }
 }

@@ -17,7 +17,7 @@ public class BasicEMM implements EMM {
 
     private final HKDFDerivator keyDerivator;
 
-    private final SEScheme SEScheme;
+    private final SEScheme seScheme;
 
     private final Map<PlaintextLabel, Set<PlaintextValue>> multiMap;
 
@@ -33,7 +33,7 @@ public class BasicEMM implements EMM {
         final var keyPair = key.getKey().keys();
         hMac = new HMacHash(new KeyParameter(keyPair.get(0).getBytes()));
         hash = new SHA512Hash();
-        SEScheme = new AESSEScheme(secureRandom, keyPair.get(1));
+        seScheme = new AESSEScheme(secureRandom, keyPair.get(1));
     }
 
     /**
@@ -59,7 +59,7 @@ public class BasicEMM implements EMM {
             for (PlaintextValue value : valuesOfLabel) {
                 final var tokenAndCounter = getTokenAndCounter(counter, token);
                 final EncryptedLabel encryptedLabel = new EncryptedLabel(hash.hash(tokenAndCounter));
-                final EncryptedValue encryptedValue = new EncryptedValue(SEScheme.encrypt(value.getValue()));
+                final EncryptedValue encryptedValue = new EncryptedValue(seScheme.encrypt(value.getValue()));
                 encryptedIndex.put(encryptedLabel, encryptedValue);
                 counter++;
             }
@@ -112,7 +112,7 @@ public class BasicEMM implements EMM {
     @Override
     public Set<Value> result(final Set<Pair> values, final Label label) {
         Set<Value> plaintextValues = new HashSet<>();
-        values.forEach(encryptedValue -> plaintextValues.add(new PlaintextValue(encryptedValue.decrypt(SEScheme).getValue().getValue())));
+        values.forEach(encryptedValue -> plaintextValues.add(new PlaintextValue(seScheme.decrypt(encryptedValue.getValue().getValue()))));
         return plaintextValues;
     }
 
@@ -120,8 +120,8 @@ public class BasicEMM implements EMM {
         return org.bouncycastle.util.Arrays.concatenate(token, BigInteger.valueOf(counter).toByteArray());
     }
 
-    public SEScheme getSEScheme() {
-        return this.SEScheme;
+    public SEScheme getSeScheme() {
+        return this.seScheme;
     }
 
     public Hash getHash() {

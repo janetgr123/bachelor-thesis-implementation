@@ -1,5 +1,6 @@
 package ch.bt.crypto;
 
+import ch.bt.model.*;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -89,6 +90,14 @@ public class AESSEScheme implements SEScheme {
         } catch (InvalidCipherTextException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Pair encrypt(final Pair pair) {
+        return new Pair(new Label(encrypt(pair.getLabel().getLabel())), new Value(encrypt(pair.getValue().getValue())));
+    }
+
+    public Pair decrypt(final Pair pair) {
+        return new Pair(new Label(decrypt(pair.getLabel().getLabel())), new Value(decrypt(pair.getValue().getValue())));
     }
 
 
