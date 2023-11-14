@@ -11,25 +11,25 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class AESSESchemeTest {
-    private final static List<Integer> VALID_SECURITY_PARAMETERS = List.of(128, 256);
+    private static final List<Integer> VALID_SECURITY_PARAMETERS = List.of(128, 256);
 
-    private final static List<Integer> INVALID_SECURITY_PARAMETERS = List.of(512, 1024);
-    private final static Map<Integer, byte[]> plaintexts = new HashMap<>();
-    private final static Map<Integer, AESSEScheme> aesSESchemes = new HashMap<>();
+    private static final List<Integer> INVALID_SECURITY_PARAMETERS = List.of(512, 1024);
+    private static final Map<Integer, byte[]> plaintexts = new HashMap<>();
+    private static final Map<Integer, AESSEScheme> aesSESchemes = new HashMap<>();
 
     @BeforeAll
     public static void init() {
-        VALID_SECURITY_PARAMETERS.forEach(securityParameter -> {
-                    final KeyGenerator keyGenerator = new KeyGenerator(new SecureRandom(), securityParameter);
+        VALID_SECURITY_PARAMETERS.forEach(
+                securityParameter -> {
+                    final KeyGenerator keyGenerator =
+                            new KeyGenerator(new SecureRandom(), securityParameter);
                     final var key = keyGenerator.generateKey();
                     final var plaintext = new byte[securityParameter];
                     new Random().nextBytes(plaintext);
                     plaintexts.put(securityParameter, plaintext);
                     final var aesseScheme = new AESSEScheme(new SecureRandom(), key);
                     aesSESchemes.put(securityParameter, aesseScheme);
-                }
-        );
-
+                });
     }
 
     private static Stream<Integer> getValidSecurityParameters() {
@@ -66,7 +66,10 @@ public class AESSESchemeTest {
     @ParameterizedTest
     @MethodSource("getInvalidSecurityParameters")
     public void testException(final int securityParameter) {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AESSEScheme(new SecureRandom(), securityParameter));
+        Throwable exception =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> new AESSEScheme(new SecureRandom(), securityParameter));
         assertEquals("security parameter too large", exception.getMessage());
     }
 }

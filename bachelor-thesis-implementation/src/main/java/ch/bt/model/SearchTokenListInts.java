@@ -12,5 +12,4 @@ public class SearchTokenListInts implements SearchToken {
     public List<SearchTokenInts> getSearchTokenList() {
         return token;
     }
-
 }

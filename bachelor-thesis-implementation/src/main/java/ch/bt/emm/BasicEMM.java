@@ -9,9 +9,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
 
-/**
- * based on the SSE scheme Pi_bas from Cash et al. 2014
- */
+/** based on the SSE scheme Pi_bas from Cash et al. 2014 */
 public class BasicEMM implements EMM {
     private final SecureRandom secureRandom;
 
@@ -25,7 +23,10 @@ public class BasicEMM implements EMM {
 
     private final Hash hash;
 
-    public BasicEMM(final SecureRandom secureRandom, final int securityParameter, final Map<PlaintextLabel, Set<PlaintextValue>> multiMap) {
+    public BasicEMM(
+            final SecureRandom secureRandom,
+            final int securityParameter,
+            final Map<PlaintextLabel, Set<PlaintextValue>> multiMap) {
         this.secureRandom = secureRandom;
         this.keyDerivator = new HKDFDerivator(securityParameter);
         this.multiMap = multiMap;
@@ -58,15 +59,16 @@ public class BasicEMM implements EMM {
             final var token = hMac.hash(label.getLabel());
             for (PlaintextValue value : valuesOfLabel) {
                 final var tokenAndCounter = getTokenAndCounter(counter, token);
-                final EncryptedLabel encryptedLabel = new EncryptedLabel(hash.hash(tokenAndCounter));
-                final EncryptedValue encryptedValue = new EncryptedValue(seScheme.encrypt(value.getValue()));
+                final EncryptedLabel encryptedLabel =
+                        new EncryptedLabel(hash.hash(tokenAndCounter));
+                final EncryptedValue encryptedValue =
+                        new EncryptedValue(seScheme.encrypt(value.getValue()));
                 encryptedIndex.put(encryptedLabel, encryptedValue);
                 counter++;
             }
         }
         return new EncryptedIndexMap(encryptedIndex);
     }
-
 
     /**
      * @param label
@@ -84,18 +86,27 @@ public class BasicEMM implements EMM {
      */
     @Override
     public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
-        if (!(encryptedIndex instanceof EncryptedIndexMap) || !(searchToken instanceof SearchTokenBytes)) {
-            throw new IllegalArgumentException("types of encrypted index or search token are not matching");
+        if (!(encryptedIndex instanceof EncryptedIndexMap)
+                || !(searchToken instanceof SearchTokenBytes)) {
+            throw new IllegalArgumentException(
+                    "types of encrypted index or search token are not matching");
         }
         final var encryptedIndexMap = ((EncryptedIndexMap) encryptedIndex).getMap();
         Set<Pair> encryptedValues = new HashSet<>();
         int counter = 0;
         while (true) {
-            final var tokenAndCounter = getTokenAndCounter(counter, ((SearchTokenBytes) searchToken).getToken());
+            final var tokenAndCounter =
+                    getTokenAndCounter(counter, ((SearchTokenBytes) searchToken).getToken());
             final var encryptedLabel = hash.hash(tokenAndCounter);
-            final var matchingLabels = encryptedIndexMap.keySet().stream().filter(el -> Arrays.equals(el.getLabel(), encryptedLabel)).toList();
+            final var matchingLabels =
+                    encryptedIndexMap.keySet().stream()
+                            .filter(el -> Arrays.equals(el.getLabel(), encryptedLabel))
+                            .toList();
             if (matchingLabels.size() == 1) {
-                encryptedValues.add(new Pair(new EncryptedLabel(new byte[0]), encryptedIndexMap.get(matchingLabels.get(0))));
+                encryptedValues.add(
+                        new Pair(
+                                new EncryptedLabel(new byte[0]),
+                                encryptedIndexMap.get(matchingLabels.get(0))));
             } else {
                 break;
             }
@@ -112,12 +123,17 @@ public class BasicEMM implements EMM {
     @Override
     public Set<Value> result(final Set<Pair> values, final Label label) {
         Set<Value> plaintextValues = new HashSet<>();
-        values.forEach(encryptedValue -> plaintextValues.add(new PlaintextValue(seScheme.decrypt(encryptedValue.getValue().getValue()))));
+        values.forEach(
+                encryptedValue ->
+                        plaintextValues.add(
+                                new PlaintextValue(
+                                        seScheme.decrypt(encryptedValue.getValue().getValue()))));
         return plaintextValues;
     }
 
     private byte[] getTokenAndCounter(final int counter, final byte[] token) {
-        return org.bouncycastle.util.Arrays.concatenate(token, BigInteger.valueOf(counter).toByteArray());
+        return org.bouncycastle.util.Arrays.concatenate(
+                token, BigInteger.valueOf(counter).toByteArray());
     }
 
     public SEScheme getSeScheme() {

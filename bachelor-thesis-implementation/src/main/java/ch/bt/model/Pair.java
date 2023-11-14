@@ -1,6 +1,5 @@
 package ch.bt.model;
 
-import ch.bt.crypto.SEScheme;
 
 public class Pair {
     private final Label label;

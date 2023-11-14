@@ -13,5 +13,4 @@ public interface SEScheme {
     Pair encrypt(final Pair input);
 
     Pair decrypt(final Pair input);
-
 }

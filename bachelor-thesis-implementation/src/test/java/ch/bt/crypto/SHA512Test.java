@@ -26,6 +26,5 @@ public class SHA512Test {
         new Random().nextBytes(plaintext);
         assertArrayEquals(sha512Hash.hash(plaintext), sha512Hash.hash(plaintext));
         assertArrayEquals(sha512Hash.hash(plaintext), sha512Hash1.hash(plaintext));
-
     }
 }

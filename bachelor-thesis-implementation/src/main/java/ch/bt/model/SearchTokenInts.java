@@ -12,5 +12,4 @@ public class SearchTokenInts {
     public int getToken(final int number) {
         return number == 1 ? token1 : token2;
     }
-
 }

@@ -1,6 +1,9 @@
 package ch.bt.emm;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import ch.bt.model.*;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -8,8 +11,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class VolumeHidingEMMTest {
 
@@ -48,6 +49,31 @@ public class VolumeHidingEMMTest {
 
     private static Stream<Integer> getInvalidSecurityParametersForSE() {
         return INVALID_SECURITY_PARAMETERS_FOR_SE.stream();
+    }
+
+    private static PlaintextLabel buildMultiMapAndGenerateRandomSearchLabel(final int securityParameter) {
+        final Map<PlaintextLabel, Set<PlaintextValue>> multimap = new HashMap<>();
+        PlaintextLabel searchLabel = null;
+        Random random = new Random();
+        int index = (int) (MAX_NUMBER_OF_LABELS * Math.random());
+        while (multimap.size() < MAX_NUMBER_OF_LABELS) {
+            final var values = new HashSet<PlaintextValue>();
+            int size = (int) (MAX_SIZE_VALUE_SET * Math.random()) + 1;
+            while (values.size() < size) {
+                byte[] v = new byte[securityParameter];
+                random.nextBytes(v);
+                values.add(new PlaintextValue(v));
+            }
+            byte[] l = new byte[securityParameter];
+            random.nextBytes(l);
+            final var label = new PlaintextLabel(l);
+            multimap.put(label, values);
+            if (multimap.size() == index) {
+                searchLabel = label;
+            }
+        }
+        multimaps.put(securityParameter, multimap);
+        return searchLabel;
     }
 
     @ParameterizedTest
@@ -96,30 +122,5 @@ public class VolumeHidingEMMTest {
     public void testKeyTooLongForSE(final int securityParameter) {
         Throwable exception = assertThrows(IllegalArgumentException.class, () -> new VolumeHidingEMM(new SecureRandom(), new SecureRandom(), securityParameter, ALPHA, new HashMap<>()));
         assertEquals("security parameter too large", exception.getMessage());
-    }
-
-    private static PlaintextLabel buildMultiMapAndGenerateRandomSearchLabel(final int securityParameter) {
-        final Map<PlaintextLabel, Set<PlaintextValue>> multimap = new HashMap<>();
-        PlaintextLabel searchLabel = null;
-        Random random = new Random();
-        int index = (int) (MAX_NUMBER_OF_LABELS * Math.random());
-        while (multimap.size() < MAX_NUMBER_OF_LABELS) {
-            final var values = new HashSet<PlaintextValue>();
-            int size = (int) (MAX_SIZE_VALUE_SET * Math.random()) + 1;
-            while (values.size() < size) {
-                byte[] v = new byte[securityParameter];
-                random.nextBytes(v);
-                values.add(new PlaintextValue(v));
-            }
-            byte[] l = new byte[securityParameter];
-            random.nextBytes(l);
-            final var label = new PlaintextLabel(l);
-            multimap.put(label, values);
-            if (multimap.size() == index) {
-                searchLabel = label;
-            }
-        }
-        multimaps.put(securityParameter, multimap);
-        return searchLabel;
     }
 }

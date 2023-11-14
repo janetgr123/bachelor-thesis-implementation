@@ -10,13 +10,13 @@ public class HMacHash implements Hash {
     private final HMac hMac;
     private final KeyParameter keyParameter;
 
-    public HMacHash(final KeyParameter keyParameter){
+    public HMacHash(final KeyParameter keyParameter) {
         this.keyParameter = keyParameter;
         this.hMac = new HMac(DEFAULT_HASH);
         hMac.init(this.keyParameter);
     }
 
-    public HMacHash(final KeyParameter keyParameter, final Digest hash){
+    public HMacHash(final KeyParameter keyParameter, final Digest hash) {
         this.keyParameter = keyParameter;
         this.hMac = new HMac(hash);
         hMac.init(this.keyParameter);

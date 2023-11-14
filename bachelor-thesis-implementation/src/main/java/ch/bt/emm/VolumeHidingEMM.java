@@ -18,12 +18,9 @@ public class VolumeHidingEMM implements EMM {
     private final Hash hash;
 
     private final Map<PlaintextLabel, Set<PlaintextValue>> multiMap;
-
-    private Stack<Pair> stash;
-
     private final int maxStashSize;
-
     private final int tableSize;
+    private Stack<Pair> stash;
 
 
     public VolumeHidingEMM(final SecureRandom secureRandom, final SecureRandom secureRandomSE, final int securityParameter, final int alpha, final Map<PlaintextLabel, Set<PlaintextValue>> multiMap) {

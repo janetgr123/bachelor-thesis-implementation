@@ -1,9 +1,8 @@
 package ch.bt.crypto;
 
-import org.bouncycastle.crypto.params.KeyParameter;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.bouncycastle.crypto.params.KeyParameter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

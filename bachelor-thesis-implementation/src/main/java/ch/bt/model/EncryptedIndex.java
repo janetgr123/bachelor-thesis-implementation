@@ -1,5 +1,3 @@
 package ch.bt.model;
 
-public interface EncryptedIndex {
-
-}
+public interface EncryptedIndex {}

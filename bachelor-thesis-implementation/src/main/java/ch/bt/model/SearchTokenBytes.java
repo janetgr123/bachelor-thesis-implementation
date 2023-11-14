@@ -7,7 +7,6 @@ public class SearchTokenBytes implements SearchToken {
         this.token = token;
     }
 
-
     public byte[] getToken() {
         return token;
     }

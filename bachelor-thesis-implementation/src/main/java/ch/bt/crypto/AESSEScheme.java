@@ -1,6 +1,7 @@
 package ch.bt.crypto;
 
 import ch.bt.model.*;
+
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -14,14 +15,12 @@ import java.security.SecureRandom;
 import java.util.*;
 
 public class AESSEScheme implements SEScheme {
+    private static final int LENGTH_INTIALISATION_VECTOR = 16;
+    private final SecureRandom secureRandom;
+    private final SecretKey key;
+    private final Map<byte[], CipherParameters> cipherParameters = new HashMap<>();
     private PaddedBufferedBlockCipher ENCRYPTION_CIPHER;
     private PaddedBufferedBlockCipher DECRYPTION_CIPHER;
-    private final SecureRandom secureRandom;
-
-    private static final int LENGTH_INTIALISATION_VECTOR = 16;
-    private final SecretKey key;
-
-    private final Map<byte[], CipherParameters> cipherParameters = new HashMap<>();
 
 
     public AESSEScheme(final SecureRandom secureRandom, final int securityParameter) {

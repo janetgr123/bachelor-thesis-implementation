@@ -14,7 +14,7 @@ public class SecretKeySingle implements SecretKey {
         return new SecretKeyWrapper(List.of(this));
     }
 
-    public byte[] getBytes(){
+    public byte[] getBytes() {
         return this.key;
     }
 }
