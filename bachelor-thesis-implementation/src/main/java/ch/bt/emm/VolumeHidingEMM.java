@@ -3,7 +3,6 @@ package ch.bt.emm;
 import ch.bt.crypto.*;
 import ch.bt.model.*;
 
-import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,14 +47,18 @@ public class VolumeHidingEMM implements EMM {
 
     @Override
     public EncryptedIndex buildIndex() {
-        final int numberOfValues = getNumberOfValues();
+        final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multiMap);
         final Pair[] table1 = new Pair[(alpha + 1) * numberOfValues];
         final Pair[] table2 = new Pair[(alpha + 1) * numberOfValues];
-        doCuckooHashingWithStash(numberOfValues, table1, table2);
+        final Stack<Pair> stash = new Stack<>();
+        VolumeHidingEMMUtils.doCuckooHashingWithStash(numberOfValues, table1, table2, multiMap, stash, hash);
+        VolumeHidingEMMUtils.fillEmptyValues(table1);
+        VolumeHidingEMMUtils.fillEmptyValues(table2);
+        this.stash = stash;
 
         final Pair[] encryptedTable1 = new Pair[(alpha + 1) * numberOfValues];
         final Pair[] encryptedTable2 = new Pair[(alpha + 1) * numberOfValues];
-        encryptTables(table1, table2, encryptedTable1, encryptedTable2);
+        VolumeHidingEMMUtils.encryptTables(table1, table2, encryptedTable1, encryptedTable2, SEScheme);
 
         return new EncryptedIndexTables(encryptedTable1, encryptedTable2);
     }
@@ -70,8 +73,8 @@ public class VolumeHidingEMM implements EMM {
         final var token = new ArrayList<SearchTokenInts>();
         int i = 0;
         while (i < valueSetSize) {
-            final var token1 = getHash(label, i, 0);
-            final var token2 = getHash(label, i, 1);
+            final var token1 = VolumeHidingEMMUtils.getHash(label, i, 0, hash);
+            final var token2 = VolumeHidingEMMUtils.getHash(label, i, 1, hash);
             token.add(new SearchTokenInts(token1, token2));
             i++;
         }
@@ -111,77 +114,9 @@ public class VolumeHidingEMM implements EMM {
         return plaintexts.stream().map(Pair::getValue).collect(Collectors.toSet());
     }
 
-    private int getHash(final Label label, final int i, final int tableNo) {
-        final var toHash = org.bouncycastle.util.Arrays.concatenate(label.getLabel(), BigInteger.valueOf(i).toByteArray(), BigInteger.valueOf(tableNo).toByteArray());
-        return Arrays.hashCode(hash.hash(toHash));
-    }
-
-    private Pair insert(final Pair[] table, final int hash, final Pair pair) {
-        Pair removed = null;
-        if (table[hash] != null) {
-            removed = table[hash];
-        }
-        table[hash] = pair;
-        return removed;
-    }
-
     public Map<PlaintextLabel, Set<PlaintextValue>> getMultiMap() {
         return multiMap;
     }
 
-    private int getNumberOfValues() {
-        int n = 0;
-        final var labels = multiMap.keySet();
-        for (final var label : labels) {
-            n += multiMap.get(label).size();
-        }
-        return n;
-    }
 
-    private void doCuckooHashingWithStash(final int numberOfValues, final Pair[] table1, final Pair[] table2) {
-        final Stack<Pair> stash = new Stack<>();
-        final var labels = multiMap.keySet();
-        int evictionCounter = 0;
-        for (final var label : labels) {
-            int valueCounter = 0;
-            final var values = multiMap.get(label);
-            for (final var value : values) {
-                Pair toInsert = new Pair(label, value);
-                while (evictionCounter < Math.log(numberOfValues) && toInsert != null) {
-                    toInsert = insert(table1, getHash(toInsert.getLabel(), valueCounter, 0), toInsert);
-                    if (toInsert != null) {
-                        evictionCounter++;
-                        toInsert = insert(table2, getHash(toInsert.getLabel(), valueCounter, 1), toInsert);
-                        if (toInsert != null) {
-                            evictionCounter++;
-                        }
-                    }
-                }
-                if (toInsert != null) {
-                    stash.add(toInsert);
-                }
-                valueCounter++;
-            }
-        }
-
-        if (stash.size() > numberOfValues) {
-            throw new IllegalStateException("stash exceeded maximum size");
-        }
-
-        this.stash = stash;
-    }
-
-    private void encryptTables(final Pair[] table1, final Pair[] table2, final Pair[] encryptedTable1, final Pair[] encryptedTable2) {
-        if (table1.length != table2.length) {
-            throw new IllegalArgumentException("table sizes must match");
-        }
-        final var pairsTable1 = Arrays.stream(table1).map(entry -> entry.encrypt(SEScheme)).toList();
-        final var pairsTable2 = Arrays.stream(table2).map(entry -> entry.encrypt(SEScheme)).toList();
-        int i = 0;
-        while (i < pairsTable1.size()) {
-            encryptedTable1[i] = pairsTable1.get(i);
-            encryptedTable2[i] = pairsTable2.get(i);
-            i++;
-        }
-    }
 }
