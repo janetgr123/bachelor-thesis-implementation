@@ -1,10 +1,12 @@
 package ch.bt.emm;
 
+import ch.bt.model.EncryptedIndexMap;
 import ch.bt.model.PlaintextLabel;
 import ch.bt.model.PlaintextValue;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,9 +35,9 @@ public class BasicEMMTest {
     @BeforeAll
     public static void init() {
         VALID_SECURITY_PARAMETERS.forEach(securityParameter -> {
-                    final var emm = new BasicEMM(new SecureRandom(), securityParameter);
-                    basicEMMMs.put(securityParameter, emm);
                     searchLabels.put(securityParameter, buildMultiMapAndGenerateRandomSearchLabel(securityParameter));
+                    final var emm = new BasicEMM(new SecureRandom(), securityParameter, multimaps.get(securityParameter));
+                    basicEMMMs.put(securityParameter, emm);
                 }
         );
     }
@@ -58,10 +60,10 @@ public class BasicEMMTest {
         final var basicEMM = basicEMMMs.get(securityParameter);
         final var multimap = multimaps.get(securityParameter);
         final var searchLabel = searchLabels.get(securityParameter);
-        final var encryptedIndex = basicEMM.buildIndex(multimap);
+        final var encryptedIndex = basicEMM.buildIndex();
         final var searchToken = basicEMM.trapdoor(searchLabel);
         final var ciphertexts = basicEMM.search(searchToken, encryptedIndex);
-        final var values = basicEMM.result(ciphertexts).stream().sorted().toList();
+        final var values = basicEMM.result(ciphertexts, searchLabel).stream().sorted().toList();
         final var expectedValues = multimap.get(searchLabel).stream().sorted().toList();
         assertEquals(values, expectedValues);
     }
@@ -72,8 +74,8 @@ public class BasicEMMTest {
         final var basicEMM = basicEMMMs.get(securityParameter);
         final var multimap = multimaps.get(securityParameter);
         final var searchLabel = searchLabels.get(securityParameter);
-        final var encryptedIndex = basicEMM.buildIndex(multimap);
-        final var encryptedIndex2 = basicEMM.buildIndex(multimap);
+        final var encryptedIndex = ((EncryptedIndexMap) basicEMM.buildIndex()).getMap();
+        final var encryptedIndex2 = ((EncryptedIndexMap) basicEMM.buildIndex()).getMap();
         final var labels = encryptedIndex.keySet().stream().sorted().toList();
         final var labels2 = encryptedIndex2.keySet().stream().sorted().toList();
         assertEquals(labels, labels2);
@@ -85,35 +87,35 @@ public class BasicEMMTest {
         assertEquals(1, matchingLabels.size());
         final var values = encryptedIndex.values();
         Set<PlaintextValue> plaintexts = new HashSet<>();
-        for(var el : values){
+        for (var el : values) {
             plaintexts.add(new PlaintextValue(basicEMM.getSEScheme().decrypt(el.getValue())));
         }
         final var expectedValues = multimap.get(searchLabel);
         boolean[] found = new boolean[expectedValues.size()];
         int i = 0;
-        for(var el2 : expectedValues){
-            for(var el : plaintexts){
-                if(Arrays.equals(el.getValue(), el2.getValue())){
+        for (var el2 : expectedValues) {
+            for (var el : plaintexts) {
+                if (Arrays.equals(el.getValue(), el2.getValue())) {
                     found[i] = true;
                     break;
                 }
             }
             ++i;
         }
-        IntStream.range(0, found.length).mapToObj(j -> found[j]).forEach(b -> assertTrue(b));
+        IntStream.range(0, found.length).mapToObj(j -> found[j]).forEach(Assertions::assertTrue);
     }
 
     @ParameterizedTest
     @MethodSource("getInvalidSecurityParametersForHash")
     public void testNotMatchingHash(final int securityParameter) {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new BasicEMM(new SecureRandom(), securityParameter));
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new BasicEMM(new SecureRandom(), securityParameter, new HashMap<>()));
         assertEquals("security parameter doesn't match hash", exception.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("getInvalidSecurityParametersForSE")
     public void testKeyTooLongForSE(final int securityParameter) {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new BasicEMM(new SecureRandom(), securityParameter));
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new BasicEMM(new SecureRandom(), securityParameter, new HashMap<>()));
         assertEquals("security parameter too large", exception.getMessage());
     }
 
