@@ -4,13 +4,15 @@ import ch.bt.crypto.Hash;
 import ch.bt.crypto.SEScheme;
 import ch.bt.model.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 public class VolumeHidingEMMUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(VolumeHidingEMMUtils.class);
 
     public static int getNumberOfValues(final Map<PlaintextLabel, Set<PlaintextValue>> multiMap) {
         int n = 0;
@@ -22,46 +24,61 @@ public class VolumeHidingEMMUtils {
     }
 
     public static void doCuckooHashingWithStash(
-            final int numberOfValues,
+            final int maxStashSize,
             final Pair[] table1,
             final Pair[] table2,
             final Map<PlaintextLabel, Set<PlaintextValue>> multiMap,
             final Stack<Pair> stash,
             final Hash hash,
-            final int n) {
+            final int tableSize) {
         final var labels = multiMap.keySet();
+
+        final Map<Label, List<PlaintextValue>> indices = new HashMap<>();
+        for(final var label : labels){
+            final var values = multiMap.get(label).stream().toList();
+            indices.put(label, values);
+        }
+
         int evictionCounter = 0;
         for (final var label : labels) {
-            int valueCounter = 0;
-            final var values = multiMap.get(label);
+            final var values = indices.get(label);
             for (final var value : values) {
                 Pair toInsert = new Pair(label, value);
-                while (evictionCounter < Math.log(numberOfValues) && toInsert != null) {
+                while (evictionCounter < Math.log(tableSize) && toInsert != null) {
+                    logger.debug("Inserting in table 1: {}", toInsert);
                     toInsert =
                             insert(
                                     table1,
-                                    getHash(toInsert.getLabel(), valueCounter, 0, hash, n),
+                                    getHash(toInsert.getLabel(), values.indexOf(toInsert.getValue()), 0, hash, tableSize),
                                     toInsert);
                     if (toInsert != null) {
+                        logger.debug("COLLISION! Evict from table 1: {}", toInsert);
+                        logger.debug("Inserting in table 2: {}", toInsert);
                         evictionCounter++;
                         toInsert =
                                 insert(
                                         table2,
-                                        getHash(toInsert.getLabel(), valueCounter, 1, hash, n),
+                                        getHash(
+                                                toInsert.getLabel(),
+                                                values.indexOf(toInsert.getValue()),
+                                                1,
+                                                hash,
+                                                tableSize),
                                         toInsert);
                         if (toInsert != null) {
+                            logger.debug("COLLISION! Evict from table 2: {}", toInsert);
                             evictionCounter++;
                         }
                     }
                 }
                 if (toInsert != null) {
+                    logger.debug("Could not insert element. Putting onto stash: {}", toInsert);
                     stash.add(toInsert);
                 }
-                valueCounter++;
             }
         }
 
-        if (stash.size() > numberOfValues) {
+        if (stash.size() > maxStashSize) {
             throw new IllegalStateException("stash exceeded maximum size");
         }
     }
@@ -73,9 +90,10 @@ public class VolumeHidingEMMUtils {
                         label.getLabel(),
                         BigInteger.valueOf(i).toByteArray(),
                         BigInteger.valueOf(tableNo).toByteArray());
-        var tmp = hash.hash(toHash);
-        var tmp2 = Arrays.hashCode(hash.hash(toHash));
-        var tmp3 = Math.floorMod(Arrays.hashCode(hash.hash(toHash)), n);
+        logger.debug(
+                "Hashing element {}. The hash evaluates to {}.",
+                toHash,
+                Math.floorMod(Arrays.hashCode(hash.hash(toHash)), n));
         return Math.floorMod(Arrays.hashCode(hash.hash(toHash)), n);
     }
 
@@ -97,10 +115,8 @@ public class VolumeHidingEMMUtils {
         if (table1.length != table2.length) {
             throw new IllegalArgumentException("table sizes must match");
         }
-        final var pairsTable1 =
-                Arrays.stream(table1).map(SEScheme::encrypt).toList();
-        final var pairsTable2 =
-                Arrays.stream(table2).map(SEScheme::encrypt).toList();
+        final var pairsTable1 = Arrays.stream(table1).map(SEScheme::encrypt).toList();
+        final var pairsTable2 = Arrays.stream(table2).map(SEScheme::encrypt).toList();
         int i = 0;
         while (i < pairsTable1.size()) {
             encryptedTable1[i] = pairsTable1.get(i);

@@ -1,5 +1,6 @@
 package ch.bt.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class Pair {
     private final Label label;
@@ -16,5 +17,10 @@ public class Pair {
 
     public Value getValue() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this).append("label", label).append("value", value).toString();
     }
 }
