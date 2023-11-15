@@ -7,8 +7,8 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/** SSE scheme from Patel et al. (2019) */
-public class VolumeHidingEMM implements EMM {
+/** SSE scheme from Patel et al. (2019) With improved communication using delegatable PRFs */
+public class VolumeHidingEMMOptimised implements EMM {
     private final SecureRandom secureRandom;
     private final SecureRandom secureRandomSE;
     private final SEScheme seScheme;
@@ -19,7 +19,7 @@ public class VolumeHidingEMM implements EMM {
     private final int tableSize;
     private Stack<Pair> stash;
 
-    public VolumeHidingEMM(
+    public VolumeHidingEMMOptimised(
             final SecureRandom secureRandom,
             final SecureRandom secureRandomSE,
             final int securityParameter,
