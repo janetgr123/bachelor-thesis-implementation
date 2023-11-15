@@ -134,4 +134,12 @@ public class VolumeHidingEMM implements EMM {
     public SEScheme getSeScheme() {
         return seScheme;
     }
+
+    public Hash getHash() {
+        return hash;
+    }
+
+    public int getTableSize() {
+        return tableSize;
+    }
 }
