@@ -12,30 +12,28 @@ import java.util.*;
 
 public class VolumeHidingEMMUtilsTest {
 
-    private static final Map<PlaintextLabel, Set<PlaintextValue>> multimap = new HashMap<>();
-    private static final Map<PlaintextLabel, Set<PlaintextValue>> multimap2 = new HashMap<>();
+    private static final Map<Label, Set<Value>> multimap = new HashMap<>();
+    private static final Map<Label, Set<Value>> multimap2 = new HashMap<>();
 
     private static final Hash hash = new SHA512Hash();
 
     @BeforeAll
     public static void init() {
-        org.apache.log4j.BasicConfigurator.configure();
-
-        final var set1 = new HashSet<PlaintextValue>();
-        final List<PlaintextValue> plaintexts = new ArrayList<>();
-        plaintexts.add(new PlaintextValue(new byte[] {0}));
-        plaintexts.add(new PlaintextValue(new byte[] {1}));
-        plaintexts.add(new PlaintextValue(new byte[] {2}));
-        plaintexts.add(new PlaintextValue(new byte[] {3}));
-        plaintexts.add(new PlaintextValue(new byte[] {4}));
-        plaintexts.add(new PlaintextValue(new byte[] {5}));
-        final List<PlaintextLabel> labels = new ArrayList<>();
-        labels.add(new PlaintextLabel(new byte[] {0}));
-        labels.add(new PlaintextLabel(new byte[] {1}));
-        labels.add(new PlaintextLabel(new byte[] {2}));
-        labels.add(new PlaintextLabel(new byte[] {3}));
-        labels.add(new PlaintextLabel(new byte[] {4}));
-        labels.add(new PlaintextLabel(new byte[] {5}));
+        final var set1 = new HashSet<Value>();
+        final List<Value> plaintexts = new ArrayList<>();
+        plaintexts.add(new Value(new byte[] {0}));
+        plaintexts.add(new Value(new byte[] {1}));
+        plaintexts.add(new Value(new byte[] {2}));
+        plaintexts.add(new Value(new byte[] {3}));
+        plaintexts.add(new Value(new byte[] {4}));
+        plaintexts.add(new Value(new byte[] {5}));
+        final List<Label> labels = new ArrayList<>();
+        labels.add(new Label(new byte[] {0}));
+        labels.add(new Label(new byte[] {1}));
+        labels.add(new Label(new byte[] {2}));
+        labels.add(new Label(new byte[] {3}));
+        labels.add(new Label(new byte[] {4}));
+        labels.add(new Label(new byte[] {5}));
         set1.add(plaintexts.get(0));
         set1.add(plaintexts.get(1));
         set1.add(plaintexts.get(2));

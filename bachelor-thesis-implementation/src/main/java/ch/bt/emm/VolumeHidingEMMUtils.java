@@ -14,7 +14,7 @@ public class VolumeHidingEMMUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(VolumeHidingEMMUtils.class);
 
-    public static int getNumberOfValues(final Map<PlaintextLabel, Set<PlaintextValue>> multiMap) {
+    public static int getNumberOfValues(final Map<Label, Set<Value>> multiMap) {
         int n = 0;
         final var labels = multiMap.keySet();
         for (final var label : labels) {
@@ -27,13 +27,13 @@ public class VolumeHidingEMMUtils {
             final int maxStashSize,
             final Pair[] table1,
             final Pair[] table2,
-            final Map<PlaintextLabel, Set<PlaintextValue>> multiMap,
+            final Map<Label, Set<Value>> multiMap,
             final Stack<Pair> stash,
             final Hash hash,
             final int tableSize) {
         final var labels = multiMap.keySet();
 
-        final Map<Label, List<PlaintextValue>> indices = new HashMap<>();
+        final Map<Label, List<Value>> indices = new HashMap<>();
         for(final var label : labels){
             final var values = multiMap.get(label).stream().toList();
             indices.put(label, values);
@@ -130,7 +130,7 @@ public class VolumeHidingEMMUtils {
         for (final var pair : table) {
             if (pair == null) {
                 table[i] =
-                        new Pair(new PlaintextLabel(new byte[0]), new PlaintextValue(new byte[0]));
+                        new Pair(new Label(new byte[0]), new Value(new byte[0]));
             }
             i++;
         }
