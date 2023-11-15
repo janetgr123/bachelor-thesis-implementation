@@ -17,7 +17,7 @@ public class BasicEMM implements EMM {
 
     private final SEScheme seScheme;
 
-    private final Map<PlaintextLabel, Set<PlaintextValue>> multiMap;
+    private final Map<Label, Set<Value>> multiMap;
 
     private final Hash hMac;
 
@@ -26,7 +26,7 @@ public class BasicEMM implements EMM {
     public BasicEMM(
             final SecureRandom secureRandom,
             final int securityParameter,
-            final Map<PlaintextLabel, Set<PlaintextValue>> multiMap) {
+            final Map<Label, Set<Value>> multiMap) {
         this.secureRandom = secureRandom;
         this.keyDerivator = new HKDFDerivator(securityParameter);
         this.multiMap = multiMap;
@@ -53,16 +53,16 @@ public class BasicEMM implements EMM {
     public EncryptedIndex buildIndex() {
         Map<Label, Value> encryptedIndex = new HashMap<>();
         final var labels = multiMap.keySet();
-        for (PlaintextLabel label : labels) {
+        for (Label label : labels) {
             int counter = 0;
             final var valuesOfLabel = multiMap.get(label);
             final var token = hMac.hash(label.getLabel());
-            for (PlaintextValue value : valuesOfLabel) {
+            for (Value value : valuesOfLabel) {
                 final var tokenAndCounter = getTokenAndCounter(counter, token);
-                final EncryptedLabel encryptedLabel =
-                        new EncryptedLabel(hash.hash(tokenAndCounter));
-                final EncryptedValue encryptedValue =
-                        new EncryptedValue(seScheme.encrypt(value.getValue()));
+                final var encryptedLabel =
+                        new Label(hash.hash(tokenAndCounter));
+                final var encryptedValue =
+                        new Value(seScheme.encrypt(value.getValue()));
                 encryptedIndex.put(encryptedLabel, encryptedValue);
                 counter++;
             }
@@ -105,7 +105,7 @@ public class BasicEMM implements EMM {
             if (matchingLabels.size() == 1) {
                 encryptedValues.add(
                         new Pair(
-                                new EncryptedLabel(new byte[0]),
+                                new Label(new byte[0]),
                                 encryptedIndexMap.get(matchingLabels.get(0))));
             } else {
                 break;
@@ -126,8 +126,7 @@ public class BasicEMM implements EMM {
         values.forEach(
                 encryptedValue ->
                         plaintextValues.add(
-                                new PlaintextValue(
-                                        seScheme.decrypt(encryptedValue.getValue().getValue()))));
+                                new Value(seScheme.decrypt(encryptedValue.getValue().getValue()))));
         return plaintextValues;
     }
 

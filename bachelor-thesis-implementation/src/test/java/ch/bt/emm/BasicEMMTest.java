@@ -3,8 +3,8 @@ package ch.bt.emm;
 import static org.junit.jupiter.api.Assertions.*;
 
 import ch.bt.model.EncryptedIndexMap;
-import ch.bt.model.PlaintextLabel;
-import ch.bt.model.PlaintextValue;
+import ch.bt.model.Label;
+import ch.bt.model.Value;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,9 +28,9 @@ public class BasicEMMTest {
     private final static List<Integer> INVALID_SECURITY_PARAMETERS_FOR_SE = List.of(512);
     private final static Map<Integer, BasicEMM> basicEMMMs = new HashMap<>();
 
-    private final static Map<Integer, PlaintextLabel> searchLabels = new HashMap<>();
+    private final static Map<Integer, Label> searchLabels = new HashMap<>();
 
-    private final static Map<Integer, Map<PlaintextLabel, Set<PlaintextValue>>> multimaps = new HashMap<>();
+    private final static Map<Integer, Map<Label, Set<Value>>> multimaps = new HashMap<>();
 
     @BeforeAll
     public static void init() {
@@ -54,22 +54,22 @@ public class BasicEMMTest {
         return INVALID_SECURITY_PARAMETERS_FOR_SE.stream();
     }
 
-    private static PlaintextLabel buildMultiMapAndGenerateRandomSearchLabel(final int securityParameter) {
-        final Map<PlaintextLabel, Set<PlaintextValue>> multimap = new HashMap<>();
-        PlaintextLabel searchLabel = null;
+    private static Label buildMultiMapAndGenerateRandomSearchLabel(final int securityParameter) {
+        final Map<Label, Set<Value>> multimap = new HashMap<>();
+        Label searchLabel = null;
         Random random = new Random();
         int index = (int) (MAX_NUMBER_OF_LABELS * Math.random()) + 1;
         while (multimap.size() < MAX_NUMBER_OF_LABELS) {
-            final var values = new HashSet<PlaintextValue>();
+            final var values = new HashSet<Value>();
             int size = (int) (MAX_SIZE_VALUE_SET * Math.random()) + 1;
             while (values.size() < size) {
                 byte[] v = new byte[securityParameter];
                 random.nextBytes(v);
-                values.add(new PlaintextValue(v));
+                values.add(new Value(v));
             }
             byte[] l = new byte[securityParameter];
             random.nextBytes(l);
-            final var label = new PlaintextLabel(l);
+            final var label = new Label(l);
             multimap.put(label, values);
             if (multimap.size() == index) {
                 searchLabel = label;
@@ -111,9 +111,9 @@ public class BasicEMMTest {
         final var matchingLabels = encryptedIndex.keySet().stream().filter(el -> Arrays.equals(el.getLabel(), encryptedLabel)).toList();
         assertEquals(1, matchingLabels.size());
         final var values = encryptedIndex.values();
-        Set<PlaintextValue> plaintexts = new HashSet<>();
+        Set<Value> plaintexts = new HashSet<>();
         for (var el : values) {
-            plaintexts.add(new PlaintextValue(basicEMM.getSeScheme().decrypt(el.getValue())));
+            plaintexts.add(new Value(basicEMM.getSeScheme().decrypt(el.getValue())));
         }
         final var expectedValues = multimap.get(searchLabel);
         boolean[] found = new boolean[expectedValues.size()];
