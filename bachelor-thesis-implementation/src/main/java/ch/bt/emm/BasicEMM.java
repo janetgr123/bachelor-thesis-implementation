@@ -59,10 +59,8 @@ public class BasicEMM implements EMM {
             final var token = hMac.hash(label.label());
             for (Value value : valuesOfLabel) {
                 final var tokenAndCounter = getTokenAndCounter(counter, token);
-                final var encryptedLabel =
-                        new Label(hash.hash(tokenAndCounter));
-                final var encryptedValue =
-                        new Value(seScheme.encrypt(value.value()));
+                final var encryptedLabel = new Label(hash.hash(tokenAndCounter));
+                final var encryptedValue = new Value(seScheme.encrypt(value.value()));
                 encryptedIndex.put(encryptedLabel, encryptedValue);
                 counter++;
             }
@@ -85,14 +83,14 @@ public class BasicEMM implements EMM {
      * @return
      */
     @Override
-    public Set<PairLabelValue> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+    public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof EncryptedIndexMap)
                 || !(searchToken instanceof SearchTokenBytes)) {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
         final var encryptedIndexMap = ((EncryptedIndexMap) encryptedIndex).map();
-        Set<PairLabelValue> encryptedValues = new HashSet<>();
+        Set<Pair> encryptedValues = new HashSet<>();
         int counter = 0;
         while (true) {
             final var tokenAndCounter =
@@ -121,12 +119,18 @@ public class BasicEMM implements EMM {
      * @return
      */
     @Override
-    public Set<Value> result(final Set<PairLabelValue> values, final Label label) {
+    public Set<Value> result(final Set<Pair> values, final Label label) {
         Set<Value> plaintextValues = new HashSet<>();
         values.forEach(
-                encryptedValue ->
-                        plaintextValues.add(
-                                new Value(seScheme.decrypt(encryptedValue.value().value()))));
+                encryptedValue -> {
+                    if (!(encryptedValue instanceof PairLabelValue)) {
+                        throw new IllegalArgumentException("type of values not matching.");
+                    }
+                    plaintextValues.add(
+                            new Value(
+                                    seScheme.decrypt(
+                                            ((PairLabelValue) encryptedValue).value().value())));
+                });
         return plaintextValues;
     }
 

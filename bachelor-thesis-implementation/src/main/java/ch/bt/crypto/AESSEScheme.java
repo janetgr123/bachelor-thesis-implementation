@@ -11,6 +11,7 @@ import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
+import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -106,5 +107,25 @@ public class AESSEScheme implements SEScheme {
         return new PairLabelValue(
                 new Label(decrypt(pairLabelValue.label().label())),
                 new Value(decrypt(pairLabelValue.value().value())));
+    }
+
+    public PairLabelNumberValues encrypt(final PairLabelNumberValues pairLabelNumberValues) {
+        return new PairLabelNumberValues(
+                new Label(encrypt(pairLabelNumberValues.label().label())),
+                new BigInteger(
+                                encrypt(
+                                        BigInteger.valueOf(pairLabelNumberValues.numberOfValues())
+                                                .toByteArray()))
+                        .intValue());
+    }
+
+    public PairLabelNumberValues decrypt(final PairLabelNumberValues pairLabelNumberValues) {
+        return new PairLabelNumberValues(
+                new Label(decrypt(pairLabelNumberValues.label().label())),
+                new BigInteger(
+                                encrypt(
+                                        BigInteger.valueOf(pairLabelNumberValues.numberOfValues())
+                                                .toByteArray()))
+                        .intValue());
     }
 }

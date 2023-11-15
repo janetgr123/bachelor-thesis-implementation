@@ -90,13 +90,13 @@ public class VolumeHidingEMM implements EMM {
      * @return
      */
     @Override
-    public Set<PairLabelValue> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+    public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof EncryptedIndexTables)
                 || !(searchToken instanceof SearchTokenListInts)) {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
-        Set<PairLabelValue> ciphertexts = new HashSet<>();
+        Set<Pair> ciphertexts = new HashSet<>();
         final var encryptedIndexTable1 = ((EncryptedIndexTables) encryptedIndex).getTable(0);
         final var encryptedIndexTable2 = ((EncryptedIndexTables) encryptedIndex).getTable(1);
         final var token = ((SearchTokenListInts) searchToken).getSearchTokenList();
@@ -114,16 +114,15 @@ public class VolumeHidingEMM implements EMM {
      * @return
      */
     @Override
-    public Set<Value> result(final Set<PairLabelValue> values, final Label label) {
+    public Set<Value> result(final Set<Pair> values, final Label label) {
         final var plaintexts =
                 values.stream()
-                        .map(el -> seScheme.decrypt(el))
+                        .map(PairLabelValue.class::cast)
+                        .map(seScheme::decrypt)
                         .filter(el -> el.label().equals(label))
                         .collect(Collectors.toSet());
         plaintexts.addAll(
-                stash.stream()
-                        .filter(el -> el.label().equals(label))
-                        .collect(Collectors.toSet()));
+                stash.stream().filter(el -> el.label().equals(label)).collect(Collectors.toSet()));
         return plaintexts.stream().map(PairLabelValue::value).collect(Collectors.toSet());
     }
 
@@ -141,5 +140,9 @@ public class VolumeHidingEMM implements EMM {
 
     public int getTableSize() {
         return tableSize;
+    }
+
+    public int getMaxStashSize() {
+        return maxStashSize;
     }
 }

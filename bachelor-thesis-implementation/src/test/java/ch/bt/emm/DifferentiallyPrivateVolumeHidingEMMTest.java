@@ -12,16 +12,18 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class VolumeHidingEMMTest {
+public class DifferentiallyPrivateVolumeHidingEMMTest {
 
     private static final int MAX_NUMBER_OF_LABELS = 100;
     private static final int MAX_SIZE_VALUE_SET = 10;
 
     private static final int ALPHA = 2;
-    private static final List<Integer> VALID_SECURITY_PARAMETERS = List.of(256);
 
+    private static final double EPSILON = 0.2;
+    private static final List<Integer> VALID_SECURITY_PARAMETERS = List.of(256);
     private static final List<Integer> INVALID_SECURITY_PARAMETERS_FOR_SE = List.of(512);
-    private static final Map<Integer, VolumeHidingEMM> volumeHidingEMMs = new HashMap<>();
+    private static final Map<Integer, DifferentiallyPrivateVolumeHidingEMM>
+            differentiallyPrivateVolumeHidingEMMs = new HashMap<>();
 
     private static final Map<Integer, Label> searchLabels = new HashMap<>();
 
@@ -35,13 +37,14 @@ public class VolumeHidingEMMTest {
                             securityParameter,
                             buildMultiMapAndGenerateRandomSearchLabel(securityParameter));
                     final var emm =
-                            new VolumeHidingEMM(
+                            new DifferentiallyPrivateVolumeHidingEMM(
                                     new SecureRandom(),
                                     new SecureRandom(),
                                     securityParameter,
+                                    EPSILON,
                                     ALPHA,
                                     multimaps.get(securityParameter));
-                    volumeHidingEMMs.put(securityParameter, emm);
+                    differentiallyPrivateVolumeHidingEMMs.put(securityParameter, emm);
                 });
     }
 
@@ -81,35 +84,58 @@ public class VolumeHidingEMMTest {
     @ParameterizedTest
     @MethodSource("getValidSecurityParameters")
     public void testCorrectness(final int securityParameter) {
-        final var volumeHidingEMM = volumeHidingEMMs.get(securityParameter);
+        final var differentiallyPrivateVolumeHidingEMM =
+                differentiallyPrivateVolumeHidingEMMs.get(securityParameter);
         final var searchLabel = searchLabels.get(securityParameter);
-        final var encryptedIndex = volumeHidingEMM.buildIndex();
-        final var searchToken = volumeHidingEMM.trapdoor(searchLabel);
-        final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
+        final var encryptedIndex = differentiallyPrivateVolumeHidingEMM.buildIndex();
+        final var searchToken = differentiallyPrivateVolumeHidingEMM.trapdoor(searchLabel);
+        final var ciphertextCounters =
+                differentiallyPrivateVolumeHidingEMM.search(searchToken, encryptedIndex);
+        final var searchToken2 =
+                differentiallyPrivateVolumeHidingEMM.trapdoor(searchLabel, ciphertextCounters);
+        final var ciphertexts =
+                differentiallyPrivateVolumeHidingEMM.search2(searchToken2, encryptedIndex);
         final var values =
-                volumeHidingEMM.result(ciphertexts, searchLabel).stream().sorted().toList();
+                differentiallyPrivateVolumeHidingEMM.result(ciphertexts, searchLabel).stream()
+                        .sorted()
+                        .toList();
         final var expectedValues =
-                volumeHidingEMM.getMultiMap().get(searchLabel).stream().sorted().toList();
+                differentiallyPrivateVolumeHidingEMM.getMultiMap().get(searchLabel).stream()
+                        .sorted()
+                        .toList();
         assertEquals(expectedValues, values);
     }
 
     @ParameterizedTest
     @MethodSource("getValidSecurityParameters")
     public void testBuildIndex(final int securityParameter) {
-        final var volumeHidingEMM = volumeHidingEMMs.get(securityParameter);
-        final var table11 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(0);
-        final var table12 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(1);
-        final var table21 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(0);
-        final var table22 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(1);
+        final var differentiallyPrivateVolumeHidingEMM =
+                differentiallyPrivateVolumeHidingEMMs.get(securityParameter);
+        final var encryptedIndexTables1 =
+                ((DifferentiallyPrivateEncryptedIndexTables)
+                                differentiallyPrivateVolumeHidingEMM.buildIndex())
+                        .getEncryptedIndexTables();
+        final var encryptedIndexTables2 =
+                ((DifferentiallyPrivateEncryptedIndexTables)
+                                differentiallyPrivateVolumeHidingEMM.buildIndex())
+                        .getEncryptedIndexTables();
+        final var table11 = ((EncryptedIndexTables) encryptedIndexTables1).getTable(0);
+        final var table12 = ((EncryptedIndexTables) encryptedIndexTables1).getTable(1);
+        final var table21 = ((EncryptedIndexTables) encryptedIndexTables2).getTable(0);
+        final var table22 = ((EncryptedIndexTables) encryptedIndexTables2).getTable(1);
         final var labels =
-                VolumeHidingEMMUtils.getDecryptedLabels(volumeHidingEMM, table11, table12);
+                VolumeHidingEMMUtils.getDecryptedLabels(
+                        differentiallyPrivateVolumeHidingEMM, table11, table12);
         final var labels2 =
-                VolumeHidingEMMUtils.getDecryptedLabels(volumeHidingEMM, table21, table22);
+                VolumeHidingEMMUtils.getDecryptedLabels(
+                        differentiallyPrivateVolumeHidingEMM, table21, table22);
         assertEquals(labels, labels2);
         final var values =
-                VolumeHidingEMMUtils.getDecryptedValues(volumeHidingEMM, table11, table12);
+                VolumeHidingEMMUtils.getDecryptedValues(
+                        differentiallyPrivateVolumeHidingEMM, table11, table12);
         final var values2 =
-                VolumeHidingEMMUtils.getDecryptedValues(volumeHidingEMM, table21, table22);
+                VolumeHidingEMMUtils.getDecryptedValues(
+                        differentiallyPrivateVolumeHidingEMM, table21, table22);
         assertEquals(values, values2);
     }
 

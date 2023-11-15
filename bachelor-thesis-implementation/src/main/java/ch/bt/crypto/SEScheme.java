@@ -1,5 +1,6 @@
 package ch.bt.crypto;
 
+import ch.bt.model.PairLabelNumberValues;
 import ch.bt.model.PairLabelValue;
 
 public interface SEScheme {
@@ -13,4 +14,8 @@ public interface SEScheme {
     PairLabelValue encrypt(final PairLabelValue input);
 
     PairLabelValue decrypt(final PairLabelValue input);
+
+    PairLabelNumberValues encrypt(final PairLabelNumberValues input);
+
+    PairLabelNumberValues decrypt(final PairLabelNumberValues input);
 }

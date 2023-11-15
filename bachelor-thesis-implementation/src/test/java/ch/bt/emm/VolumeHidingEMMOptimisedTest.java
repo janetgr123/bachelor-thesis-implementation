@@ -14,14 +14,11 @@ import java.util.stream.Stream;
 
 public class VolumeHidingEMMOptimisedTest {
 
-    private static final int MAX_NUMBER_OF_LABELS = 2;
-    private static final int MAX_SIZE_VALUE_SET = 3;
+    private static final int MAX_NUMBER_OF_LABELS = 100;
+    private static final int MAX_SIZE_VALUE_SET = 10;
 
     private static final int ALPHA = 2;
     private static final List<Integer> VALID_SECURITY_PARAMETERS = List.of(256);
-
-    private static final List<Integer> INVALID_SECURITY_PARAMETERS_FOR_HASH =
-            List.of(128, 1024, 2048);
 
     private static final List<Integer> INVALID_SECURITY_PARAMETERS_FOR_SE = List.of(512);
     private static final Map<Integer, VolumeHidingEMM> volumeHidingEMMOptimised = new HashMap<>();
@@ -50,10 +47,6 @@ public class VolumeHidingEMMOptimisedTest {
 
     private static Stream<Integer> getValidSecurityParameters() {
         return VALID_SECURITY_PARAMETERS.stream();
-    }
-
-    private static Stream<Integer> getInvalidSecurityParametersForHash() {
-        return INVALID_SECURITY_PARAMETERS_FOR_HASH.stream();
     }
 
     private static Stream<Integer> getInvalidSecurityParametersForSE() {
@@ -108,40 +101,16 @@ public class VolumeHidingEMMOptimisedTest {
         final var table12 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(1);
         final var table21 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(0);
         final var table22 = ((EncryptedIndexTables) volumeHidingEMM.buildIndex()).getTable(1);
-        final var labels = getDecryptedLabels(volumeHidingEMM, table11, table12);
-        final var labels2 = getDecryptedLabels(volumeHidingEMM, table21, table22);
+        final var labels =
+                VolumeHidingEMMUtils.getDecryptedLabels(volumeHidingEMM, table11, table12);
+        final var labels2 =
+                VolumeHidingEMMUtils.getDecryptedLabels(volumeHidingEMM, table21, table22);
         assertEquals(labels, labels2);
-        final var values = getDecryptedLabels(volumeHidingEMM, table11, table12);
-        final var values2 = getDecryptedLabels(volumeHidingEMM, table21, table22);
+        final var values =
+                VolumeHidingEMMUtils.getDecryptedValues(volumeHidingEMM, table11, table12);
+        final var values2 =
+                VolumeHidingEMMUtils.getDecryptedValues(volumeHidingEMM, table21, table22);
         assertEquals(values, values2);
-    }
-
-    private List<Label> getDecryptedLabels(
-            final VolumeHidingEMM volumeHidingEMM, final PairLabelValue[] table1, final PairLabelValue[] table2) {
-        final var labelsTable1 = Arrays.stream(table1).map(PairLabelValue::label).toList();
-        final var labelsTable2 = Arrays.stream(table2).map(PairLabelValue::label).toList();
-        final var labelsTables = new ArrayList<>(labelsTable1);
-        labelsTables.addAll(labelsTable2);
-        return labelsTables.stream()
-                .map(el -> volumeHidingEMM.getSeScheme().decrypt(el.label()))
-                .map(Label::new)
-                .distinct()
-                .sorted()
-                .toList();
-    }
-
-    private List<Value> getDecryptedValues(
-            final VolumeHidingEMM volumeHidingEMM, final PairLabelValue[] table1, final PairLabelValue[] table2) {
-        final var valuesTable1 = Arrays.stream(table1).map(PairLabelValue::value).toList();
-        final var valuesTable2 = Arrays.stream(table2).map(PairLabelValue::value).toList();
-        final var valuesTables = new ArrayList<>(valuesTable1);
-        valuesTables.addAll(valuesTable2);
-        return valuesTables.stream()
-                .map(el -> volumeHidingEMM.getSeScheme().decrypt(el.value()))
-                .map(Value::new)
-                .distinct()
-                .sorted()
-                .toList();
     }
 
     @ParameterizedTest

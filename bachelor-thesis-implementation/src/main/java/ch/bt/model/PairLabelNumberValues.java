@@ -4,7 +4,14 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public record PairLabelNumberValues(Label label, int numberOfValues) {
+public class PairLabelNumberValues extends Pair {
+    private final Label label;
+    private final int numberOfValues;
+
+    public PairLabelNumberValues(Label label, int numberOfValues) {
+        this.label = label;
+        this.numberOfValues = numberOfValues;
+    }
 
     @Override
     public String toString() {
@@ -31,5 +38,13 @@ public record PairLabelNumberValues(Label label, int numberOfValues) {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(label).append(numberOfValues).toHashCode();
+    }
+
+    public Label label() {
+        return label;
+    }
+
+    public int numberOfValues() {
+        return numberOfValues;
     }
 }

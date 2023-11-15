@@ -12,7 +12,7 @@ public interface EMM {
 
     SearchToken trapdoor(final Label label);
 
-    Set<PairLabelValue> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex);
+    Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex);
 
-    Set<Value> result(final Set<PairLabelValue> values, final Label label);
+    Set<Value> result(final Set<Pair> values, final Label label);
 }
