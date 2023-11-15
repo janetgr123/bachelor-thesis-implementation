@@ -19,18 +19,19 @@ public class HMacTest {
 
     @BeforeAll
     public static void init() {
-        SECURITY_PARAMETERS.forEach(securityParameter -> {
-                    final KeyGenerator keyGenerator = new KeyGenerator(new SecureRandom(), securityParameter);
+        SECURITY_PARAMETERS.forEach(
+                securityParameter -> {
+                    final KeyGenerator keyGenerator =
+                            new KeyGenerator(new SecureRandom(), securityParameter);
                     final var key = keyGenerator.generateKey();
                     keys.put(securityParameter, key);
                     final var plaintext = new byte[securityParameter];
                     new Random().nextBytes(plaintext);
                     plaintexts.put(securityParameter, plaintext);
-                    final var hMac = new HMacHash(new KeyParameter(key.getKey().keys().get(0).getBytes()));
+                    final var hMac =
+                            new HMacHash(new KeyParameter(key.getKey().keys().get(0).getBytes()));
                     hMacs.put(securityParameter, hMac);
-                }
-        );
-
+                });
     }
 
     private static Stream<Integer> getSecurityParameters() {
@@ -51,7 +52,8 @@ public class HMacTest {
         final var key = keys.get(securityParameter);
         final var plaintext = plaintexts.get(securityParameter);
         final var hMac = hMacs.get(securityParameter);
-        final HMacHash hMac2 = new HMacHash(new KeyParameter(key.getKey().keys().get(0).getBytes()));
+        final HMacHash hMac2 =
+                new HMacHash(new KeyParameter(key.getKey().keys().get(0).getBytes()));
         assertFalse(Arrays.equals(hMac.hash(plaintext), plaintext));
         assertArrayEquals(hMac.hash(plaintext), hMac.hash(plaintext));
         assertArrayEquals(hMac.hash(plaintext), hMac2.hash(plaintext));
@@ -64,7 +66,8 @@ public class HMacTest {
         final var hMac = hMacs.get(securityParameter);
         final KeyGenerator keyGenerator = new KeyGenerator(new SecureRandom(), securityParameter);
         final SecretKey key2 = keyGenerator.generateKey();
-        final HMacHash hMac2 = new HMacHash(new KeyParameter(key2.getKey().keys().get(0).getBytes()));
+        final HMacHash hMac2 =
+                new HMacHash(new KeyParameter(key2.getKey().keys().get(0).getBytes()));
         assertFalse(Arrays.equals(hMac.hash(plaintext), hMac2.hash(plaintext)));
     }
 }
