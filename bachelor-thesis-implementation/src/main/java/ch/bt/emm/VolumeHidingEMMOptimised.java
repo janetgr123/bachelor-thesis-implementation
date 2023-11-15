@@ -1,6 +1,5 @@
 package ch.bt.emm;
 
-import ch.bt.crypto.*;
 import ch.bt.model.*;
 
 import java.security.SecureRandom;
