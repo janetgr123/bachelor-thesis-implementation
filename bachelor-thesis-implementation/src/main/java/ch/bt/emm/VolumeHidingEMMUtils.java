@@ -25,10 +25,10 @@ public class VolumeHidingEMMUtils {
 
     public static void doCuckooHashingWithStash(
             final int maxStashSize,
-            final Pair[] table1,
-            final Pair[] table2,
+            final PairLabelValue[] table1,
+            final PairLabelValue[] table2,
             final Map<Label, Set<Value>> multiMap,
-            final Stack<Pair> stash,
+            final Stack<PairLabelValue> stash,
             final Hash hash,
             final int tableSize) {
         final var labels = multiMap.keySet();
@@ -43,7 +43,7 @@ public class VolumeHidingEMMUtils {
         for (final var label : labels) {
             final var values = indices.get(label);
             for (final var value : values) {
-                Pair toInsert = new Pair(label, value);
+                PairLabelValue toInsert = new PairLabelValue(label, value);
                 while (evictionCounter < Math.log(tableSize) && toInsert != null) {
                     logger.debug("Inserting in table 1: {}", toInsert);
                     toInsert =
@@ -97,20 +97,20 @@ public class VolumeHidingEMMUtils {
         return Math.floorMod(Arrays.hashCode(hash.hash(toHash)), n);
     }
 
-    private static Pair insert(final Pair[] table, final int hash, final Pair pair) {
-        Pair removed = null;
+    private static PairLabelValue insert(final PairLabelValue[] table, final int hash, final PairLabelValue pairLabelValue) {
+        PairLabelValue removed = null;
         if (table[hash] != null) {
             removed = table[hash];
         }
-        table[hash] = pair;
+        table[hash] = pairLabelValue;
         return removed;
     }
 
     public static void encryptTables(
-            final Pair[] table1,
-            final Pair[] table2,
-            final Pair[] encryptedTable1,
-            final Pair[] encryptedTable2,
+            final PairLabelValue[] table1,
+            final PairLabelValue[] table2,
+            final PairLabelValue[] encryptedTable1,
+            final PairLabelValue[] encryptedTable2,
             final SEScheme SEScheme) {
         if (table1.length != table2.length) {
             throw new IllegalArgumentException("table sizes must match");
@@ -125,12 +125,12 @@ public class VolumeHidingEMMUtils {
         }
     }
 
-    public static void fillEmptyValues(final Pair[] table) {
+    public static void fillEmptyValues(final PairLabelValue[] table) {
         int i = 0;
         for (final var pair : table) {
             if (pair == null) {
                 table[i] =
-                        new Pair(new Label(new byte[0]), new Value(new byte[0]));
+                        new PairLabelValue(new Label(new byte[0]), new Value(new byte[0]));
             }
             i++;
         }

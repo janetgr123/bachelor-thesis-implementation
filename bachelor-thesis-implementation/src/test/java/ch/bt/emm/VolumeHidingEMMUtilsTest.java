@@ -52,9 +52,9 @@ public class VolumeHidingEMMUtilsTest {
     public void testCuckooHashing() {
         final int alpha = 1;
         final int numberOfValues2 = VolumeHidingEMMUtils.getNumberOfValues(multimap2);
-        final var table1 = new Pair[(1 + alpha) * numberOfValues2];
-        final var table2 = new Pair[(1 + alpha) * numberOfValues2];
-        final Stack<Pair> stash = new Stack<>();
+        final var table1 = new PairLabelValue[(1 + alpha) * numberOfValues2];
+        final var table2 = new PairLabelValue[(1 + alpha) * numberOfValues2];
+        final Stack<PairLabelValue> stash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
                 1, table1, table2, multimap2, stash, hash, (1 + alpha) * numberOfValues2);
         assertEquals(8, Arrays.stream(table1).filter(Objects::nonNull).count());
@@ -66,9 +66,9 @@ public class VolumeHidingEMMUtilsTest {
     public void testCuckooHashing2() {
         final int alpha = 1;
         final int numberOfValues1 = VolumeHidingEMMUtils.getNumberOfValues(multimap);
-        final var table1 = new Pair[(1 + alpha) * numberOfValues1];
-        final var table2 = new Pair[(1 + alpha) * numberOfValues1];
-        final Stack<Pair> stash = new Stack<>();
+        final var table1 = new PairLabelValue[(1 + alpha) * numberOfValues1];
+        final var table2 = new PairLabelValue[(1 + alpha) * numberOfValues1];
+        final Stack<PairLabelValue> stash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
                 numberOfValues1 / 3,
                 table1,

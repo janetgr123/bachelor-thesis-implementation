@@ -34,13 +34,13 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
      * @return
      */
     @Override
-    public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+    public Set<PairLabelValue> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof EncryptedIndexTables)
                 || !(searchToken instanceof SearchTokenBytes)) {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
-        Set<Pair> ciphertexts = new HashSet<>();
+        Set<PairLabelValue> ciphertexts = new HashSet<>();
         final var encryptedIndexTable1 = ((EncryptedIndexTables) encryptedIndex).getTable(0);
         final var encryptedIndexTable2 = ((EncryptedIndexTables) encryptedIndex).getTable(1);
         final var token = ((SearchTokenBytes) searchToken).getToken();

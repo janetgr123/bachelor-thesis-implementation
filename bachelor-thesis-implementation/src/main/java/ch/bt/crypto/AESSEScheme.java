@@ -96,15 +96,15 @@ public class AESSEScheme implements SEScheme {
         }
     }
 
-    public Pair encrypt(final Pair pair) {
-        return new Pair(
-                new Label(encrypt(pair.getLabel().getLabel())),
-                new Value(encrypt(pair.getValue().getValue())));
+    public PairLabelValue encrypt(final PairLabelValue pairLabelValue) {
+        return new PairLabelValue(
+                new Label(encrypt(pairLabelValue.getLabel().getLabel())),
+                new Value(encrypt(pairLabelValue.getValue().getValue())));
     }
 
-    public Pair decrypt(final Pair pair) {
-        return new Pair(
-                new Label(decrypt(pair.getLabel().getLabel())),
-                new Value(decrypt(pair.getValue().getValue())));
+    public PairLabelValue decrypt(final PairLabelValue pairLabelValue) {
+        return new PairLabelValue(
+                new Label(decrypt(pairLabelValue.getLabel().getLabel())),
+                new Value(decrypt(pairLabelValue.getValue().getValue())));
     }
 }

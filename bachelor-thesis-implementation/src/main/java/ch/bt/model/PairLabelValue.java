@@ -4,11 +4,11 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class Pair {
+public class PairLabelValue {
     private final Label label;
     private final Value value;
 
-    public Pair(Label label, Value value) {
+    public PairLabelValue(Label label, Value value) {
         this.label = label;
         this.value = value;
     }
@@ -32,9 +32,9 @@ public class Pair {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        Pair pair = (Pair) o;
+        PairLabelValue pairLabelValue = (PairLabelValue) o;
 
-        return new EqualsBuilder().append(label, pair.label).append(value, pair.value).isEquals();
+        return new EqualsBuilder().append(label, pairLabelValue.label).append(value, pairLabelValue.value).isEquals();
     }
 
     @Override

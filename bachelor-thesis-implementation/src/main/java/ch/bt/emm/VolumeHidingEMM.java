@@ -17,7 +17,7 @@ public class VolumeHidingEMM implements EMM {
     private final Map<Label, Set<Value>> multiMap;
     private final int maxStashSize;
     private final int tableSize;
-    private Stack<Pair> stash;
+    private Stack<PairLabelValue> stash;
 
     public VolumeHidingEMM(
             final SecureRandom secureRandom,
@@ -49,17 +49,17 @@ public class VolumeHidingEMM implements EMM {
 
     @Override
     public EncryptedIndex buildIndex() {
-        final Pair[] table1 = new Pair[tableSize];
-        final Pair[] table2 = new Pair[tableSize];
-        final Stack<Pair> stash = new Stack<>();
+        final PairLabelValue[] table1 = new PairLabelValue[tableSize];
+        final PairLabelValue[] table2 = new PairLabelValue[tableSize];
+        final Stack<PairLabelValue> stash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
                 maxStashSize, table1, table2, multiMap, stash, hash, tableSize);
         VolumeHidingEMMUtils.fillEmptyValues(table1);
         VolumeHidingEMMUtils.fillEmptyValues(table2);
         this.stash = stash;
 
-        final Pair[] encryptedTable1 = new Pair[tableSize];
-        final Pair[] encryptedTable2 = new Pair[tableSize];
+        final PairLabelValue[] encryptedTable1 = new PairLabelValue[tableSize];
+        final PairLabelValue[] encryptedTable2 = new PairLabelValue[tableSize];
         VolumeHidingEMMUtils.encryptTables(
                 table1, table2, encryptedTable1, encryptedTable2, seScheme);
 
@@ -90,13 +90,13 @@ public class VolumeHidingEMM implements EMM {
      * @return
      */
     @Override
-    public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+    public Set<PairLabelValue> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof EncryptedIndexTables)
                 || !(searchToken instanceof SearchTokenListInts)) {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
-        Set<Pair> ciphertexts = new HashSet<>();
+        Set<PairLabelValue> ciphertexts = new HashSet<>();
         final var encryptedIndexTable1 = ((EncryptedIndexTables) encryptedIndex).getTable(0);
         final var encryptedIndexTable2 = ((EncryptedIndexTables) encryptedIndex).getTable(1);
         final var token = ((SearchTokenListInts) searchToken).getSearchTokenList();
@@ -114,7 +114,7 @@ public class VolumeHidingEMM implements EMM {
      * @return
      */
     @Override
-    public Set<Value> result(final Set<Pair> values, final Label label) {
+    public Set<Value> result(final Set<PairLabelValue> values, final Label label) {
         final var plaintexts =
                 values.stream()
                         .map(el -> seScheme.decrypt(el))
@@ -124,7 +124,7 @@ public class VolumeHidingEMM implements EMM {
                 stash.stream()
                         .filter(el -> el.getLabel().equals(label))
                         .collect(Collectors.toSet()));
-        return plaintexts.stream().map(Pair::getValue).collect(Collectors.toSet());
+        return plaintexts.stream().map(PairLabelValue::getValue).collect(Collectors.toSet());
     }
 
     public Map<Label, Set<Value>> getMultiMap() {

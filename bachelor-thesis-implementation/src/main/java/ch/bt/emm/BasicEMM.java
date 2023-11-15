@@ -85,14 +85,14 @@ public class BasicEMM implements EMM {
      * @return
      */
     @Override
-    public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+    public Set<PairLabelValue> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof EncryptedIndexMap)
                 || !(searchToken instanceof SearchTokenBytes)) {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
         final var encryptedIndexMap = ((EncryptedIndexMap) encryptedIndex).getMap();
-        Set<Pair> encryptedValues = new HashSet<>();
+        Set<PairLabelValue> encryptedValues = new HashSet<>();
         int counter = 0;
         while (true) {
             final var tokenAndCounter =
@@ -104,7 +104,7 @@ public class BasicEMM implements EMM {
                             .toList();
             if (matchingLabels.size() == 1) {
                 encryptedValues.add(
-                        new Pair(
+                        new PairLabelValue(
                                 new Label(new byte[0]),
                                 encryptedIndexMap.get(matchingLabels.get(0))));
             } else {
@@ -121,7 +121,7 @@ public class BasicEMM implements EMM {
      * @return
      */
     @Override
-    public Set<Value> result(final Set<Pair> values, final Label label) {
+    public Set<Value> result(final Set<PairLabelValue> values, final Label label) {
         Set<Value> plaintextValues = new HashSet<>();
         values.forEach(
                 encryptedValue ->
