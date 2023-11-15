@@ -28,8 +28,7 @@ public class VolumeHidingEMMTest {
 
     private static final Map<Integer, Label> searchLabels = new HashMap<>();
 
-    private static final Map<Integer, Map<Label, Set<Value>>> multimaps =
-            new HashMap<>();
+    private static final Map<Integer, Map<Label, Set<Value>>> multimaps = new HashMap<>();
 
     @BeforeAll
     public static void init() {
