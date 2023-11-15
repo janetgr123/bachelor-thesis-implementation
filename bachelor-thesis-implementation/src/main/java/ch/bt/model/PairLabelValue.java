@@ -4,22 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class PairLabelValue {
-    private final Label label;
-    private final Value value;
-
-    public PairLabelValue(Label label, Value value) {
-        this.label = label;
-        this.value = value;
-    }
-
-    public Label getLabel() {
-        return label;
-    }
-
-    public Value getValue() {
-        return value;
-    }
+public record PairLabelValue(Label label, Value value) {
 
     @Override
     public String toString() {

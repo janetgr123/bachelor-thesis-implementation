@@ -6,16 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Arrays;
 
-public class Value implements Comparable<Value> {
-    private final byte[] value;
-
-    public Value(final byte[] value) {
-        this.value = value;
-    }
-
-    public byte[] getValue() {
-        return this.value;
-    }
+public record Value(byte[] value) implements Comparable<Value> {
 
     @Override
     public int compareTo(Value other) {

@@ -56,13 +56,13 @@ public class BasicEMM implements EMM {
         for (Label label : labels) {
             int counter = 0;
             final var valuesOfLabel = multiMap.get(label);
-            final var token = hMac.hash(label.getLabel());
+            final var token = hMac.hash(label.label());
             for (Value value : valuesOfLabel) {
                 final var tokenAndCounter = getTokenAndCounter(counter, token);
                 final var encryptedLabel =
                         new Label(hash.hash(tokenAndCounter));
                 final var encryptedValue =
-                        new Value(seScheme.encrypt(value.getValue()));
+                        new Value(seScheme.encrypt(value.value()));
                 encryptedIndex.put(encryptedLabel, encryptedValue);
                 counter++;
             }
@@ -76,7 +76,7 @@ public class BasicEMM implements EMM {
      */
     @Override
     public SearchToken trapdoor(final Label label) {
-        return new SearchTokenBytes(hMac.hash(label.getLabel()));
+        return new SearchTokenBytes(hMac.hash(label.label()));
     }
 
     /**
@@ -91,16 +91,16 @@ public class BasicEMM implements EMM {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
-        final var encryptedIndexMap = ((EncryptedIndexMap) encryptedIndex).getMap();
+        final var encryptedIndexMap = ((EncryptedIndexMap) encryptedIndex).map();
         Set<PairLabelValue> encryptedValues = new HashSet<>();
         int counter = 0;
         while (true) {
             final var tokenAndCounter =
-                    getTokenAndCounter(counter, ((SearchTokenBytes) searchToken).getToken());
+                    getTokenAndCounter(counter, ((SearchTokenBytes) searchToken).token());
             final var encryptedLabel = hash.hash(tokenAndCounter);
             final var matchingLabels =
                     encryptedIndexMap.keySet().stream()
-                            .filter(el -> Arrays.equals(el.getLabel(), encryptedLabel))
+                            .filter(el -> Arrays.equals(el.label(), encryptedLabel))
                             .toList();
             if (matchingLabels.size() == 1) {
                 encryptedValues.add(
@@ -126,7 +126,7 @@ public class BasicEMM implements EMM {
         values.forEach(
                 encryptedValue ->
                         plaintextValues.add(
-                                new Value(seScheme.decrypt(encryptedValue.getValue().getValue()))));
+                                new Value(seScheme.decrypt(encryptedValue.value().value()))));
         return plaintextValues;
     }
 

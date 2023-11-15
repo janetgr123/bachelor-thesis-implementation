@@ -49,7 +49,7 @@ public class VolumeHidingEMMUtils {
                     toInsert =
                             insert(
                                     table1,
-                                    getHash(toInsert.getLabel(), values.indexOf(toInsert.getValue()), 0, hash, tableSize),
+                                    getHash(toInsert.label(), values.indexOf(toInsert.value()), 0, hash, tableSize),
                                     toInsert);
                     if (toInsert != null) {
                         logger.debug("COLLISION! Evict from table 1: {}", toInsert);
@@ -59,8 +59,8 @@ public class VolumeHidingEMMUtils {
                                 insert(
                                         table2,
                                         getHash(
-                                                toInsert.getLabel(),
-                                                values.indexOf(toInsert.getValue()),
+                                                toInsert.label(),
+                                                values.indexOf(toInsert.value()),
                                                 1,
                                                 hash,
                                                 tableSize),
@@ -87,7 +87,7 @@ public class VolumeHidingEMMUtils {
             final Label label, final int i, final int tableNo, final Hash hash, final int n) {
         final var toHash =
                 org.bouncycastle.util.Arrays.concatenate(
-                        label.getLabel(),
+                        label.label(),
                         BigInteger.valueOf(i).toByteArray(),
                         BigInteger.valueOf(tableNo).toByteArray());
         logger.debug(

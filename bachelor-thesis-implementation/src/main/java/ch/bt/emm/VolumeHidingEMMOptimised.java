@@ -24,7 +24,7 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
     @Override
     public SearchToken trapdoor(final Label label) {
         final var hash = getHash();
-        final var labelHash = hash.hash(label.getLabel());
+        final var labelHash = hash.hash(label.label());
         return new SearchTokenBytes(labelHash);
     }
 
@@ -43,7 +43,7 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
         Set<PairLabelValue> ciphertexts = new HashSet<>();
         final var encryptedIndexTable1 = ((EncryptedIndexTables) encryptedIndex).getTable(0);
         final var encryptedIndexTable2 = ((EncryptedIndexTables) encryptedIndex).getTable(1);
-        final var token = ((SearchTokenBytes) searchToken).getToken();
+        final var token = ((SearchTokenBytes) searchToken).token();
         final var hashedToken = Math.floorMod(Arrays.hashCode(token), getTableSize());
         ciphertexts.add(encryptedIndexTable1[hashedToken]);
         ciphertexts.add(encryptedIndexTable2[hashedToken]);

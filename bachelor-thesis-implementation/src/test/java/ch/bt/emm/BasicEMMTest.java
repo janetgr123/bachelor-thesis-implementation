@@ -105,33 +105,33 @@ public class BasicEMMTest {
         final var basicEMM = basicEMMMs.get(securityParameter);
         final var multimap = multimaps.get(securityParameter);
         final var searchLabel = searchLabels.get(securityParameter);
-        final var encryptedIndex = ((EncryptedIndexMap) basicEMM.buildIndex()).getMap();
-        final var encryptedIndex2 = ((EncryptedIndexMap) basicEMM.buildIndex()).getMap();
+        final var encryptedIndex = ((EncryptedIndexMap) basicEMM.buildIndex()).map();
+        final var encryptedIndex2 = ((EncryptedIndexMap) basicEMM.buildIndex()).map();
         final var labels = encryptedIndex.keySet().stream().sorted().toList();
         final var labels2 = encryptedIndex2.keySet().stream().sorted().toList();
         assertEquals(labels, labels2);
 
-        final var token = basicEMM.getHMac().hash(searchLabel.getLabel());
+        final var token = basicEMM.getHMac().hash(searchLabel.label());
         final var tokenAndCounter =
                 org.bouncycastle.util.Arrays.concatenate(
                         token, BigInteger.valueOf(0).toByteArray());
         final var encryptedLabel = basicEMM.getHash().hash(tokenAndCounter);
         final var matchingLabels =
                 encryptedIndex.keySet().stream()
-                        .filter(el -> Arrays.equals(el.getLabel(), encryptedLabel))
+                        .filter(el -> Arrays.equals(el.label(), encryptedLabel))
                         .toList();
         assertEquals(1, matchingLabels.size());
         final var values = encryptedIndex.values();
         Set<Value> plaintexts = new HashSet<>();
         for (var el : values) {
-            plaintexts.add(new Value(basicEMM.getSeScheme().decrypt(el.getValue())));
+            plaintexts.add(new Value(basicEMM.getSeScheme().decrypt(el.value())));
         }
         final var expectedValues = multimap.get(searchLabel);
         boolean[] found = new boolean[expectedValues.size()];
         int i = 0;
         for (var el2 : expectedValues) {
             for (var el : plaintexts) {
-                if (Arrays.equals(el.getValue(), el2.getValue())) {
+                if (Arrays.equals(el.value(), el2.value())) {
                     found[i] = true;
                     break;
                 }

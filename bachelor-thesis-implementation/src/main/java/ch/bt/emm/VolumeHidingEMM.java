@@ -118,13 +118,13 @@ public class VolumeHidingEMM implements EMM {
         final var plaintexts =
                 values.stream()
                         .map(el -> seScheme.decrypt(el))
-                        .filter(el -> el.getLabel().equals(label))
+                        .filter(el -> el.label().equals(label))
                         .collect(Collectors.toSet());
         plaintexts.addAll(
                 stash.stream()
-                        .filter(el -> el.getLabel().equals(label))
+                        .filter(el -> el.label().equals(label))
                         .collect(Collectors.toSet()));
-        return plaintexts.stream().map(PairLabelValue::getValue).collect(Collectors.toSet());
+        return plaintexts.stream().map(PairLabelValue::value).collect(Collectors.toSet());
     }
 
     public Map<Label, Set<Value>> getMultiMap() {

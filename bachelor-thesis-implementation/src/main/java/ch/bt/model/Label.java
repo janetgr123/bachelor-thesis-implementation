@@ -5,16 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Arrays;
 
-public class Label implements Comparable<Label> {
-    private final byte[] label;
-
-    public Label(final byte[] label) {
-        this.label = label;
-    }
-
-    public byte[] getLabel() {
-        return this.label;
-    }
+public record Label(byte[] label) implements Comparable<Label> {
 
     @Override
     public int compareTo(Label other) {

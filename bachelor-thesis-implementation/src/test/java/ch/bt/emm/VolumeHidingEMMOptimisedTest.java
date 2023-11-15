@@ -118,12 +118,12 @@ public class VolumeHidingEMMOptimisedTest {
 
     private List<Label> getDecryptedLabels(
             final VolumeHidingEMM volumeHidingEMM, final PairLabelValue[] table1, final PairLabelValue[] table2) {
-        final var labelsTable1 = Arrays.stream(table1).map(PairLabelValue::getLabel).toList();
-        final var labelsTable2 = Arrays.stream(table2).map(PairLabelValue::getLabel).toList();
+        final var labelsTable1 = Arrays.stream(table1).map(PairLabelValue::label).toList();
+        final var labelsTable2 = Arrays.stream(table2).map(PairLabelValue::label).toList();
         final var labelsTables = new ArrayList<>(labelsTable1);
         labelsTables.addAll(labelsTable2);
         return labelsTables.stream()
-                .map(el -> volumeHidingEMM.getSeScheme().decrypt(el.getLabel()))
+                .map(el -> volumeHidingEMM.getSeScheme().decrypt(el.label()))
                 .map(Label::new)
                 .distinct()
                 .sorted()
@@ -132,12 +132,12 @@ public class VolumeHidingEMMOptimisedTest {
 
     private List<Value> getDecryptedValues(
             final VolumeHidingEMM volumeHidingEMM, final PairLabelValue[] table1, final PairLabelValue[] table2) {
-        final var valuesTable1 = Arrays.stream(table1).map(PairLabelValue::getValue).toList();
-        final var valuesTable2 = Arrays.stream(table2).map(PairLabelValue::getValue).toList();
+        final var valuesTable1 = Arrays.stream(table1).map(PairLabelValue::value).toList();
+        final var valuesTable2 = Arrays.stream(table2).map(PairLabelValue::value).toList();
         final var valuesTables = new ArrayList<>(valuesTable1);
         valuesTables.addAll(valuesTable2);
         return valuesTables.stream()
-                .map(el -> volumeHidingEMM.getSeScheme().decrypt(el.getValue()))
+                .map(el -> volumeHidingEMM.getSeScheme().decrypt(el.value()))
                 .map(Value::new)
                 .distinct()
                 .sorted()
