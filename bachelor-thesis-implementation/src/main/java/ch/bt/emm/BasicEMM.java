@@ -37,10 +37,6 @@ public class BasicEMM implements EMM {
         seScheme = new AESSEScheme(secureRandom, keyPair.get(1));
     }
 
-    /**
-     * @param securityParameter
-     * @return
-     */
     @Override
     public SecretKey setup(int securityParameter) {
         final var masterKey = new KeyGenerator(secureRandom, securityParameter).generateKey();
@@ -68,20 +64,11 @@ public class BasicEMM implements EMM {
         return new EncryptedIndexMap(encryptedIndex);
     }
 
-    /**
-     * @param label
-     * @return
-     */
     @Override
     public SearchToken trapdoor(final Label label) {
         return new SearchTokenBytes(hMac.hash(label.label()));
     }
 
-    /**
-     * @param searchToken
-     * @param encryptedIndex
-     * @return
-     */
     @Override
     public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof EncryptedIndexMap)
@@ -113,11 +100,6 @@ public class BasicEMM implements EMM {
         return encryptedValues;
     }
 
-    /**
-     * @param values
-     * @param label
-     * @return
-     */
     @Override
     public Set<Value> result(final Set<Pair> values, final Label label) {
         Set<Value> plaintextValues = new HashSet<>();

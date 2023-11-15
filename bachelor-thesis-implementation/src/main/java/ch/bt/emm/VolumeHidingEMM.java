@@ -36,10 +36,6 @@ public class VolumeHidingEMM implements EMM {
         this.maxStashSize = numberOfValues;
     }
 
-    /**
-     * @param securityParameter
-     * @return
-     */
     @Override
     public SecretKey setup(final int securityParameter) {
         final var key1 = new KeyGenerator(secureRandom, securityParameter).generateKey();
@@ -66,10 +62,6 @@ public class VolumeHidingEMM implements EMM {
         return new EncryptedIndexTables(encryptedTable1, encryptedTable2);
     }
 
-    /**
-     * @param label
-     * @return
-     */
     @Override
     public SearchToken trapdoor(final Label label) {
         final var valueSetSize = multiMap.get(label).size();
@@ -84,11 +76,6 @@ public class VolumeHidingEMM implements EMM {
         return new SearchTokenListInts(token);
     }
 
-    /**
-     * @param searchToken
-     * @param encryptedIndex
-     * @return
-     */
     @Override
     public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof EncryptedIndexTables)
@@ -108,11 +95,6 @@ public class VolumeHidingEMM implements EMM {
         return ciphertexts;
     }
 
-    /**
-     * @param values
-     * @param label
-     * @return
-     */
     @Override
     public Set<Value> result(final Set<Pair> values, final Label label) {
         final var plaintexts =

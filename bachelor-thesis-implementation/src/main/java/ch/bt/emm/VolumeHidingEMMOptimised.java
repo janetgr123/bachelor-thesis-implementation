@@ -17,10 +17,6 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
         super(secureRandom, secureRandomSE, securityParameter, alpha, multiMap);
     }
 
-    /**
-     * @param label
-     * @return
-     */
     @Override
     public SearchToken trapdoor(final Label label) {
         final var hash = getHash();
@@ -28,11 +24,6 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
         return new SearchTokenBytes(labelHash);
     }
 
-    /**
-     * @param searchToken
-     * @param encryptedIndex
-     * @return
-     */
     @Override
     public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof EncryptedIndexTables)

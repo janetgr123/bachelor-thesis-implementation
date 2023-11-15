@@ -7,7 +7,6 @@ import org.apache.commons.math3.distribution.LaplaceDistribution;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /** SSE scheme from Patel et al. (2019) */
 public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
@@ -65,10 +64,6 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
                 encryptedIndex, encryptedCounterTable1, encryptedCounterTable2);
     }
 
-    /**
-     * @param label
-     * @return
-     */
     @Override
     public SearchToken trapdoor(final Label label) {
         final var hash = getHash();
@@ -100,11 +95,6 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
         return new SearchTokenIntBytes(numberOfValuesWithNoise, token);
     }
 
-    /**
-     * @param searchToken
-     * @param encryptedIndex
-     * @return
-     */
     @Override
     public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof DifferentiallyPrivateEncryptedIndexTables)
