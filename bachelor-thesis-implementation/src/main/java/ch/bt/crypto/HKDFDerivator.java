@@ -1,5 +1,6 @@
 package ch.bt.crypto;
 
+import org.bouncycastle.crypto.CryptoServicePurpose;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
@@ -11,8 +12,8 @@ public class HKDFDerivator implements KeyDerivator {
     public HKDFDerivator(final int securityParameter) {
         final var hash =
                 switch (securityParameter) {
-                    case 256 -> new SHA256Digest();
-                    case 512 -> new SHA512Digest();
+                    case 256 -> new SHA256Digest(CryptoServicePurpose.KEYGEN);
+                    case 512 -> new SHA512Digest(CryptoServicePurpose.KEYGEN);
                     default -> throw new IllegalArgumentException(
                             "security parameter doesn't match hash");
                 };
