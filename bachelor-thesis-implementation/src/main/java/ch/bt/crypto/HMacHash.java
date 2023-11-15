@@ -1,12 +1,13 @@
 package ch.bt.crypto;
 
+import org.bouncycastle.crypto.CryptoServicePurpose;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 
 public class HMacHash implements Hash {
-    private static final Digest DEFAULT_HASH = new SHA512Digest();
+    private static final Digest DEFAULT_HASH = new SHA512Digest(CryptoServicePurpose.AUTHENTICATION);
     private final HMac hMac;
     private final KeyParameter keyParameter;
 
