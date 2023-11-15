@@ -19,27 +19,33 @@ import java.util.stream.Stream;
 
 public class BasicEMMTest {
 
-    private final static int MAX_NUMBER_OF_LABELS = 100;
-    private final static int MAX_SIZE_VALUE_SET = 10;
-    private final static List<Integer> VALID_SECURITY_PARAMETERS = List.of(256);
+    private static final int MAX_NUMBER_OF_LABELS = 100;
+    private static final int MAX_SIZE_VALUE_SET = 10;
+    private static final List<Integer> VALID_SECURITY_PARAMETERS = List.of(256);
 
     private final static List<Integer> INVALID_SECURITY_PARAMETERS_FOR_HASH = List.of(128, 1024, 2048);
 
     private final static List<Integer> INVALID_SECURITY_PARAMETERS_FOR_SE = List.of(512);
     private final static Map<Integer, BasicEMM> basicEMMMs = new HashMap<>();
 
-    private final static Map<Integer, Label> searchLabels = new HashMap<>();
+    private static final Map<Integer, Label> searchLabels = new HashMap<>();
 
-    private final static Map<Integer, Map<Label, Set<Value>>> multimaps = new HashMap<>();
+    private static final Map<Integer, Map<Label, Set<Value>>> multimaps = new HashMap<>();
 
     @BeforeAll
     public static void init() {
-        VALID_SECURITY_PARAMETERS.forEach(securityParameter -> {
-                    searchLabels.put(securityParameter, buildMultiMapAndGenerateRandomSearchLabel(securityParameter));
-                    final var emm = new BasicEMM(new SecureRandom(), securityParameter, multimaps.get(securityParameter));
+        VALID_SECURITY_PARAMETERS.forEach(
+                securityParameter -> {
+                    searchLabels.put(
+                            securityParameter,
+                            buildMultiMapAndGenerateRandomSearchLabel(securityParameter));
+                    final var emm =
+                            new BasicEMM(
+                                    new SecureRandom(),
+                                    securityParameter,
+                                    multimaps.get(securityParameter));
                     basicEMMMs.put(securityParameter, emm);
-                }
-        );
+                });
     }
 
     private static Stream<Integer> getValidSecurityParameters() {
@@ -106,9 +112,14 @@ public class BasicEMMTest {
         assertEquals(labels, labels2);
 
         final var token = basicEMM.getHMac().hash(searchLabel.getLabel());
-        final var tokenAndCounter = org.bouncycastle.util.Arrays.concatenate(token, BigInteger.valueOf(0).toByteArray());
+        final var tokenAndCounter =
+                org.bouncycastle.util.Arrays.concatenate(
+                        token, BigInteger.valueOf(0).toByteArray());
         final var encryptedLabel = basicEMM.getHash().hash(tokenAndCounter);
-        final var matchingLabels = encryptedIndex.keySet().stream().filter(el -> Arrays.equals(el.getLabel(), encryptedLabel)).toList();
+        final var matchingLabels =
+                encryptedIndex.keySet().stream()
+                        .filter(el -> Arrays.equals(el.getLabel(), encryptedLabel))
+                        .toList();
         assertEquals(1, matchingLabels.size());
         final var values = encryptedIndex.values();
         Set<Value> plaintexts = new HashSet<>();
@@ -133,14 +144,20 @@ public class BasicEMMTest {
     @ParameterizedTest
     @MethodSource("getInvalidSecurityParametersForHash")
     public void testNotMatchingHash(final int securityParameter) {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new BasicEMM(new SecureRandom(), securityParameter, new HashMap<>()));
+        Throwable exception =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> new BasicEMM(new SecureRandom(), securityParameter, new HashMap<>()));
         assertEquals("security parameter doesn't match hash", exception.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("getInvalidSecurityParametersForSE")
     public void testKeyTooLongForSE(final int securityParameter) {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new BasicEMM(new SecureRandom(), securityParameter, new HashMap<>()));
+        Throwable exception =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> new BasicEMM(new SecureRandom(), securityParameter, new HashMap<>()));
         assertEquals("security parameter too large", exception.getMessage());
     }
 }
