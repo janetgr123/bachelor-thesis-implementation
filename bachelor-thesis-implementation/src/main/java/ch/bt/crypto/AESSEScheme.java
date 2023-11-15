@@ -22,7 +22,6 @@ public class AESSEScheme implements SEScheme {
     private PaddedBufferedBlockCipher ENCRYPTION_CIPHER;
     private PaddedBufferedBlockCipher DECRYPTION_CIPHER;
 
-
     public AESSEScheme(final SecureRandom secureRandom, final int securityParameter) {
         if (securityParameter > 256) {
             throw new IllegalArgumentException("security parameter too large");
@@ -33,7 +32,8 @@ public class AESSEScheme implements SEScheme {
     }
 
     public AESSEScheme(final SecureRandom secureRandom, final SecretKey key) {
-        if (key instanceof SecretKeySingle && key.getKey().keys().get(0).getBytes().length > 32) {
+        if (key instanceof SecretKeySingle
+                && key.getKey().keys().get(0).getBytes().length > 256 / Byte.SIZE) {
             throw new IllegalArgumentException("security parameter too large");
         }
         this.secureRandom = secureRandom;
@@ -58,7 +58,10 @@ public class AESSEScheme implements SEScheme {
         final var cipher = ENCRYPTION_CIPHER;
         final var initialisationVector = new byte[LENGTH_INTIALISATION_VECTOR];
         secureRandom.nextBytes(initialisationVector);
-        final var cipherParameter = new ParametersWithIV(new KeyParameter(key.getKey().keys().get(0).getBytes()), initialisationVector);
+        final var cipherParameter =
+                new ParametersWithIV(
+                        new KeyParameter(key.getKey().keys().get(0).getBytes()),
+                        initialisationVector);
         cipher.init(true, cipherParameter);
         final var output = new byte[cipher.getOutputSize(input.length)];
         processInput(true, input, output);
@@ -71,7 +74,8 @@ public class AESSEScheme implements SEScheme {
         final var cipher = DECRYPTION_CIPHER;
         final var cipherParameter = cipherParameters.get(input);
         cipher.init(false, cipherParameter);
-        final var output = new byte[cipher.getOutputSize(input.length - LENGTH_INTIALISATION_VECTOR)];
+        final var output =
+                new byte[cipher.getOutputSize(input.length - LENGTH_INTIALISATION_VECTOR)];
         processInput(false, input, output);
         return output;
     }
@@ -82,7 +86,8 @@ public class AESSEScheme implements SEScheme {
         final var numberOfBlocks = input.length / blockSize;
         int processedBytes = 0;
         for (int i = 0; i < numberOfBlocks; i++) {
-            processedBytes += cipher.processBytes(input, i * blockSize, blockSize, output, processedBytes);
+            processedBytes +=
+                    cipher.processBytes(input, i * blockSize, blockSize, output, processedBytes);
         }
         try {
             cipher.doFinal(output, processedBytes);
@@ -92,12 +97,14 @@ public class AESSEScheme implements SEScheme {
     }
 
     public Pair encrypt(final Pair pair) {
-        return new Pair(new Label(encrypt(pair.getLabel().getLabel())), new Value(encrypt(pair.getValue().getValue())));
+        return new Pair(
+                new Label(encrypt(pair.getLabel().getLabel())),
+                new Value(encrypt(pair.getValue().getValue())));
     }
 
     public Pair decrypt(final Pair pair) {
-        return new Pair(new Label(decrypt(pair.getLabel().getLabel())), new Value(decrypt(pair.getValue().getValue())));
+        return new Pair(
+                new Label(decrypt(pair.getLabel().getLabel())),
+                new Value(decrypt(pair.getValue().getValue())));
     }
-
-
 }
