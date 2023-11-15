@@ -2,6 +2,8 @@ package ch.bt.crypto;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import ch.bt.model.*;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -51,6 +53,14 @@ public class AESSESchemeTest {
         final var generatedPlaintext2 = aesseScheme.decrypt(ciphertext2);
         assertArrayEquals(plaintext, generatedPlaintext);
         assertArrayEquals(plaintext, generatedPlaintext2);
+
+        final var pair = new Pair(new Label(plaintext), new Value(plaintext));
+        final var ciphertextPair = aesseScheme.encrypt(pair);
+        final var ciphertextPair2 = aesseScheme.encrypt(pair);
+        final var generatedPair = aesseScheme.decrypt(ciphertextPair);
+        final var generatedPair2 = aesseScheme.decrypt(ciphertextPair2);
+        assertEquals(pair, generatedPair);
+        assertEquals(pair, generatedPair2);
     }
 
     @ParameterizedTest
@@ -76,6 +86,11 @@ public class AESSESchemeTest {
         final var ciphertext = aesseScheme.encrypt(plaintext);
         final var ciphertext2 = aesseScheme.encrypt(plaintext);
         assertFalse(Arrays.equals(ciphertext, ciphertext2));
+
+        final var pair = new Pair(new Label(plaintext), new Value(plaintext));
+        final var ciphertextPair = aesseScheme.encrypt(pair);
+        final var ciphertextPair2 = aesseScheme.encrypt(pair);
+        assertNotEquals(ciphertextPair, ciphertextPair2);
     }
 
     @ParameterizedTest
