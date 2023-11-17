@@ -27,5 +27,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    - name: Cache Maven Packages
+      uses: actions/cache@v3
+      with: 
+        path: ~/.m2/repository 
+    - name: Create custom library setting.xml
+      uses: whelk-io/maven-settings-xml-action@7c60eb95b2d5ec18f2e0e29f34c9ed69475e7a96
+      with: 
+        repositories: '[{"id": "clusion", "url": "file://${project.basedir}/src/main/resources/clusion"}]'
     - name: Build with Maven
-      run: mvn -B package --file bachelor-thesis-implementation/pom.xml
+      run: mvn install --file bachelor-thesis-implementation/pom.xml
