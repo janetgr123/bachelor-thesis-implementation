@@ -15,6 +15,14 @@
         <logging>2.20.0</logging>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>clusion</id>
+            <name>Clusion</name>
+            <url>file://${project.basedir}/src/main/resources/clusion</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- CRYPTO -->
         <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
@@ -98,7 +106,7 @@
             <artifactId>Clusion</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/Clusion-1.0-SNAPSHOT-jar-with-dependencies.jar
+            <systemPath>${project.basedir}/src/main/resources/clusion/Clusion-1.0-SNAPSHOT-jar-with-dependencies.jar
             </systemPath>
         </dependency>
     </dependencies>

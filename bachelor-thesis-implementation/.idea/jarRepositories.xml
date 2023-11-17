@@ -2,6 +2,11 @@
 <project version="4">
   <component name="RemoteRepositoriesConfiguration">
     <remote-repository>
+      <option name="id" value="clusion" />
+      <option name="name" value="Clusion" />
+      <option name="url" value="file://$PROJECT_DIR$/src/main/resources/Clusion-1.0-SNAPSHOT-jar-with-dependencies.jar" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Central Repository" />
       <option name="url" value="https://repo.maven.apache.org/maven2" />
