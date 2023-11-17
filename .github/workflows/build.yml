@@ -36,4 +36,4 @@ jobs:
       with: 
         repositories: '[{"id": "clusion", "url": "file://${project.basedir}/src/main/resources/clusion"}]'
     - name: Build with Maven
-      run: mvn install --file bachelor-thesis-implementation/pom.xml
+      run: mvn --batch-mode --update-snapshots install --file bachelor-thesis-implementation/pom.xml
