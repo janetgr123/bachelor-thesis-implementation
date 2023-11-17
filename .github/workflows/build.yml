@@ -31,9 +31,5 @@ jobs:
       uses: actions/cache@v3
       with: 
         path: ~/.m2/repository 
-    - name: Create custom library setting.xml
-      uses: whelk-io/maven-settings-xml-action@7c60eb95b2d5ec18f2e0e29f34c9ed69475e7a96
-      with: 
-        repositories: '[{"id": "clusion", "url": "file://${project.basedir}/src/main/resources/clusion"}]'
     - name: Build with Maven
       run: mvn --batch-mode --update-snapshots install --file bachelor-thesis-implementation/pom.xml
