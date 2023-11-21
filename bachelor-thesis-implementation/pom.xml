@@ -15,25 +15,7 @@
         <logging>2.20.0</logging>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>clusion</id>
-            <name>Clusion</name>
-            <url>file://${project.basedir}/src/main/resources/clusion</url>
-        </repository>
-    </repositories>
-
     <dependencies>
-        <!-- CRYPTO -->
-        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
-        <!--
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.76</version>
-        </dependency>
-        -->
-
         <!-- FIPS Provider -->
         <!-- https://mvnrepository.com/artifact/org.bouncycastle/bc-fips -->
         <dependency>
@@ -109,16 +91,6 @@
             <groupId>org.jgrapht</groupId>
             <artifactId>jgrapht-core</artifactId>
             <version>1.5.2</version>
-        </dependency>
-
-        <!-- Clusion Library for SSE -->
-        <dependency>
-            <groupId>org.crypto.sse</groupId>
-            <artifactId>Clusion</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/clusion/Clusion-1.0-SNAPSHOT.jar
-            </systemPath>
         </dependency>
 
         <!-- Benchmarking -->
