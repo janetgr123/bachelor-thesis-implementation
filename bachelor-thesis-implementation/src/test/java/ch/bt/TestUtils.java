@@ -38,7 +38,7 @@ public class TestUtils {
                             searchLabels.put(
                                     securityParameter,
                                     new Label(
-                                            BigInteger.valueOf((int) (21047 * Math.random()))
+                                            BigInteger.valueOf((int) (20 * Math.random()))
                                                     .toByteArray()));
                         });
     }
