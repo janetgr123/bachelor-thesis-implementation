@@ -1,8 +1,5 @@
 package ch.bt;
 
-import ch.bt.TestConfigurations;
-import ch.bt.emm.BasicEMM;
-import ch.bt.emm.VolumeHidingEMM;
 import ch.bt.model.Label;
 import ch.bt.model.Plaintext;
 

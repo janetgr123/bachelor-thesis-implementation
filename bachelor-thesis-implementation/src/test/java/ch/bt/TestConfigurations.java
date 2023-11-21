@@ -10,15 +10,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * <a href="https://stackoverflow.com/questions/43282798/in-junit-5-how-to-run-code-before-all-tests">...</a>
+ * <a
+ * href="https://stackoverflow.com/questions/43282798/in-junit-5-how-to-run-code-before-all-tests">...</a>
  */
-
 public class TestConfigurations implements BeforeAllCallback {
     private static boolean started = false;
     public static Connection connection;
 
     @Override
-    public void beforeAll(ExtensionContext extensionContext) throws Exception {
+    public void beforeAll(ExtensionContext extensionContext) {
         if (!started) {
             started = true;
             Security.addProvider(new BouncyCastleFipsProvider());
