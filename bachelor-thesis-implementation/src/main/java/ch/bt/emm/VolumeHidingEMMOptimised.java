@@ -1,37 +1,40 @@
 package ch.bt.emm;
 
+import ch.bt.crypto.CryptoUtils;
 import ch.bt.model.*;
+import ch.bt.model.Label;
+import ch.bt.model.encryptedindex.EncryptedIndex;
+import ch.bt.model.encryptedindex.EncryptedIndexTables;
+import ch.bt.model.searchtoken.SearchToken;
+import ch.bt.model.searchtoken.SearchTokenBytes;
 
-import java.security.SecureRandom;
+import java.security.GeneralSecurityException;
 import java.util.*;
 
 /** SSE scheme from Patel et al. (2019) With improved communication using delegatable PRFs */
 public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
 
-    public VolumeHidingEMMOptimised(
-            final SecureRandom secureRandom,
-            final SecureRandom secureRandomSE,
-            final int securityParameter,
-            final int alpha,
-            final Map<Label, Set<Value>> multiMap) {
-        super(secureRandom, secureRandomSE, securityParameter, alpha, multiMap);
+    public VolumeHidingEMMOptimised(final int securityParameter, final int alpha)
+            throws GeneralSecurityException {
+        super(securityParameter, alpha);
     }
 
     @Override
-    public SearchToken trapdoor(final Label label) {
-        final var hash = getHash();
-        final var labelHash = hash.hash(label.label());
+    public SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException {
+        setSearchLabel(searchLabel);
+        final var labelHash = CryptoUtils.calculateSha3Digest(searchLabel.label());
         return new SearchTokenBytes(labelHash);
     }
 
     @Override
-    public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+    public Set<Ciphertext> search(
+            final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof EncryptedIndexTables)
                 || !(searchToken instanceof SearchTokenBytes)) {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
-        Set<Pair> ciphertexts = new HashSet<>();
+        Set<Ciphertext> ciphertexts = new HashSet<>();
         final var encryptedIndexTable1 = ((EncryptedIndexTables) encryptedIndex).getTable(0);
         final var encryptedIndexTable2 = ((EncryptedIndexTables) encryptedIndex).getTable(1);
         final var token = ((SearchTokenBytes) searchToken).token();

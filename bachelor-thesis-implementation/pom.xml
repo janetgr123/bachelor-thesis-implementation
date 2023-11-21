@@ -26,11 +26,22 @@
     <dependencies>
         <!-- CRYPTO -->
         <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
+        <!--
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
             <version>1.76</version>
         </dependency>
+        -->
+
+        <!-- FIPS Provider -->
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bc-fips -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bc-fips</artifactId>
+            <version>1.0.2.4</version>
+        </dependency>
+
 
         <!-- Testing JUnit5 -->
         <dependency>
@@ -108,6 +119,32 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/clusion/Clusion-1.0-SNAPSHOT.jar
             </systemPath>
+        </dependency>
+
+        <!-- Benchmarking -->
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>1.37</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>1.37</version>
+        </dependency>
+
+        <!-- JDBC -->
+        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

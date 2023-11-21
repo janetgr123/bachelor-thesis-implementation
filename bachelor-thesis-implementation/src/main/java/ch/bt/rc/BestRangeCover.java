@@ -1,7 +1,7 @@
 package ch.bt.rc;
 
-import ch.bt.model.CustomRange;
-import ch.bt.model.Vertex;
+import ch.bt.model.rc.CustomRange;
+import ch.bt.model.rc.Vertex;
 
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;

@@ -2,60 +2,63 @@ package ch.bt.emm;
 
 import ch.bt.crypto.*;
 import ch.bt.model.*;
+import ch.bt.model.Label;
+import ch.bt.model.encryptedindex.EncryptedIndex;
+import ch.bt.model.encryptedindex.EncryptedIndexTables;
+import ch.bt.model.searchtoken.SearchToken;
+import ch.bt.model.searchtoken.SearchTokenInts;
+import ch.bt.model.searchtoken.SearchTokenListInts;
 
-import java.security.SecureRandom;
+import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.crypto.SecretKey;
+
 /** SSE scheme from Patel et al. (2019) */
 public class VolumeHidingEMM implements EMM {
-    private final SecureRandom secureRandom;
-    private final SecureRandom secureRandomSE;
     private final SEScheme seScheme;
-    private final Hash hash;
+    private int maxStashSize;
+    private int tableSize;
+    private Stack<PairLabelPlaintext> stash;
+    private final int alpha;
+    private Map<Label, Set<Plaintext>> multiMap;
 
-    private final Map<Label, Set<Value>> multiMap;
-    private final int maxStashSize;
-    private final int tableSize;
-    private Stack<PairLabelValue> stash;
+    private Label searchLabel;
 
-    public VolumeHidingEMM(
-            final SecureRandom secureRandom,
-            final SecureRandom secureRandomSE,
-            final int securityParameter,
-            final int alpha,
-            final Map<Label, Set<Value>> multiMap) {
-        this.secureRandom = secureRandom;
-        this.secureRandomSE = secureRandomSE;
+    public VolumeHidingEMM(final int securityParameter, final int alpha)
+            throws GeneralSecurityException {
+        final var secretKeys = this.setup(securityParameter);
+        this.seScheme = new AESSEScheme(secretKeys.get(1));
+        this.alpha = alpha;
+    }
+
+    @Override
+    public List<SecretKey> setup(final int securityParameter) throws GeneralSecurityException {
+        final var key1 = CryptoUtils.generateKeyWithHMac(securityParameter);
+        final var key2 = CryptoUtils.generateKeyForAES(securityParameter);
+        return List.of(key1, key2);
+    }
+
+    @Override
+    public EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
+            throws GeneralSecurityException {
         this.multiMap = multiMap;
-        final var secretKey = this.setup(securityParameter);
-        this.hash = new SHA256Hash();
-        this.seScheme = new AESSEScheme(secureRandomSE, secretKey.getKey().keys().get(1));
         final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multiMap);
         this.tableSize = (1 + alpha) * numberOfValues;
         this.maxStashSize = numberOfValues;
-    }
 
-    @Override
-    public SecretKey setup(final int securityParameter) {
-        final var key1 = new KeyGenerator(secureRandom, securityParameter).generateKey();
-        final var key2 = new KeyGenerator(secureRandomSE, securityParameter).generateKey();
-        return new SecretKeyPair(key1, key2);
-    }
-
-    @Override
-    public EncryptedIndex buildIndex() {
-        final PairLabelValue[] table1 = new PairLabelValue[tableSize];
-        final PairLabelValue[] table2 = new PairLabelValue[tableSize];
-        final Stack<PairLabelValue> stash = new Stack<>();
+        final PairLabelPlaintext[] table1 = new PairLabelPlaintext[tableSize];
+        final PairLabelPlaintext[] table2 = new PairLabelPlaintext[tableSize];
+        final Stack<PairLabelPlaintext> stash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
-                maxStashSize, table1, table2, multiMap, stash, hash, tableSize);
+                maxStashSize, table1, table2, multiMap, stash, tableSize);
         VolumeHidingEMMUtils.fillEmptyValues(table1);
         VolumeHidingEMMUtils.fillEmptyValues(table2);
         this.stash = stash;
 
-        final PairLabelValue[] encryptedTable1 = new PairLabelValue[tableSize];
-        final PairLabelValue[] encryptedTable2 = new PairLabelValue[tableSize];
+        final PairLabelCiphertext[] encryptedTable1 = new PairLabelCiphertext[tableSize];
+        final PairLabelCiphertext[] encryptedTable2 = new PairLabelCiphertext[tableSize];
         VolumeHidingEMMUtils.encryptTables(
                 table1, table2, encryptedTable1, encryptedTable2, seScheme);
 
@@ -63,13 +66,14 @@ public class VolumeHidingEMM implements EMM {
     }
 
     @Override
-    public SearchToken trapdoor(final Label label) {
-        final var valueSetSize = multiMap.get(label).size();
+    public SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException {
+        this.searchLabel = searchLabel;
+        final var valueSetSize = multiMap.get(searchLabel).size();
         final var token = new ArrayList<SearchTokenInts>();
         int i = 0;
         while (i < valueSetSize) {
-            final var token1 = VolumeHidingEMMUtils.getHash(label, i, 0, hash, tableSize);
-            final var token2 = VolumeHidingEMMUtils.getHash(label, i, 1, hash, tableSize);
+            final var token1 = VolumeHidingEMMUtils.getHash(searchLabel, i, 0, tableSize);
+            final var token2 = VolumeHidingEMMUtils.getHash(searchLabel, i, 1, tableSize);
             token.add(new SearchTokenInts(token1, token2));
             i++;
         }
@@ -77,13 +81,14 @@ public class VolumeHidingEMM implements EMM {
     }
 
     @Override
-    public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+    public Set<Ciphertext> search(
+            final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
         if (!(encryptedIndex instanceof EncryptedIndexTables)
                 || !(searchToken instanceof SearchTokenListInts)) {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
-        Set<Pair> ciphertexts = new HashSet<>();
+        Set<Ciphertext> ciphertexts = new HashSet<>();
         final var encryptedIndexTable1 = ((EncryptedIndexTables) encryptedIndex).getTable(0);
         final var encryptedIndexTable2 = ((EncryptedIndexTables) encryptedIndex).getTable(1);
         final var token = ((SearchTokenListInts) searchToken).getSearchTokenList();
@@ -96,28 +101,33 @@ public class VolumeHidingEMM implements EMM {
     }
 
     @Override
-    public Set<Value> result(final Set<Pair> values, final Label label) {
+    public Set<Plaintext> result(final Set<Ciphertext> ciphertexts)
+            throws GeneralSecurityException {
+        final var encryptedSearchLabel = seScheme.encryptLabel(searchLabel);
         final var plaintexts =
-                values.stream()
-                        .map(PairLabelValue.class::cast)
-                        .map(seScheme::decrypt)
-                        .filter(el -> el.label().equals(label))
+                ciphertexts.stream()
+                        .map(PairLabelCiphertext.class::cast)
+                        .filter(el -> el.label().equals(encryptedSearchLabel))
+                        .map(PairLabelCiphertext::value)
+                        .map(
+                                ciphertextWithIV -> {
+                                    try {
+                                        return seScheme.decrypt(ciphertextWithIV);
+                                    } catch (GeneralSecurityException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                })
                         .collect(Collectors.toSet());
         plaintexts.addAll(
-                stash.stream().filter(el -> el.label().equals(label)).collect(Collectors.toSet()));
-        return plaintexts.stream().map(PairLabelValue::value).collect(Collectors.toSet());
-    }
-
-    public Map<Label, Set<Value>> getMultiMap() {
-        return multiMap;
+                stash.stream()
+                        .filter(el -> el.label().equals(searchLabel))
+                        .map(PairLabelPlaintext::value)
+                        .collect(Collectors.toSet()));
+        return plaintexts;
     }
 
     public SEScheme getSeScheme() {
         return seScheme;
-    }
-
-    public Hash getHash() {
-        return hash;
     }
 
     public int getTableSize() {
@@ -126,5 +136,9 @@ public class VolumeHidingEMM implements EMM {
 
     public int getMaxStashSize() {
         return maxStashSize;
+    }
+
+    public void setSearchLabel(final Label label) {
+        this.searchLabel = label;
     }
 }
