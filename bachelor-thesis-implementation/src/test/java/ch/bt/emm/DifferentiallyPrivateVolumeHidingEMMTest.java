@@ -17,7 +17,6 @@ import java.util.*;
 
 @ExtendWith({TestConfigurations.class})
 public class DifferentiallyPrivateVolumeHidingEMMTest {
-    private static final int ALPHA = 2;
     private static final double EPSILON = 0.2;
     private static final Map<Integer, DifferentiallyPrivateVolumeHidingEMM>
             differentiallyPrivateVolumeHidingEMMs = new HashMap<>();
@@ -30,7 +29,7 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
                             try {
                                 final var emm =
                                         new DifferentiallyPrivateVolumeHidingEMM(
-                                                securityParameter, EPSILON, ALPHA);
+                                                securityParameter, EPSILON, TestUtils.ALPHA);
                                 differentiallyPrivateVolumeHidingEMMs.put(securityParameter, emm);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
@@ -115,7 +114,7 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
                         IllegalArgumentException.class,
                         () ->
                                 new DifferentiallyPrivateVolumeHidingEMM(
-                                        securityParameter, EPSILON, ALPHA));
+                                        securityParameter, EPSILON, TestUtils.ALPHA));
         assertEquals(
                 "Attempt to create key with invalid key size [" + securityParameter + "]: AES",
                 exception.getMessage());

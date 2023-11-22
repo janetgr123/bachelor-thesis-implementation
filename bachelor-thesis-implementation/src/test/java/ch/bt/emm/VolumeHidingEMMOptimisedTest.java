@@ -17,7 +17,6 @@ import java.util.*;
 @ExtendWith({TestConfigurations.class})
 public class VolumeHidingEMMOptimisedTest {
 
-    private static final int ALPHA = 2;
     private static final Map<Integer, VolumeHidingEMM> volumeHidingEMMOptimised = new HashMap<>();
 
     @BeforeAll
@@ -27,7 +26,7 @@ public class VolumeHidingEMMOptimisedTest {
                         securityParameter -> {
                             try {
                                 final var emm =
-                                        new VolumeHidingEMMOptimised(securityParameter, ALPHA);
+                                        new VolumeHidingEMMOptimised(securityParameter, TestUtils.ALPHA);
                                 volumeHidingEMMOptimised.put(securityParameter, emm);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
@@ -94,7 +93,7 @@ public class VolumeHidingEMMOptimisedTest {
         Throwable exception =
                 assertThrows(
                         IllegalArgumentException.class,
-                        () -> new VolumeHidingEMMOptimised(securityParameter, ALPHA));
+                        () -> new VolumeHidingEMMOptimised(securityParameter, TestUtils.ALPHA));
         assertEquals(
                 "Attempt to create key with invalid key size [" + securityParameter + "]: AES",
                 exception.getMessage());
