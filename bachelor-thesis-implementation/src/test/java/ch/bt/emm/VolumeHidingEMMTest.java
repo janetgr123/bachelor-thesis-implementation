@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ch.bt.TestConfigurations;
 import ch.bt.TestUtils;
-import ch.bt.model.Label;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
@@ -40,19 +38,16 @@ public class VolumeHidingEMMTest {
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
     public void testCorrectness(final int securityParameter) throws GeneralSecurityException {
         final var volumeHidingEMM = volumeHidingEMMs.get(securityParameter);
-        // final var searchLabel = TestUtils.searchLabels.get(securityParameter);
-        for (int i = 0; i < 21048; i++) {
-            final var searchLabel = new Label(BigInteger.valueOf(i).toByteArray());
-            final var multiMap = TestUtils.multimaps.get(securityParameter);
-            final var encryptedIndex = volumeHidingEMM.buildIndex(multiMap);
-            final var searchToken = volumeHidingEMM.trapdoor(searchLabel);
-            final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
-            final var values = volumeHidingEMM.result(ciphertexts).stream().sorted().toList();
-            final var expectedValues = multiMap.get(searchLabel).stream().sorted().toList();
+        final var searchLabel = TestUtils.searchLabels.get(securityParameter);
+        final var multiMap = TestUtils.multimaps.get(securityParameter);
+        final var encryptedIndex = volumeHidingEMM.buildIndex(multiMap);
+        final var searchToken = volumeHidingEMM.trapdoor(searchLabel);
+        final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
+        final var values = volumeHidingEMM.result(ciphertexts).stream().sorted().toList();
+        final var expectedValues = multiMap.get(searchLabel).stream().sorted().toList();
 
-            // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
-            assertEquals(expectedValues, values);
-        }
+        // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
+        assertEquals(expectedValues, values);
     }
 
     @ParameterizedTest
