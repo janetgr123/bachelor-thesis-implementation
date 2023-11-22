@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ch.bt.TestConfigurations;
 import ch.bt.TestUtils;
+import ch.bt.model.Label;
+import ch.bt.model.Plaintext;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +20,10 @@ import java.util.*;
 public class VolumeHidingEMMOptimisedTest {
 
     private static final Map<Integer, VolumeHidingEMM> volumeHidingEMMOptimised = new HashMap<>();
+
+    private static final Map<Label, Set<Plaintext>> multiMap = TestUtils.multimap;
+
+    private static final Label searchLabel = TestUtils.searchLabel;
 
     @BeforeAll
     public static void init() {
@@ -38,8 +44,6 @@ public class VolumeHidingEMMOptimisedTest {
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
     public void testCorrectness(final int securityParameter) throws GeneralSecurityException {
         final var volumeHidingEMM = volumeHidingEMMOptimised.get(securityParameter);
-        final var multiMap = TestUtils.multimaps.get(securityParameter);
-        final var searchLabel = TestUtils.searchLabels.get(securityParameter);
         final var encryptedIndex = volumeHidingEMM.buildIndex(multiMap);
         final var searchToken = volumeHidingEMM.trapdoor(searchLabel);
         final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
@@ -54,7 +58,6 @@ public class VolumeHidingEMMOptimisedTest {
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
     public void testBuildIndex(final int securityParameter) throws GeneralSecurityException {
         final var volumeHidingEMM = volumeHidingEMMOptimised.get(securityParameter);
-        final var multiMap = TestUtils.multimaps.get(securityParameter);
         final var table11 =
                 ((EncryptedIndexTables) volumeHidingEMM.buildIndex(multiMap)).getTable(0);
         final var table12 =

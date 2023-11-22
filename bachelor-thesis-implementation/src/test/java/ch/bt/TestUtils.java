@@ -2,6 +2,12 @@ package ch.bt;
 
 import ch.bt.model.Label;
 import ch.bt.model.Plaintext;
+import ch.bt.model.rc.Vertex;
+import ch.bt.rc.RangeCoverUtils;
+
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DirectedAcyclicGraph;
 
 import java.math.BigInteger;
 import java.sql.ResultSet;
@@ -12,8 +18,6 @@ import java.util.stream.Stream;
 
 public class TestUtils {
     public static final double ALPHA = 0.3;
-    private static final int MAX_NUMBER_OF_LABELS = 100;
-    private static final int MAX_SIZE_VALUE_SET = 10;
 
     public static final List<Integer> VALID_SECURITY_PARAMETERS_FOR_AES = List.of(128, 256);
 
@@ -21,24 +25,36 @@ public class TestUtils {
 
     public static final List<Integer> VALID_SECURITY_PARAMETERS_FOR_HMAC = List.of(128, 256, 512);
 
-    public static final Map<Integer, Map<Label, Set<Plaintext>>> multimaps = new HashMap<>();
+    public static Map<Label, Set<Plaintext>> multimap = new HashMap<>();
 
-    public static final Map<Integer, Label> searchLabels = new HashMap<>();
+    public static Label searchLabel;
+
+    public static Graph<Vertex, DefaultEdge> graph;
+
+    public static Vertex root;
 
     public static void init() {
-        VALID_SECURITY_PARAMETERS_FOR_AES.forEach(
-                securityParameter -> {
-                    Map<Label, Set<Plaintext>> multiMap;
-                    try {
-                        multiMap = TestUtils.getDataFromDB();
-                        multimaps.put(securityParameter, multiMap);
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                    final var labels = multiMap.keySet().stream().toList();
-                    final var randomLabelId = (int) ((labels.size() - 1) * Math.random());
-                    searchLabels.put(securityParameter, labels.get(randomLabelId));
-                });
+        try {
+            multimap = getDataFromDB();
+            graph = generateGraph(multimap);
+            final var keys =
+                    multimap.keySet().stream()
+                            .map(el -> new BigInteger(el.label()).intValue())
+                            .sorted()
+                            .toList();
+            root =
+                    RangeCoverUtils.getVertex(
+                            graph,
+                            String.join(
+                                    "",
+                                    keys.get(0).toString(),
+                                    keys.get(keys.size() - 1).toString()));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        final var labels = multimap.keySet().stream().toList();
+        final var randomLabelId = (int) ((labels.size() - 1) * Math.random());
+        searchLabel = labels.get(randomLabelId);
     }
 
     public static Map<Label, Set<Plaintext>> getDataFromDB() throws SQLException {
@@ -56,31 +72,6 @@ public class TestUtils {
         return multiMap;
     }
 
-    public static Label buildMultiMapAndGenerateRandomSearchLabel(final int securityParameter) {
-        final Map<Label, Set<Plaintext>> multimap = new HashMap<>();
-        Label searchLabel = null;
-        Random random = new Random();
-        int index = (int) (MAX_NUMBER_OF_LABELS * Math.random()) + 1;
-        while (multimap.size() < MAX_NUMBER_OF_LABELS) {
-            final var values = new HashSet<Plaintext>();
-            int size = (int) (MAX_SIZE_VALUE_SET * Math.random()) + 1;
-            while (values.size() < size) {
-                byte[] v = new byte[securityParameter];
-                random.nextBytes(v);
-                values.add(new Plaintext(v));
-            }
-            byte[] l = new byte[securityParameter];
-            random.nextBytes(l);
-            final var label = new Label(l);
-            multimap.put(label, values);
-            if (multimap.size() == index) {
-                searchLabel = label;
-            }
-        }
-        multimaps.put(securityParameter, multimap);
-        return searchLabel;
-    }
-
     public static Stream<Integer> getValidSecurityParametersForAES() {
         return VALID_SECURITY_PARAMETERS_FOR_AES.stream();
     }
@@ -91,5 +82,22 @@ public class TestUtils {
 
     public static Stream<Integer> getInvalidSecurityParametersForAES() {
         return INVALID_SECURITY_PARAMETERS_FOR_AES.stream();
+    }
+
+    public static Graph<Vertex, DefaultEdge> generateGraph(
+            final Map<Label, Set<Plaintext>> multiMap) {
+        final var graph = new DirectedAcyclicGraph<Vertex, DefaultEdge>(DefaultEdge.class);
+        final Set<Vertex> vertices = new HashSet<>();
+        int n = 0;
+        final var keys = multiMap.keySet();
+        for (final var key : keys) {
+            final var values = multiMap.get(key);
+            n += values.size();
+        }
+        final int size = (int) Math.round(Math.log(n) / Math.log(2));
+        for (int i = 0; i < size; i++) {
+            RangeCoverUtils.addVerticesAndEdgesForLevel(vertices, graph, i);
+        }
+        return graph;
     }
 }

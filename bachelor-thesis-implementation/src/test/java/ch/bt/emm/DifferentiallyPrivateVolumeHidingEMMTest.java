@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ch.bt.TestConfigurations;
 import ch.bt.TestUtils;
+import ch.bt.model.Label;
+import ch.bt.model.Plaintext;
 import ch.bt.model.encryptedindex.DifferentiallyPrivateEncryptedIndexTables;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
 
@@ -20,6 +22,10 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
     private static final double EPSILON = 0.2;
     private static final Map<Integer, DifferentiallyPrivateVolumeHidingEMM>
             differentiallyPrivateVolumeHidingEMMs = new HashMap<>();
+
+    private static final Map<Label, Set<Plaintext>> multiMap = TestUtils.multimap;
+
+    private static final Label searchLabel = TestUtils.searchLabel;
 
     @BeforeAll
     public static void init() {
@@ -42,8 +48,6 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
     public void testCorrectness(final int securityParameter) throws GeneralSecurityException {
         final var differentiallyPrivateVolumeHidingEMM =
                 differentiallyPrivateVolumeHidingEMMs.get(securityParameter);
-        final var multiMap = TestUtils.multimaps.get(securityParameter);
-        final var searchLabel = TestUtils.searchLabels.get(securityParameter);
         final var encryptedIndex = differentiallyPrivateVolumeHidingEMM.buildIndex(multiMap);
         final var searchToken = differentiallyPrivateVolumeHidingEMM.trapdoor(searchLabel);
         final var ciphertextCounters =
@@ -65,7 +69,6 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
     public void testBuildIndex(final int securityParameter) throws GeneralSecurityException {
         final var differentiallyPrivateVolumeHidingEMM =
                 differentiallyPrivateVolumeHidingEMMs.get(securityParameter);
-        final var multiMap = TestUtils.multimaps.get(securityParameter);
         final var encryptedIndexTables1 =
                 ((DifferentiallyPrivateEncryptedIndexTables)
                                 differentiallyPrivateVolumeHidingEMM.buildIndex(multiMap))

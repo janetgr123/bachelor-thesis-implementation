@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ch.bt.TestConfigurations;
 import ch.bt.TestUtils;
+import ch.bt.model.Label;
+import ch.bt.model.Plaintext;
 import ch.bt.model.encryptedindex.EncryptedIndexMap;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +20,10 @@ import java.util.*;
 @ExtendWith({TestConfigurations.class})
 public class BasicEMMTest {
     private static final Map<Integer, BasicEMM> basicEMMMs = new HashMap<>();
+
+    private static final Map<Label, Set<Plaintext>> multimap = TestUtils.multimap;
+
+    private static final Label searchLabel = TestUtils.searchLabel;
 
     @BeforeAll
     public static void init() {
@@ -37,8 +43,6 @@ public class BasicEMMTest {
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
     public void testCorrectness(final int securityParameter) throws GeneralSecurityException {
         final var basicEMM = basicEMMMs.get(securityParameter);
-        final var multimap = TestUtils.multimaps.get(securityParameter);
-        final var searchLabel = TestUtils.searchLabels.get(securityParameter);
         final var encryptedIndex = basicEMM.buildIndex(multimap);
         final var searchToken = basicEMM.trapdoor(searchLabel);
         final var ciphertexts = basicEMM.search(searchToken, encryptedIndex);
@@ -53,7 +57,6 @@ public class BasicEMMTest {
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
     public void testBuildIndex(final int securityParameter) throws GeneralSecurityException {
         final var basicEMM = basicEMMMs.get(securityParameter);
-        final var multimap = TestUtils.multimaps.get(securityParameter);
         final var encryptedIndex = ((EncryptedIndexMap) basicEMM.buildIndex(multimap)).map();
         final var encryptedIndex2 = ((EncryptedIndexMap) basicEMM.buildIndex(multimap)).map();
         final var labels = encryptedIndex.keySet().stream().sorted().toList();
