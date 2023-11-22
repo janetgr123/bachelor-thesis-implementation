@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class TestUtils {
-    public static final int ALPHA = 3;
+    public static final double ALPHA = 0.3;
     private static final int MAX_NUMBER_OF_LABELS = 100;
     private static final int MAX_SIZE_VALUE_SET = 10;
 

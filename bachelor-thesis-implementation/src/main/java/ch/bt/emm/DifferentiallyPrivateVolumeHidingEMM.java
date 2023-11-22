@@ -24,7 +24,7 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
     private Stack<PairLabelNumberValues> counterStash;
 
     public DifferentiallyPrivateVolumeHidingEMM(
-            final int securityParameter, final double epsilon, final int alpha)
+            final int securityParameter, final double epsilon, final double alpha)
             throws GeneralSecurityException {
         super(securityParameter, alpha);
         this.epsilon = epsilon;
@@ -42,7 +42,13 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
         final PairLabelNumberValues[] counterTable2 = new PairLabelNumberValues[tableSize];
         final Stack<PairLabelNumberValues> counterStash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStashCT(
-                maxStashSize, counterTable1, counterTable2, multiMap, counterStash, tableSize);
+                getMaxNumberOfEvictions(),
+                maxStashSize,
+                counterTable1,
+                counterTable2,
+                multiMap,
+                counterStash,
+                tableSize);
         VolumeHidingEMMUtils.fillEmptyValues(counterTable1);
         VolumeHidingEMMUtils.fillEmptyValues(counterTable2);
         this.counterStash = counterStash;

@@ -14,7 +14,7 @@ import java.util.*;
 /** SSE scheme from Patel et al. (2019) With improved communication using delegatable PRFs */
 public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
 
-    public VolumeHidingEMMOptimised(final int securityParameter, final int alpha)
+    public VolumeHidingEMMOptimised(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
         super(securityParameter, alpha);
     }

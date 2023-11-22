@@ -20,13 +20,15 @@ public class VolumeHidingEMM implements EMM {
     private final SEScheme seScheme;
     private int maxStashSize;
     private int tableSize;
+
+    private int maxNumberOfEvictions;
     private Stack<PairLabelPlaintext> stash;
-    private final int alpha;
+    private final double alpha;
     private Map<Label, Set<Plaintext>> multiMap;
 
     private Label searchLabel;
 
-    public VolumeHidingEMM(final int securityParameter, final int alpha)
+    public VolumeHidingEMM(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
         final var secretKeys = this.setup(securityParameter);
         this.seScheme = new AESSEScheme(secretKeys.get(1));
@@ -45,14 +47,15 @@ public class VolumeHidingEMM implements EMM {
             throws GeneralSecurityException {
         this.multiMap = multiMap;
         final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multiMap);
-        this.tableSize = (1 + alpha) * numberOfValues;
+        this.tableSize = (int) Math.round((1 + alpha) * numberOfValues);
+        this.maxNumberOfEvictions = (int) Math.round(5 * Math.log(numberOfValues) / Math.log(2));
         this.maxStashSize = numberOfValues;
 
         final PairLabelPlaintext[] table1 = new PairLabelPlaintext[tableSize];
         final PairLabelPlaintext[] table2 = new PairLabelPlaintext[tableSize];
         final Stack<PairLabelPlaintext> stash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
-                maxStashSize, table1, table2, multiMap, stash, tableSize);
+                maxNumberOfEvictions, maxStashSize, table1, table2, multiMap, stash, tableSize);
         VolumeHidingEMMUtils.fillEmptyValues(table1);
         VolumeHidingEMMUtils.fillEmptyValues(table2);
         this.stash = stash;
@@ -144,5 +147,9 @@ public class VolumeHidingEMM implements EMM {
 
     public void setSearchLabel(final Label label) {
         this.searchLabel = label;
+    }
+
+    public int getMaxNumberOfEvictions() {
+        return maxNumberOfEvictions;
     }
 }

@@ -26,6 +26,7 @@ public class VolumeHidingEMMUtils {
     }
 
     public static void doCuckooHashingWithStash(
+            final int maxNumberOfEvictions,
             final int maxStashSize,
             final PairLabelPlaintext[] table1,
             final PairLabelPlaintext[] table2,
@@ -46,7 +47,7 @@ public class VolumeHidingEMMUtils {
             final var values = indices.get(label);
             for (final var value : values) {
                 PairLabelPlaintext toInsert = new PairLabelPlaintext(label, value);
-                while (evictionCounter < Math.log(tableSize) && toInsert != null) {
+                while (evictionCounter < maxNumberOfEvictions && toInsert != null) {
                     logger.debug("Inserting in table 1: {}", toInsert);
                     toInsert =
                             insert(
@@ -89,6 +90,7 @@ public class VolumeHidingEMMUtils {
     }
 
     public static void doCuckooHashingWithStashCT(
+            final int maxNumberOfEvictions,
             final int maxStashSize,
             final PairLabelNumberValues[] table1,
             final PairLabelNumberValues[] table2,
@@ -102,7 +104,7 @@ public class VolumeHidingEMMUtils {
         for (final var label : labels) {
             final var numberOfValues = multiMap.get(label).size();
             PairLabelNumberValues toInsert = new PairLabelNumberValues(label, numberOfValues);
-            while (evictionCounter < Math.log(tableSize) && toInsert != null) {
+            while (evictionCounter < maxNumberOfEvictions && toInsert != null) {
                 logger.debug("Inserting in table 1: {}", toInsert);
                 toInsert = insert(table1, getHashCT(toInsert.label(), 0, tableSize), toInsert);
                 if (toInsert != null) {
