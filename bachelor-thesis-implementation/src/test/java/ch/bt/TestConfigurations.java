@@ -28,8 +28,7 @@ public class TestConfigurations implements BeforeAllCallback {
     public static Connection connection;
 
     @Override
-    public void beforeAll(ExtensionContext extensionContext)
-            throws SQLException, IOException, InterruptedException {
+    public void beforeAll(ExtensionContext extensionContext) throws SQLException {
         if (!started) {
             started = true;
             Security.addProvider(new BouncyCastleFipsProvider());
