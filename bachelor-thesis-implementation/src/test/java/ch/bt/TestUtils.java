@@ -25,23 +25,19 @@ public class TestUtils {
 
     public static final Map<Integer, Label> searchLabels = new HashMap<>();
 
-    private static final List<Integer> possibleSearchLabels = new ArrayList<>();
-
     public static void init() {
         VALID_SECURITY_PARAMETERS_FOR_AES.forEach(
                 securityParameter -> {
+                    Map<Label, Set<Plaintext>> multiMap;
                     try {
-                        multimaps.put(securityParameter, TestUtils.getDataFromDB());
+                        multiMap = TestUtils.getDataFromDB();
+                        multimaps.put(securityParameter, multiMap);
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
-                    final var randomLabelId =
-                            (int) ((possibleSearchLabels.size() - 1) * Math.random());
-                    searchLabels.put(
-                            securityParameter,
-                            new Label(
-                                    BigInteger.valueOf(possibleSearchLabels.get(randomLabelId))
-                                            .toByteArray()));
+                    final var labels = multiMap.keySet().stream().toList();
+                    final var randomLabelId = (int) ((labels.size() - 1) * Math.random());
+                    searchLabels.put(securityParameter, labels.get(randomLabelId));
                 });
     }
 
@@ -50,7 +46,6 @@ public class TestUtils {
         ResultSet rs = stmt.executeQuery("select pk_node_id, latitude from t_network_nodes");
         final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
         while (rs.next()) {
-            possibleSearchLabels.add(rs.getInt("pk_node_id"));
             final var set = new HashSet<Plaintext>();
             set.add(
                     new Plaintext(

@@ -68,7 +68,11 @@ public class VolumeHidingEMM implements EMM {
     @Override
     public SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException {
         this.searchLabel = searchLabel;
-        final var valueSetSize = multiMap.get(searchLabel).size();
+        final var valueSet = multiMap.get(searchLabel);
+        int valueSetSize = 0;
+        if (valueSet != null) {
+            valueSetSize = valueSet.size();
+        }
         final var token = new ArrayList<SearchTokenInts>();
         int i = 0;
         while (i < valueSetSize) {
