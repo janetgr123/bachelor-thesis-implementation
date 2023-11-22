@@ -2,61 +2,52 @@ package ch.bt.emm;
 
 import ch.bt.crypto.*;
 import ch.bt.model.*;
+import ch.bt.model.Label;
+import ch.bt.model.Plaintext;
+import ch.bt.model.encryptedindex.EncryptedIndex;
+import ch.bt.model.encryptedindex.EncryptedIndexMap;
+import ch.bt.model.searchtoken.SearchToken;
+import ch.bt.model.searchtoken.SearchTokenBytes;
 
-import org.bouncycastle.crypto.params.KeyParameter;
-
-import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.security.GeneralSecurityException;
 import java.util.*;
+
+import javax.crypto.SecretKey;
 
 /** based on the SSE scheme Pi_bas from Cash et al. 2014 */
 public class BasicEMM implements EMM {
-    private final SecureRandom secureRandom;
-
-    private final HKDFDerivator keyDerivator;
-
     private final SEScheme seScheme;
+    private final SecretKey hmacKey;
+    private final SecretKey encryptionKey;
 
-    private final Map<Label, Set<Value>> multiMap;
-
-    private final Hash hMac;
-
-    private final Hash hash;
-
-    public BasicEMM(
-            final SecureRandom secureRandom,
-            final int securityParameter,
-            final Map<Label, Set<Value>> multiMap) {
-        this.secureRandom = secureRandom;
-        this.keyDerivator = new HKDFDerivator(securityParameter);
-        this.multiMap = multiMap;
-        final var key = this.setup(securityParameter);
-        final var keyPair = key.getKey().keys();
-        hMac = new HMacHash(new KeyParameter(keyPair.get(0).getBytes()));
-        hash = new SHA512Hash();
-        seScheme = new AESSEScheme(secureRandom, keyPair.get(1));
+    public BasicEMM(final int securityParameter) throws GeneralSecurityException {
+        final var keys = this.setup(securityParameter);
+        this.hmacKey = keys.get(0);
+        this.encryptionKey = keys.get(1);
+        seScheme = new AESSEScheme(encryptionKey);
     }
 
     @Override
-    public SecretKey setup(int securityParameter) {
-        final var masterKey = new KeyGenerator(secureRandom, securityParameter).generateKey();
-        final var key1 = keyDerivator.deriveKeyFrom(masterKey, null);
-        final var key2 = keyDerivator.deriveKeyFrom(masterKey, null);
-        return new SecretKeyPair(key1, key2);
+    public List<SecretKey> setup(int securityParameter) throws GeneralSecurityException {
+        final var key1 = CryptoUtils.generateKeyWithHMac(securityParameter);
+        final var key2 = CryptoUtils.generateKeyForAES(securityParameter);
+        return List.of(key1, key2);
     }
 
     @Override
-    public EncryptedIndex buildIndex() {
-        Map<Label, Value> encryptedIndex = new HashMap<>();
+    public EncryptedIndex buildIndex(Map<Label, Set<Plaintext>> multiMap)
+            throws GeneralSecurityException {
+        Map<Label, CiphertextWithIV> encryptedIndex = new HashMap<>();
         final var labels = multiMap.keySet();
-        for (Label label : labels) {
+        for (final var label : labels) {
             int counter = 0;
             final var valuesOfLabel = multiMap.get(label);
-            final var token = hMac.hash(label.label());
-            for (Value value : valuesOfLabel) {
+            final var token = CryptoUtils.calculateHmac(hmacKey, label.label());
+            for (final var value : valuesOfLabel) {
                 final var tokenAndCounter = getTokenAndCounter(counter, token);
-                final var encryptedLabel = new Label(hash.hash(tokenAndCounter));
-                final var encryptedValue = new Value(seScheme.encrypt(value.value()));
+                final var encryptedLabel =
+                        new Label(CryptoUtils.calculateSha3Digest(tokenAndCounter));
+                final var encryptedValue = seScheme.encrypt(value);
                 encryptedIndex.put(encryptedLabel, encryptedValue);
                 counter++;
             }
@@ -65,33 +56,30 @@ public class BasicEMM implements EMM {
     }
 
     @Override
-    public SearchToken trapdoor(final Label label) {
-        return new SearchTokenBytes(hMac.hash(label.label()));
+    public SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException {
+        return new SearchTokenBytes(CryptoUtils.calculateHmac(hmacKey, searchLabel.label()));
     }
 
     @Override
-    public Set<Pair> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+    public Set<Ciphertext> search(
+            final SearchToken searchToken, final EncryptedIndex encryptedIndex)
+            throws GeneralSecurityException {
         if (!(encryptedIndex instanceof EncryptedIndexMap)
                 || !(searchToken instanceof SearchTokenBytes)) {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
         final var encryptedIndexMap = ((EncryptedIndexMap) encryptedIndex).map();
-        Set<Pair> encryptedValues = new HashSet<>();
+        Set<Ciphertext> encryptedValues = new HashSet<>();
         int counter = 0;
         while (true) {
             final var tokenAndCounter =
                     getTokenAndCounter(counter, ((SearchTokenBytes) searchToken).token());
-            final var encryptedLabel = hash.hash(tokenAndCounter);
+            final var encryptedLabel = new Label(CryptoUtils.calculateSha3Digest(tokenAndCounter));
             final var matchingLabels =
-                    encryptedIndexMap.keySet().stream()
-                            .filter(el -> Arrays.equals(el.label(), encryptedLabel))
-                            .toList();
+                    encryptedIndexMap.keySet().stream().filter(encryptedLabel::equals).toList();
             if (matchingLabels.size() == 1) {
-                encryptedValues.add(
-                        new PairLabelValue(
-                                new Label(new byte[0]),
-                                encryptedIndexMap.get(matchingLabels.get(0))));
+                encryptedValues.add(encryptedIndexMap.get(matchingLabels.get(0)));
             } else {
                 break;
             }
@@ -101,35 +89,24 @@ public class BasicEMM implements EMM {
     }
 
     @Override
-    public Set<Value> result(final Set<Pair> values, final Label label) {
-        Set<Value> plaintextValues = new HashSet<>();
-        values.forEach(
+    public Set<Plaintext> result(final Set<Ciphertext> ciphertextWithIVS) {
+        Set<Plaintext> plaintextValues = new HashSet<>();
+        ciphertextWithIVS.forEach(
                 encryptedValue -> {
-                    if (!(encryptedValue instanceof PairLabelValue)) {
-                        throw new IllegalArgumentException("type of values not matching.");
+                    try {
+                        plaintextValues.add(seScheme.decrypt((CiphertextWithIV) encryptedValue));
+                    } catch (GeneralSecurityException e) {
+                        throw new RuntimeException(e);
                     }
-                    plaintextValues.add(
-                            new Value(
-                                    seScheme.decrypt(
-                                            ((PairLabelValue) encryptedValue).value().value())));
                 });
         return plaintextValues;
     }
 
-    private byte[] getTokenAndCounter(final int counter, final byte[] token) {
-        return org.bouncycastle.util.Arrays.concatenate(
-                token, BigInteger.valueOf(counter).toByteArray());
+    private String getTokenAndCounter(final int counter, final byte[] token) {
+        return Arrays.toString(token).concat(String.valueOf(counter));
     }
 
     public SEScheme getSeScheme() {
         return this.seScheme;
-    }
-
-    public Hash getHash() {
-        return hash;
-    }
-
-    public Hash getHMac() {
-        return hMac;
     }
 }

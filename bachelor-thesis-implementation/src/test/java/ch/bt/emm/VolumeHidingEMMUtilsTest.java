@@ -2,31 +2,33 @@ package ch.bt.emm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import ch.bt.crypto.*;
+import ch.bt.TestConfigurations;
 import ch.bt.model.*;
+import ch.bt.model.Label;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.security.GeneralSecurityException;
 import java.util.*;
 
+@ExtendWith({TestConfigurations.class})
 public class VolumeHidingEMMUtilsTest {
 
-    private static final Map<Label, Set<Value>> multimap = new HashMap<>();
-    private static final Map<Label, Set<Value>> multimap2 = new HashMap<>();
-
-    private static final Hash hash = new SHA512Hash();
+    private static final Map<Label, Set<Plaintext>> multimap = new HashMap<>();
+    private static final Map<Label, Set<Plaintext>> multimap2 = new HashMap<>();
 
     @BeforeAll
     public static void init() {
-        final var set1 = new HashSet<Value>();
-        final List<Value> plaintexts = new ArrayList<>();
-        plaintexts.add(new Value(new byte[] {0}));
-        plaintexts.add(new Value(new byte[] {1}));
-        plaintexts.add(new Value(new byte[] {2}));
-        plaintexts.add(new Value(new byte[] {3}));
-        plaintexts.add(new Value(new byte[] {4}));
-        plaintexts.add(new Value(new byte[] {5}));
+        final var set1 = new HashSet<Plaintext>();
+        final List<Plaintext> plaintexts = new ArrayList<>();
+        plaintexts.add(new Plaintext(new byte[] {0}));
+        plaintexts.add(new Plaintext(new byte[] {1}));
+        plaintexts.add(new Plaintext(new byte[] {2}));
+        plaintexts.add(new Plaintext(new byte[] {3}));
+        plaintexts.add(new Plaintext(new byte[] {4}));
+        plaintexts.add(new Plaintext(new byte[] {5}));
         final List<Label> labels = new ArrayList<>();
         labels.add(new Label(new byte[] {0}));
         labels.add(new Label(new byte[] {1}));
@@ -49,36 +51,44 @@ public class VolumeHidingEMMUtilsTest {
     }
 
     @Test
-    public void testCuckooHashing() {
-        final int alpha = 1;
+    public void testCuckooHashing() throws GeneralSecurityException {
+        final double alpha = 0.3;
         final int numberOfValues2 = VolumeHidingEMMUtils.getNumberOfValues(multimap2);
-        final var table1 = new PairLabelValue[(1 + alpha) * numberOfValues2];
-        final var table2 = new PairLabelValue[(1 + alpha) * numberOfValues2];
-        final Stack<PairLabelValue> stash = new Stack<>();
+        final int size = (int) Math.round((1 + alpha) * numberOfValues2);
+        final var table1 = new PairLabelPlaintext[size];
+        final var table2 = new PairLabelPlaintext[size];
+        final Stack<PairLabelPlaintext> stash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
-                1, table1, table2, multimap2, stash, hash, (1 + alpha) * numberOfValues2);
-        assertEquals(8, Arrays.stream(table1).filter(Objects::nonNull).count());
-        assertEquals(1, Arrays.stream(table2).filter(Objects::nonNull).count());
+                (int) Math.round(5 * Math.log(numberOfValues2) / Math.log(2)),
+                numberOfValues2,
+                table1,
+                table2,
+                multimap2,
+                stash,
+                size);
+        assertEquals(6, Arrays.stream(table1).filter(Objects::nonNull).count());
+        assertEquals(3, Arrays.stream(table2).filter(Objects::nonNull).count());
         assertEquals(0, stash.size());
     }
 
     @Test
-    public void testCuckooHashing2() {
-        final int alpha = 1;
+    public void testCuckooHashing2() throws GeneralSecurityException {
+        final double alpha = 0.3;
         final int numberOfValues1 = VolumeHidingEMMUtils.getNumberOfValues(multimap);
-        final var table1 = new PairLabelValue[(1 + alpha) * numberOfValues1];
-        final var table2 = new PairLabelValue[(1 + alpha) * numberOfValues1];
-        final Stack<PairLabelValue> stash = new Stack<>();
+        final int size = (int) Math.round((1 + alpha) * numberOfValues1);
+        final var table1 = new PairLabelPlaintext[size];
+        final var table2 = new PairLabelPlaintext[size];
+        final Stack<PairLabelPlaintext> stash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
-                numberOfValues1 / 3,
+                (int) Math.round(5 * Math.log(numberOfValues1) / Math.log(2)),
+                numberOfValues1,
                 table1,
                 table2,
                 multimap,
                 stash,
-                hash,
-                (1 + alpha) * numberOfValues1);
-        assertEquals(17, Arrays.stream(table1).filter(Objects::nonNull).count());
-        assertEquals(5, Arrays.stream(table2).filter(Objects::nonNull).count());
-        assertEquals(11, stash.size());
+                size);
+        assertEquals(21, Arrays.stream(table1).filter(Objects::nonNull).count());
+        assertEquals(12, Arrays.stream(table2).filter(Objects::nonNull).count());
+        assertEquals(0, stash.size());
     }
 }

@@ -2,6 +2,7 @@ package ch.bt.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Arrays;
 
@@ -14,9 +15,7 @@ public record Label(byte[] label) implements Comparable<Label> {
 
     @Override
     public String toString() {
-        return new org.apache.commons.lang3.builder.ToStringBuilder(this)
-                .append("label", label)
-                .toString();
+        return new ToStringBuilder(this).append("label", label).toString();
     }
 
     @Override
@@ -33,5 +32,9 @@ public record Label(byte[] label) implements Comparable<Label> {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(label).toHashCode();
+    }
+
+    public byte[] label() {
+        return label;
     }
 }

@@ -15,22 +15,15 @@
         <logging>2.20.0</logging>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>clusion</id>
-            <name>Clusion</name>
-            <url>file://${project.basedir}/src/main/resources/clusion</url>
-        </repository>
-    </repositories>
-
     <dependencies>
-        <!-- CRYPTO -->
-        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
+        <!-- FIPS Provider -->
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bc-fips -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.76</version>
+            <artifactId>bc-fips</artifactId>
+            <version>1.0.2.4</version>
         </dependency>
+
 
         <!-- Testing JUnit5 -->
         <dependency>
@@ -44,6 +37,21 @@
             <artifactId>junit-jupiter-params</artifactId>
             <version>5.10.1</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Testcontainer -->
+        <!-- https://mvnrepository.com/artifact/org.testcontainers/postgresql -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.19.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.18.3</version>
         </dependency>
 
         <!-- Generating methods -->
@@ -100,15 +108,40 @@
             <version>1.5.2</version>
         </dependency>
 
-        <!-- Clusion Library for SSE -->
+        <!-- Benchmarking -->
         <dependency>
-            <groupId>org.crypto.sse</groupId>
-            <artifactId>Clusion</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/clusion/Clusion-1.0-SNAPSHOT.jar
-            </systemPath>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>1.37</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>1.37</version>
+        </dependency>
+
+        <!-- JDBC -->
+        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- CSV Parser -->
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.10.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
