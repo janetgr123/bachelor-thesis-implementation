@@ -10,19 +10,24 @@ import java.util.Set;
 
 public class RangeCoverUtils {
     public static void addVerticesAndEdgesForLevel(
-            final Set<Vertex> vertices, Graph<Vertex, DefaultEdge> graph, final int level) {
+            final Set<Vertex> vertices,
+            Graph<Vertex, DefaultEdge> graph,
+            final int level,
+            final int n) {
         final int size = (int) Math.pow(2, level) - 1;
-        for (int i = 0; i < 8; i += 1 + size) {
+        for (int i = 0; i < n; i += 1 + size) {
             final var range = new CustomRange(i, i + size);
             final var targetVertices =
                     vertices.stream()
                             .filter(
                                     el ->
                                             range.containsRange(el.range())
-                                                    && el.range().size() > level - 1)
+                                                    && (el.range().size()
+                                                            == ((int) Math.pow(2, level - 1))))
                             .toList();
             final var sourceVertex =
-                    new Vertex(String.valueOf(i).concat(String.valueOf(i + size)), range);
+                    new Vertex(
+                            String.join("-", String.valueOf(i), String.valueOf(i + size)), range);
             vertices.add(sourceVertex);
             graph.addVertex(sourceVertex);
             targetVertices.forEach(

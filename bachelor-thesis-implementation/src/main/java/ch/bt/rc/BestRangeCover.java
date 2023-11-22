@@ -24,6 +24,9 @@ public class BestRangeCover implements RangeCoveringAlgorithm {
             final CustomRange q,
             final Vertex v,
             final Set<Vertex> rangeCover) {
+        if (q.isEmpty()) {
+            return new HashSet<>();
+        }
         explored.add(v);
         if (q.containsRange(v.range())) {
             rangeCover.add(v);

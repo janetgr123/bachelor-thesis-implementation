@@ -1,6 +1,5 @@
 package ch.bt.genericRs;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ch.bt.TestConfigurations;
@@ -14,7 +13,6 @@ import ch.bt.model.Plaintext;
 import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
 import ch.bt.rc.BestRangeCover;
-import ch.bt.rc.RangeCoveringAlgorithm;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
@@ -43,18 +41,18 @@ public class RangeBRCSchemeTest {
 
     private static final double EPSILON = 0.2;
 
-    private static final Map<Label, Set<Plaintext>> multimap = TestUtils.multimap;
+    private static Map<Label, Set<Plaintext>> multimap;
 
-    private static final Graph<Vertex, DefaultEdge> graph = TestUtils.graph;
-
-    private static final RangeCoveringAlgorithm BRC = new BestRangeCover();
-
-    private static final Vertex root = TestUtils.root;
+    private static Graph<Vertex, DefaultEdge> graph;
+    private static Vertex root;
 
     private static final CustomRange range = new CustomRange(27, 84);
 
     @BeforeAll
     public static void init() {
+        multimap = TestUtils.multimap;
+        graph = TestUtils.graph;
+        root = TestUtils.root;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
                         securityParameter -> {
@@ -83,7 +81,8 @@ public class RangeBRCSchemeTest {
     public void testCorrectnessWithBasicEMM(final int securityParameter)
             throws GeneralSecurityException, IOException {
         final var basicEMM = basicEMMs.get(securityParameter);
-        final var rangeScheme = new RangeBRCScheme(securityParameter, basicEMM, graph, BRC, root);
+        final var rangeScheme =
+                new RangeBRCScheme(securityParameter, basicEMM, graph, new BestRangeCover(), root);
         final var encryptedIndex = rangeScheme.buildIndex(multimap);
         final var searchToken = rangeScheme.trapdoor(range);
         final var ciphertexts = rangeScheme.search(searchToken, encryptedIndex);
@@ -93,13 +92,17 @@ public class RangeBRCSchemeTest {
                         .map(el -> BigInteger.valueOf(el).toByteArray())
                         .map(Label::new)
                         .collect(Collectors.toSet());
-        final var expectedValues = new HashSet<Plaintext>();
-        expectedLabels.stream()
-                .map(multimap::get)
-                .flatMap(Collection::stream)
-                .forEach(expectedValues::add);
+        final var expectedValues =
+                expectedLabels.stream()
+                        .map(multimap::get)
+                        .filter(Objects::nonNull)
+                        .flatMap(Collection::stream)
+                        .distinct()
+                        .sorted()
+                        .toList();
 
-        // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
-        assertEquals(values, expectedValues.stream().sorted().toList());
+        // PROPERTY: Result(Search(Trapdoor(range), BuildIndex(multiMap))) =
+        // union(multiMap[label][value] : value in range)
+        assertEquals(expectedValues, values);
     }
 }

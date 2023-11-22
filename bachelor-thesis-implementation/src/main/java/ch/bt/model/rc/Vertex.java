@@ -1,7 +1,11 @@
 package ch.bt.model.rc;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.jetbrains.annotations.NotNull;
 
-public class Vertex {
+public class Vertex implements Comparable<Vertex> {
     final String id;
     final CustomRange range;
 
@@ -16,5 +20,29 @@ public class Vertex {
 
     public CustomRange range() {
         return range;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Vertex vertex = (Vertex) o;
+
+        return new EqualsBuilder().append(id, vertex.id).append(range, vertex.range).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(id).append(range).toHashCode();
+    }
+
+    @Override
+    public int compareTo(@NotNull Vertex vertex) {
+        return new CompareToBuilder()
+                .append(id, vertex.id)
+                .append(range, vertex.range)
+                .toComparison();
     }
 }

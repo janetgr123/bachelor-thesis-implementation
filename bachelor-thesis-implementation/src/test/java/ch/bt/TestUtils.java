@@ -2,6 +2,7 @@ package ch.bt;
 
 import ch.bt.model.Label;
 import ch.bt.model.Plaintext;
+import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
 import ch.bt.rc.RangeCoverUtils;
 
@@ -37,18 +38,20 @@ public class TestUtils {
         try {
             multimap = getDataFromDB();
             graph = generateGraph(multimap);
-            final var keys =
-                    multimap.keySet().stream()
-                            .map(el -> new BigInteger(el.label()).intValue())
+            final var intervalsWith0 =
+                    graph.vertexSet().stream()
+                            .filter(el -> el.id().startsWith("0-"))
+                            .map(Vertex::range)
+                            .map(CustomRange::getMaximum)
                             .sorted()
                             .toList();
             root =
                     RangeCoverUtils.getVertex(
                             graph,
                             String.join(
-                                    "",
-                                    keys.get(0).toString(),
-                                    keys.get(keys.size() - 1).toString()));
+                                    "-",
+                                    "0",
+                                    intervalsWith0.get(intervalsWith0.size() - 1).toString()));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -94,9 +97,9 @@ public class TestUtils {
             final var values = multiMap.get(key);
             n += values.size();
         }
-        final int size = (int) Math.round(Math.log(n) / Math.log(2));
-        for (int i = 0; i < size; i++) {
-            RangeCoverUtils.addVerticesAndEdgesForLevel(vertices, graph, i);
+        final var size = (int) Math.ceil(Math.log(n) / Math.log(2));
+        for (int i = 0; i < size + 1; i++) {
+            RangeCoverUtils.addVerticesAndEdgesForLevel(vertices, graph, i, n);
         }
         return graph;
     }
