@@ -91,12 +91,8 @@ public class TestUtils {
             final Map<Label, Set<Plaintext>> multiMap) {
         final var graph = new DirectedAcyclicGraph<Vertex, DefaultEdge>(DefaultEdge.class);
         final Set<Vertex> vertices = new HashSet<>();
-        int n = 0;
         final var keys = multiMap.keySet();
-        for (final var key : keys) {
-            final var values = multiMap.get(key);
-            n += values.size();
-        }
+        final int n = keys.size();
         final var size = (int) Math.ceil(Math.log(n) / Math.log(2));
         for (int i = 0; i < size + 1; i++) {
             RangeCoverUtils.addVerticesAndEdgesForLevel(vertices, graph, i, n);

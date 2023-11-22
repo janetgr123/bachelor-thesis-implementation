@@ -19,7 +19,7 @@ public interface EMM {
     EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
             throws GeneralSecurityException;
 
-    SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException;
+    SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException, IOException;
 
     Set<Ciphertext> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex)
             throws GeneralSecurityException;

@@ -70,7 +70,7 @@ public class RangeBRCScheme implements GenericRSScheme {
                                 el -> {
                                     try {
                                         return emmScheme.trapdoor(el);
-                                    } catch (GeneralSecurityException e) {
+                                    } catch (GeneralSecurityException | IOException e) {
                                         throw new RuntimeException(e);
                                     }
                                 })

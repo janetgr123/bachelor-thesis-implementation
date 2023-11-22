@@ -68,7 +68,7 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
 
     @Override
     public SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException {
-        setSearchLabel(searchLabel);
+        addSearchLabel(searchLabel);
         final var counterLabelHash =
                 CryptoUtils.calculateSha3Digest(
                         String.join("", "CT", Arrays.toString(searchLabel.label())));

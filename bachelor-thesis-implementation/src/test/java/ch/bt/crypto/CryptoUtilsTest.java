@@ -13,6 +13,7 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.Random;
+
 @ExtendWith({TestConfigurations.class})
 public class CryptoUtilsTest {
 
@@ -69,12 +70,21 @@ public class CryptoUtilsTest {
         final var hash1OfData = CryptoUtils.calculateSha3Digest(data);
         final var hash2OfData = CryptoUtils.calculateSha3Digest(data);
         final var hash1OfData2 = CryptoUtils.calculateSha3Digest(data2);
+        final var hash1OfBothData =
+                CryptoUtils.calculateSha3Digest(
+                        org.bouncycastle.util.Arrays.concatenate(data, data2));
 
         // PROPERTY 1: hash must be deterministic
         assertArrayEquals(hash1OfData, hash2OfData);
 
         // PROPERTY 2: hash must be different for different data
         assertFalse(Arrays.equals(hash1OfData, hash1OfData2));
+
+        // PROPERTY 3:  sha3 does not work as DPRF
+        assertFalse(
+                Arrays.equals(
+                        org.bouncycastle.util.Arrays.concatenate(hash1OfData, hash1OfData2),
+                        hash1OfBothData));
     }
 
     @ParameterizedTest

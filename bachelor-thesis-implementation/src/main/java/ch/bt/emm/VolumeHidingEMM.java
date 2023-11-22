@@ -9,6 +9,7 @@ import ch.bt.model.searchtoken.SearchToken;
 import ch.bt.model.searchtoken.SearchTokenInts;
 import ch.bt.model.searchtoken.SearchTokenListInts;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,12 +27,15 @@ public class VolumeHidingEMM implements EMM {
     private final double alpha;
     private Map<Label, Set<Plaintext>> multiMap;
 
-    private Label searchLabel;
+    private final List<Label> searchLabels = new LinkedList<>();
+
+    private final int securityParameter;
 
     public VolumeHidingEMM(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
-        final var secretKeys = this.setup(securityParameter);
-        this.seScheme = new AESSEScheme(secretKeys.get(1));
+        this.securityParameter = securityParameter;
+        final var keys = this.setup(securityParameter);
+        this.seScheme = new AESSEScheme(keys.get(1));
         this.alpha = alpha;
     }
 
@@ -69,8 +73,9 @@ public class VolumeHidingEMM implements EMM {
     }
 
     @Override
-    public SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException {
-        this.searchLabel = searchLabel;
+    public SearchToken trapdoor(final Label searchLabel)
+            throws GeneralSecurityException, IOException {
+        this.searchLabels.add(searchLabel);
         final var valueSet = multiMap.get(searchLabel);
         int valueSetSize = 0;
         if (valueSet != null) {
@@ -89,7 +94,7 @@ public class VolumeHidingEMM implements EMM {
 
     @Override
     public Set<Ciphertext> search(
-            final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+            final SearchToken searchToken, final EncryptedIndex encryptedIndex) throws GeneralSecurityException {
         if (!(encryptedIndex instanceof EncryptedIndexTables)
                 || !(searchToken instanceof SearchTokenListInts)) {
             throw new IllegalArgumentException(
@@ -110,24 +115,27 @@ public class VolumeHidingEMM implements EMM {
     @Override
     public Set<Plaintext> result(final Set<Ciphertext> ciphertexts)
             throws GeneralSecurityException {
-        final var encryptedSearchLabel = seScheme.encryptLabel(searchLabel);
         final var plaintexts =
                 ciphertexts.stream()
                         .map(PairLabelCiphertext.class::cast)
-                        .filter(el -> el.label().equals(encryptedSearchLabel))
-                        .map(PairLabelCiphertext::value)
                         .map(
-                                ciphertextWithIV -> {
+                                el -> {
                                     try {
-                                        return seScheme.decrypt(ciphertextWithIV);
+                                        return new PairLabelPlaintext(
+                                                seScheme.decryptLabel(el.label()),
+                                                seScheme.decrypt(el.value()));
                                     } catch (GeneralSecurityException e) {
                                         throw new RuntimeException(e);
                                     }
                                 })
+                        .map(PairLabelPlaintext.class::cast)
+                        .filter(el -> !Arrays.equals(el.label().label(), new byte[0]))
+                        .filter(el -> searchLabels.contains(el.label()))
+                        .map(PairLabelPlaintext::value)
                         .collect(Collectors.toSet());
         plaintexts.addAll(
                 stash.stream()
-                        .filter(el -> el.label().equals(searchLabel))
+                        .filter(el -> searchLabels.contains(el.label()))
                         .map(PairLabelPlaintext::value)
                         .collect(Collectors.toSet()));
         return plaintexts;
@@ -145,11 +153,15 @@ public class VolumeHidingEMM implements EMM {
         return maxStashSize;
     }
 
-    public void setSearchLabel(final Label label) {
-        this.searchLabel = label;
+    public void addSearchLabel(final Label label) {
+        this.searchLabels.add(label);
     }
 
     public int getMaxNumberOfEvictions() {
         return maxNumberOfEvictions;
+    }
+
+    public int getSecurityParameter() {
+        return securityParameter;
     }
 }

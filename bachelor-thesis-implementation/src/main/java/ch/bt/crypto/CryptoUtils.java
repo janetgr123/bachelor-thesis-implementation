@@ -114,7 +114,7 @@ public class CryptoUtils {
      * @param securityParameter length in bits of the derived keys
      * @return derived key of the masterkey of length securityParameter bits
      */
-    public static SecretKey deriveKey(final SecretKey masterKey, final int securityParameter)
+    public static SecretKey deriveKey(final byte[] masterKey, final int securityParameter)
             throws IOException,
                     NoSuchAlgorithmException,
                     NoSuchProviderException,
@@ -124,7 +124,7 @@ public class CryptoUtils {
         OutputXOFCalculator<FipsSHS.Parameters> calculator =
                 factory.createOutputXOFCalculator(FipsSHS.SHAKE256);
         OutputStream digestStream = calculator.getFunctionStream();
-        digestStream.write(masterKey.getEncoded());
+        digestStream.write(masterKey);
         digestStream.close();
         final var keyFactory = SecretKeyFactory.getInstance("HmacSHA512", "BCFIPS");
         return keyFactory.generateSecret(

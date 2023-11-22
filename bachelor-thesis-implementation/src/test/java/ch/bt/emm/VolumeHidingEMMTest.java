@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
@@ -39,7 +40,7 @@ public class VolumeHidingEMMTest {
 
     @ParameterizedTest
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
-    public void testCorrectness(final int securityParameter) throws GeneralSecurityException {
+    public void testCorrectness(final int securityParameter) throws GeneralSecurityException, IOException {
         final var volumeHidingEMM = volumeHidingEMMs.get(securityParameter);
         final var encryptedIndex = volumeHidingEMM.buildIndex(multiMap);
         final var searchToken = volumeHidingEMM.trapdoor(searchLabel);
