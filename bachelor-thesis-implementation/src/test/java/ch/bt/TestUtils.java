@@ -23,24 +23,26 @@ public class TestUtils {
 
     public static final Map<Integer, Map<Label, Set<Plaintext>>> multimaps = new HashMap<>();
 
-
     public static final Map<Integer, Label> searchLabels = new HashMap<>();
 
-    public static void init(){
-        VALID_SECURITY_PARAMETERS_FOR_AES
-                .forEach(
-                        securityParameter -> {
-                            try {
-                                multimaps.put(securityParameter, TestUtils.getDataFromDB());
-                            } catch (SQLException e) {
-                                throw new RuntimeException(e);
-                            }
-                            searchLabels.put(
-                                    securityParameter,
-                                    new Label(
-                                            BigInteger.valueOf((int) (21047 * Math.random()))
-                                                    .toByteArray()));
-                        });
+    private static final List<Integer> possibleSearchLabels = new ArrayList<>();
+
+    public static void init() {
+        VALID_SECURITY_PARAMETERS_FOR_AES.forEach(
+                securityParameter -> {
+                    try {
+                        multimaps.put(securityParameter, TestUtils.getDataFromDB());
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    final var randomLabelId =
+                            (int) ((possibleSearchLabels.size() - 1) * Math.random());
+                    searchLabels.put(
+                            securityParameter,
+                            new Label(
+                                    BigInteger.valueOf(possibleSearchLabels.get(randomLabelId))
+                                            .toByteArray()));
+                });
     }
 
     public static Map<Label, Set<Plaintext>> getDataFromDB() throws SQLException {
@@ -48,6 +50,7 @@ public class TestUtils {
         ResultSet rs = stmt.executeQuery("select pk_node_id, latitude from t_network_nodes");
         final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
         while (rs.next()) {
+            possibleSearchLabels.add(rs.getInt("pk_node_id"));
             final var set = new HashSet<Plaintext>();
             set.add(
                     new Plaintext(
