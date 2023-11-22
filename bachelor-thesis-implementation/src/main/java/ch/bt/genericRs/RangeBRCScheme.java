@@ -14,6 +14,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,7 +34,8 @@ public class RangeBRCScheme implements GenericRSScheme {
             final EMM emmScheme,
             final Graph<Vertex, DefaultEdge> graph,
             final RangeCoveringAlgorithm rangeCoveringAlgorithm,
-            final Vertex root) throws GeneralSecurityException, IOException {
+            final Vertex root)
+            throws GeneralSecurityException, IOException {
         this.emmScheme = emmScheme;
         this.graph = graph;
         this.rangeCoveringAlgorithm = rangeCoveringAlgorithm;
@@ -42,12 +44,14 @@ public class RangeBRCScheme implements GenericRSScheme {
     }
 
     @Override
-    public List<SecretKey> setup(final int securityParameter) throws GeneralSecurityException, IOException {
+    public List<SecretKey> setup(final int securityParameter)
+            throws GeneralSecurityException, IOException {
         return emmScheme.setup(securityParameter);
     }
 
     @Override
-    public EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap) throws GeneralSecurityException {
+    public EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
+            throws GeneralSecurityException {
         return emmScheme.buildIndex(multiMap);
     }
 
@@ -56,34 +60,42 @@ public class RangeBRCScheme implements GenericRSScheme {
         final var rangeCover =
                 rangeCoveringAlgorithm.getRangeCover(
                         graph, q, RangeCoverUtils.getVertex(graph, root.id()));
-        /*
         final var token =
                 rangeCover.stream()
-                        .map(el -> emmScheme.trapdoor(el.range()))
+                        .map(Vertex::range)
+                        .flatMap(CustomRange::getStream)
+                        .map(el -> BigInteger.valueOf(el).toByteArray())
+                        .map(Label::new)
+                        .map(
+                                el -> {
+                                    try {
+                                        return emmScheme.trapdoor(el);
+                                    } catch (GeneralSecurityException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                })
                         .collect(Collectors.toList());
         Collections.shuffle(token);
         return token;
-         */
-        return null;
     }
 
     @Override
     public Set<Ciphertext> search(List<SearchToken> searchToken, EncryptedIndex encryptedIndex) {
         return searchToken.stream()
-                .map(t -> {
-                    try {
-                        return emmScheme.search(t, encryptedIndex);
-                    } catch (GeneralSecurityException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+                .map(
+                        t -> {
+                            try {
+                                return emmScheme.search(t, encryptedIndex);
+                            } catch (GeneralSecurityException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public Set<Plaintext> result(Set<Ciphertext> values) {
-        // return emmScheme.result(values, ?);
-        return null;
+    public Set<Plaintext> result(Set<Ciphertext> ciphertexts) throws GeneralSecurityException {
+        return emmScheme.result(ciphertexts);
     }
 }

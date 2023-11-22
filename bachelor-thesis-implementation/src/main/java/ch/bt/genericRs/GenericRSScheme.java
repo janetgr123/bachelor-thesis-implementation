@@ -22,5 +22,5 @@ public interface GenericRSScheme {
 
     Set<Ciphertext> search(final List<SearchToken> searchToken, final EncryptedIndex encryptedIndex);
 
-    Set<Plaintext> result(final Set<Ciphertext> values);
+    Set<Plaintext> result(final Set<Ciphertext> values) throws GeneralSecurityException;
 }

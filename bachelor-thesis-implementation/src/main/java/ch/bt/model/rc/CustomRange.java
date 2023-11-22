@@ -1,5 +1,8 @@
 package ch.bt.model.rc;
 
+import java.util.ArrayList;
+import java.util.stream.Stream;
+
 public class CustomRange {
 
     private static final CustomRange EMPTY_RANGE = new CustomRange(0, -1);
@@ -53,5 +56,13 @@ public class CustomRange {
         }
         return new CustomRange(
                 Math.max(from, range.getMinimum()), Math.min(to, range.getMaximum()));
+    }
+
+    public Stream<Integer> getStream() {
+        final var values = new ArrayList<Integer>();
+        for (int i = from; i <= to; i++) {
+            values.add(i);
+        }
+        return values.stream();
     }
 }
