@@ -20,8 +20,13 @@ import java.sql.Statement;
 /**
  * <a
  * href="https://stackoverflow.com/questions/43282798/in-junit-5-how-to-run-code-before-all-tests">...</a>
- * <a href="https://www.baeldung.com/docker-test-containers">...</a> <a
- * href="https://github.com/mikemybytes/squash-db-migrations">...</a>
+ * date accessed: 22.11.2023
+ *
+ * <p><a href="https://www.baeldung.com/docker-test-containers">...</a> date accessed: 22.11.2023
+ *
+ * <p><a
+ * href="https://learn.microsoft.com/en-us/sql/connect/jdbc/performing-batch-operations?view=sql-server-ver16&redirectedfrom=MSDN">...</a>
+ * date accessed: 22.11.2023
  */
 public class TestConfigurationsWithDB implements BeforeAllCallback {
     private static boolean started = false;
