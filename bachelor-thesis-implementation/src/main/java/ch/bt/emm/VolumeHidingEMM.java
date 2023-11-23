@@ -29,12 +29,12 @@ public class VolumeHidingEMM implements EMM {
 
     private final List<Label> searchLabels = new LinkedList<>();
 
-    private final int securityParameter;
+    private final SecretKey prfKey;
 
     public VolumeHidingEMM(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
-        this.securityParameter = securityParameter;
         final var keys = this.setup(securityParameter);
+        this.prfKey = keys.get(0);
         this.seScheme = new AESSEScheme(keys.get(1));
         this.alpha = alpha;
     }
@@ -48,7 +48,7 @@ public class VolumeHidingEMM implements EMM {
 
     @Override
     public EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
-            throws GeneralSecurityException {
+            throws GeneralSecurityException, IOException {
         this.multiMap = multiMap;
         final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multiMap);
         this.tableSize = (int) Math.round((1 + alpha) * numberOfValues);
@@ -59,7 +59,14 @@ public class VolumeHidingEMM implements EMM {
         final PairLabelPlaintext[] table2 = new PairLabelPlaintext[tableSize];
         final Stack<PairLabelPlaintext> stash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
-                maxNumberOfEvictions, maxStashSize, table1, table2, multiMap, stash, tableSize);
+                maxNumberOfEvictions,
+                maxStashSize,
+                table1,
+                table2,
+                multiMap,
+                stash,
+                tableSize,
+                prfKey);
         VolumeHidingEMMUtils.fillEmptyValues(table1);
         VolumeHidingEMMUtils.fillEmptyValues(table2);
         this.stash = stash;
@@ -84,8 +91,8 @@ public class VolumeHidingEMM implements EMM {
         final var token = new ArrayList<SearchTokenInts>();
         int i = 0;
         while (i < valueSetSize) {
-            final var token1 = VolumeHidingEMMUtils.getHash(searchLabel, i, 0, tableSize);
-            final var token2 = VolumeHidingEMMUtils.getHash(searchLabel, i, 1, tableSize);
+            final var token1 = VolumeHidingEMMUtils.getHash(searchLabel, i, 0, tableSize, prfKey);
+            final var token2 = VolumeHidingEMMUtils.getHash(searchLabel, i, 1, tableSize, prfKey);
             token.add(new SearchTokenInts(token1, token2));
             i++;
         }
@@ -94,7 +101,8 @@ public class VolumeHidingEMM implements EMM {
 
     @Override
     public Set<Ciphertext> search(
-            final SearchToken searchToken, final EncryptedIndex encryptedIndex) throws GeneralSecurityException {
+            final SearchToken searchToken, final EncryptedIndex encryptedIndex)
+            throws GeneralSecurityException, IOException {
         if (!(encryptedIndex instanceof EncryptedIndexTables)
                 || !(searchToken instanceof SearchTokenListInts)) {
             throw new IllegalArgumentException(
@@ -153,15 +161,15 @@ public class VolumeHidingEMM implements EMM {
         return maxStashSize;
     }
 
-    public void addSearchLabel(final Label label) {
-        this.searchLabels.add(label);
-    }
-
     public int getMaxNumberOfEvictions() {
         return maxNumberOfEvictions;
     }
 
-    public int getSecurityParameter() {
-        return securityParameter;
+    public SecretKey getPrfKey() {
+        return prfKey;
+    }
+
+    public void addSearchLabel(final Label label) {
+        this.searchLabels.add(label);
     }
 }

@@ -2,7 +2,7 @@ package ch.bt.emm;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import ch.bt.TestConfigurations;
+import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
 import ch.bt.model.Label;
 import ch.bt.model.Plaintext;
@@ -14,21 +14,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
-@ExtendWith({TestConfigurations.class})
+@ExtendWith({TestConfigurationsWithDB.class})
 public class DifferentiallyPrivateVolumeHidingEMMTest {
     private static final double EPSILON = 0.2;
     private static final Map<Integer, DifferentiallyPrivateVolumeHidingEMM>
             differentiallyPrivateVolumeHidingEMMs = new HashMap<>();
 
-    private static final Map<Label, Set<Plaintext>> multiMap = TestUtils.multimap;
+    private static Map<Label, Set<Plaintext>> multiMap;
 
-    private static final Label searchLabel = TestUtils.searchLabel;
+    private static Label searchLabel;
 
     @BeforeAll
     public static void init() {
+        multiMap = TestUtils.multimap;
+        searchLabel = TestUtils.searchLabel;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
                         securityParameter -> {
@@ -45,7 +48,7 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
 
     @ParameterizedTest
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
-    public void testCorrectness(final int securityParameter) throws GeneralSecurityException {
+    public void testCorrectness(final int securityParameter) throws GeneralSecurityException, IOException {
         final var differentiallyPrivateVolumeHidingEMM =
                 differentiallyPrivateVolumeHidingEMMs.get(securityParameter);
         final var encryptedIndex = differentiallyPrivateVolumeHidingEMM.buildIndex(multiMap);
@@ -66,7 +69,8 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
 
     @ParameterizedTest
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
-    public void testBuildIndex(final int securityParameter) throws GeneralSecurityException {
+    public void testBuildIndex(final int securityParameter)
+            throws GeneralSecurityException, IOException {
         final var differentiallyPrivateVolumeHidingEMM =
                 differentiallyPrivateVolumeHidingEMMs.get(securityParameter);
         final var encryptedIndexTables1 =

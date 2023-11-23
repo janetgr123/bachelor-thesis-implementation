@@ -16,7 +16,8 @@ import javax.crypto.SecretKey;
 public interface GenericRSScheme {
     List<SecretKey> setup(final int securityParameter) throws GeneralSecurityException, IOException;
 
-    EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap) throws GeneralSecurityException;
+    EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
+            throws GeneralSecurityException, IOException;
 
     List<SearchToken> trapdoor(final CustomRange q);
 

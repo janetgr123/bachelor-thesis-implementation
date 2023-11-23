@@ -1,5 +1,6 @@
 package ch.bt.genericRs;
 
+import ch.bt.crypto.CastingHelpers;
 import ch.bt.emm.EMM;
 import ch.bt.model.*;
 import ch.bt.model.Label;
@@ -14,7 +15,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,7 +51,7 @@ public class RangeBRCScheme implements GenericRSScheme {
 
     @Override
     public EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
-            throws GeneralSecurityException {
+            throws GeneralSecurityException, IOException {
         return emmScheme.buildIndex(multiMap);
     }
 
@@ -64,7 +64,7 @@ public class RangeBRCScheme implements GenericRSScheme {
                 rangeCover.stream()
                         .map(Vertex::range)
                         .flatMap(CustomRange::getStream)
-                        .map(el -> BigInteger.valueOf(el).toByteArray())
+                        .map(CastingHelpers::fromIntToByteArray)
                         .map(Label::new)
                         .map(
                                 el -> {
@@ -86,7 +86,7 @@ public class RangeBRCScheme implements GenericRSScheme {
                         t -> {
                             try {
                                 return emmScheme.search(t, encryptedIndex);
-                            } catch (GeneralSecurityException e) {
+                            } catch (GeneralSecurityException | IOException e) {
                                 throw new RuntimeException(e);
                             }
                         })

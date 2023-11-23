@@ -17,12 +17,12 @@ public interface EMM {
     List<SecretKey> setup(final int securityParameter) throws GeneralSecurityException, IOException;
 
     EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
-            throws GeneralSecurityException;
+            throws GeneralSecurityException, IOException;
 
     SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException, IOException;
 
     Set<Ciphertext> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex)
-            throws GeneralSecurityException;
+            throws GeneralSecurityException, IOException;
 
     Set<Plaintext> result(final Set<Ciphertext> ciphertexts) throws GeneralSecurityException;
 }

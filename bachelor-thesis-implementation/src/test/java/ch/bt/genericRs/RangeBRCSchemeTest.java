@@ -2,8 +2,9 @@ package ch.bt.genericRs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import ch.bt.TestConfigurations;
+import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
+import ch.bt.crypto.CastingHelpers;
 import ch.bt.emm.BasicEMM;
 import ch.bt.emm.DifferentiallyPrivateVolumeHidingEMM;
 import ch.bt.emm.VolumeHidingEMM;
@@ -17,18 +18,16 @@ import ch.bt.rc.BestRangeCover;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@ExtendWith({TestConfigurations.class})
+@ExtendWith({TestConfigurationsWithDB.class})
 public class RangeBRCSchemeTest {
 
     private static final Map<Integer, BasicEMM> basicEMMs = new HashMap<>();
@@ -98,8 +97,6 @@ public class RangeBRCSchemeTest {
         testRangeSchemeWithEMM(rangeScheme);
     }
 
-    // TODO: FIX
-    @Disabled
     @ParameterizedTest
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
     public void testCorrectnessWithVHOEMM(final int securityParameter)
@@ -112,7 +109,6 @@ public class RangeBRCSchemeTest {
     }
 
     // TODO: FIX!!
-    @Disabled
     @ParameterizedTest
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
     public void testCorrectnessWithDPVHEMM(final int securityParameter)
@@ -121,18 +117,44 @@ public class RangeBRCSchemeTest {
         final var rangeScheme =
                 new RangeBRCScheme(
                         securityParameter, dpVolumeHidingOEMM, graph, new BestRangeCover(), root);
-        testRangeSchemeWithEMM(rangeScheme);
-    }
-
-    private void testRangeSchemeWithEMM(final GenericRSScheme rangeScheme)
-            throws GeneralSecurityException {
         final var encryptedIndex = rangeScheme.buildIndex(multimap);
         final var searchToken = rangeScheme.trapdoor(range);
-        final var ciphertexts = rangeScheme.search(searchToken, encryptedIndex);
-        final var values = rangeScheme.result(ciphertexts).stream().sorted().toList();
+        final var values = new ArrayList<>();
+        searchToken.forEach(
+                t -> {
+                    try {
+                        final var ciphertextCounters = dpVolumeHidingOEMM.search(t, encryptedIndex);
+                        range.getStream()
+                                .map(CastingHelpers::fromIntToByteArray)
+                                .map(Label::new)
+                                .forEach(
+                                        label -> {
+                                            try {
+                                                final var searchToken2 =
+                                                        dpVolumeHidingOEMM.trapdoor(
+                                                                label, ciphertextCounters);
+                                                final var ciphertexts =
+                                                        dpVolumeHidingOEMM.search2(
+                                                                searchToken2, encryptedIndex);
+                                                values.addAll(
+                                                        dpVolumeHidingOEMM
+                                                                .result(ciphertexts)
+                                                                .stream()
+                                                                .sorted()
+                                                                .toList());
+                                            } catch (GeneralSecurityException | IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        });
+
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
         final var expectedLabels =
                 multimap.keySet().stream()
-                        .filter(el -> range.contains(new BigInteger(el.label()).intValue()))
+                        .filter(el -> range.contains(CastingHelpers.fromByteArrayToInt(el.label())))
                         .collect(Collectors.toSet());
         final var expectedValues =
                 expectedLabels.stream()
@@ -144,8 +166,29 @@ public class RangeBRCSchemeTest {
 
         // PROPERTY:    Result(Search(Trapdoor(range), BuildIndex(multiMap))) =
         //              union(multiMap[label] : label in range)
-        var tmp = values.stream().map(el -> new BigInteger(el.data()).intValue()).sorted().toList();
-        var tmp2 = expectedValues.stream().map(el -> new BigInteger(el.data()).intValue()).sorted().toList();
+        assertEquals(expectedValues, values.stream().distinct().sorted().toList());
+    }
+
+    private void testRangeSchemeWithEMM(final GenericRSScheme rangeScheme)
+            throws GeneralSecurityException, IOException {
+        final var encryptedIndex = rangeScheme.buildIndex(multimap);
+        final var searchToken = rangeScheme.trapdoor(range);
+        final var ciphertexts = rangeScheme.search(searchToken, encryptedIndex);
+        final var values = rangeScheme.result(ciphertexts).stream().sorted().toList();
+        final var expectedLabels =
+                multimap.keySet().stream()
+                        .filter(el -> range.contains(CastingHelpers.fromByteArrayToInt(el.label())))
+                        .collect(Collectors.toSet());
+        final var expectedValues =
+                expectedLabels.stream()
+                        .map(el -> multimap.get(el))
+                        .flatMap(Collection::stream)
+                        .distinct()
+                        .sorted()
+                        .toList();
+
+        // PROPERTY:    Result(Search(Trapdoor(range), BuildIndex(multiMap))) =
+        //              union(multiMap[label] : label in range)
         assertEquals(expectedValues, values);
     }
 }

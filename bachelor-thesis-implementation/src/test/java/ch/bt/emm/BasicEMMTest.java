@@ -2,7 +2,7 @@ package ch.bt.emm;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import ch.bt.TestConfigurations;
+import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
 import ch.bt.model.Label;
 import ch.bt.model.Plaintext;
@@ -17,16 +17,18 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidParameterException;
 import java.util.*;
 
-@ExtendWith({TestConfigurations.class})
+@ExtendWith({TestConfigurationsWithDB.class})
 public class BasicEMMTest {
     private static final Map<Integer, BasicEMM> basicEMMMs = new HashMap<>();
 
-    private static final Map<Label, Set<Plaintext>> multimap = TestUtils.multimap;
+    private static Map<Label, Set<Plaintext>> multimap;
 
-    private static final Label searchLabel = TestUtils.searchLabel;
+    private static Label searchLabel;
 
     @BeforeAll
     public static void init() {
+        multimap = TestUtils.multimap;
+        searchLabel = TestUtils.searchLabel;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
                         securityParameter -> {

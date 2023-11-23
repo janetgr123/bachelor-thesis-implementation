@@ -1,6 +1,7 @@
 package ch.bt.emm;
 
-import ch.bt.crypto.CryptoUtils;
+import ch.bt.crypto.CastingHelpers;
+import ch.bt.crypto.DPRF;
 import ch.bt.crypto.SEScheme;
 import ch.bt.model.*;
 import ch.bt.model.Label;
@@ -8,9 +9,11 @@ import ch.bt.model.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
+
+import javax.crypto.SecretKey;
 
 public class VolumeHidingEMMUtils {
 
@@ -32,8 +35,7 @@ public class VolumeHidingEMMUtils {
             final PairLabelPlaintext[] table2,
             final Map<Label, Set<Plaintext>> multiMap,
             final Stack<PairLabelPlaintext> stash,
-            final int tableSize)
-            throws GeneralSecurityException {
+            final int tableSize, final SecretKey key) throws IOException {
         final var labels = multiMap.keySet();
 
         final Map<Label, List<Plaintext>> indices = new HashMap<>();
@@ -56,7 +58,7 @@ public class VolumeHidingEMMUtils {
                                             toInsert.label(),
                                             values.indexOf(toInsert.value()),
                                             0,
-                                            tableSize),
+                                            tableSize, key),
                                     toInsert);
                     if (toInsert != null) {
                         logger.debug("COLLISION! Evict from table 1: {}", toInsert);
@@ -69,7 +71,7 @@ public class VolumeHidingEMMUtils {
                                                 toInsert.label(),
                                                 values.indexOf(toInsert.value()),
                                                 1,
-                                                tableSize),
+                                                tableSize, key),
                                         toInsert);
                         if (toInsert != null) {
                             logger.debug("COLLISION! Evict from table 2: {}", toInsert);
@@ -96,8 +98,7 @@ public class VolumeHidingEMMUtils {
             final PairLabelNumberValues[] table2,
             final Map<Label, Set<Plaintext>> multiMap,
             final Stack<PairLabelNumberValues> stash,
-            final int tableSize)
-            throws GeneralSecurityException {
+            final int tableSize, final SecretKey key) throws IOException {
         final var labels = multiMap.keySet();
 
         int evictionCounter = 0;
@@ -106,12 +107,12 @@ public class VolumeHidingEMMUtils {
             PairLabelNumberValues toInsert = new PairLabelNumberValues(label, numberOfValues);
             while (evictionCounter < maxNumberOfEvictions && toInsert != null) {
                 logger.debug("Inserting in table 1: {}", toInsert);
-                toInsert = insert(table1, getHashCT(toInsert.label(), 0, tableSize), toInsert);
+                toInsert = insert(table1, getHashCT(toInsert.label(), 0, tableSize, key), toInsert);
                 if (toInsert != null) {
                     logger.debug("COLLISION! Evict from table 1: {}", toInsert);
                     logger.debug("Inserting in table 2: {}", toInsert);
                     evictionCounter++;
-                    toInsert = insert(table2, getHashCT(toInsert.label(), 1, tableSize), toInsert);
+                    toInsert = insert(table2, getHashCT(toInsert.label(), 1, tableSize, key), toInsert);
                     if (toInsert != null) {
                         logger.debug("COLLISION! Evict from table 2: {}", toInsert);
                         evictionCounter++;
@@ -129,30 +130,40 @@ public class VolumeHidingEMMUtils {
         }
     }
 
-    public static int getHash(final Label label, final int i, final int tableNo, final int n)
-            throws GeneralSecurityException {
+    public static int getHash(
+            final Label label, final int i, final int tableNo, final int n, final SecretKey key)
+            throws IOException {
         final var toHash =
-                String.join(
-                        "",
-                        Arrays.toString(label.label()),
-                        String.valueOf(i),
-                        String.valueOf(tableNo));
-        logger.debug(
-                "Hashing element {}. The hash evaluates to {}.",
-                toHash,
-                Math.floorMod(Arrays.hashCode(CryptoUtils.calculateSha3Digest(toHash)), n));
-        return Math.floorMod(Arrays.hashCode(CryptoUtils.calculateSha3Digest(toHash)), n);
+                org.bouncycastle.util.Arrays.concatenate(
+                        label.label(),
+                        CastingHelpers.fromIntToByteArray(i),
+                        CastingHelpers.fromIntToByteArray(tableNo));
+        final var result =
+                CastingHelpers.fromByteArrayToHashModN(
+                        DPRF.calculateFk(
+                                CastingHelpers.fromByteArrayToBitInputStream(toHash),
+                                key.getEncoded()),
+                        n);
+        logger.debug("Hashing element {}. The hash evaluates to {}.", toHash, result);
+        return result;
     }
 
-    public static int getHashCT(final Label label, final int tableNo, final int n)
-            throws GeneralSecurityException {
+    public static int getHashCT(
+            final Label label, final int tableNo, final int n, final SecretKey key)
+            throws IOException {
         final var toHash =
-                String.join("", "CT", Arrays.toString(label.label()), String.valueOf(tableNo));
-        logger.debug(
-                "Hashing element {}. The hash evaluates to {}.",
-                toHash,
-                Math.floorMod(Arrays.hashCode(CryptoUtils.calculateSha3Digest(toHash)), n));
-        return Math.floorMod(Arrays.hashCode(CryptoUtils.calculateSha3Digest(toHash)), n);
+                org.bouncycastle.util.Arrays.concatenate(
+                        CastingHelpers.fromStringToByteArray("CT"),
+                        label.label(),
+                        CastingHelpers.fromIntToByteArray(tableNo));
+        final var result =
+                CastingHelpers.fromByteArrayToHashModN(
+                        DPRF.calculateFk(
+                                CastingHelpers.fromByteArrayToBitInputStream(toHash),
+                                key.getEncoded()),
+                        n);
+        logger.debug("Hashing element {}. The hash evaluates to {}.", toHash, result);
+        return result;
     }
 
     private static PairLabelPlaintext insert(
@@ -231,7 +242,7 @@ public class VolumeHidingEMMUtils {
         return new PairLabelCiphertext(
                 seScheme.encryptLabel(entry.label()),
                 seScheme.encrypt(
-                        new Plaintext(BigInteger.valueOf(entry.numberOfValues()).toByteArray())));
+                        new Plaintext(CastingHelpers.fromIntToByteArray(entry.numberOfValues()))));
     }
 
     public static void encryptCounterTables(

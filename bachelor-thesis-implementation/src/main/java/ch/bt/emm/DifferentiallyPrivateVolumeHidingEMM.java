@@ -1,6 +1,7 @@
 package ch.bt.emm;
 
-import ch.bt.crypto.CryptoUtils;
+import ch.bt.crypto.CastingHelpers;
+import ch.bt.crypto.DPRF;
 import ch.bt.model.*;
 import ch.bt.model.Label;
 import ch.bt.model.encryptedindex.DifferentiallyPrivateEncryptedIndexTables;
@@ -12,6 +13,7 @@ import ch.bt.model.searchtoken.SearchTokenIntBytes;
 
 import org.apache.commons.math3.distribution.LaplaceDistribution;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
@@ -32,7 +34,7 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
 
     @Override
     public EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
-            throws GeneralSecurityException {
+            throws GeneralSecurityException, IOException {
         final var encryptedIndex = super.buildIndex(multiMap);
         final int tableSize = getTableSize();
         final var maxStashSize = getMaxStashSize();
@@ -48,7 +50,8 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
                 counterTable2,
                 multiMap,
                 counterStash,
-                tableSize);
+                tableSize,
+                getPrfKey());
         VolumeHidingEMMUtils.fillEmptyValues(counterTable1);
         VolumeHidingEMMUtils.fillEmptyValues(counterTable2);
         this.counterStash = counterStash;
@@ -67,16 +70,20 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
     }
 
     @Override
-    public SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException {
+    public SearchToken trapdoor(final Label searchLabel)
+            throws GeneralSecurityException, IOException {
         addSearchLabel(searchLabel);
-        final var counterLabelHash =
-                CryptoUtils.calculateSha3Digest(
-                        String.join("", "CT", Arrays.toString(searchLabel.label())));
-        return new SearchTokenBytes(counterLabelHash);
+        return new SearchTokenBytes(
+                DPRF.generateToken(
+                        getPrfKey(),
+                        new Label(
+                                org.bouncycastle.util.Arrays.concatenate(
+                                        CastingHelpers.fromStringToByteArray("CT"),
+                                        searchLabel.label()))));
     }
 
     public SearchToken trapdoor(final Label label, final Set<Ciphertext> ciphertexts)
-            throws GeneralSecurityException {
+            throws GeneralSecurityException, IOException {
         final var encryptedLabel = getSeScheme().encryptLabel(label);
         final var matchingEntries =
                 ciphertexts.stream()
@@ -91,13 +98,13 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
         final var noise = laplaceDistribution.sample();
         final var numberOfValuesWithNoise =
                 (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
-        final var token = CryptoUtils.calculateSha3Digest(label.label());
+        final var token = DPRF.generateToken(getPrfKey(), label);
         return new SearchTokenIntBytes(numberOfValuesWithNoise, token);
     }
 
     @Override
     public Set<Ciphertext> search(
-            final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+            final SearchToken searchToken, final EncryptedIndex encryptedIndex) throws IOException {
         if (!(encryptedIndex instanceof DifferentiallyPrivateEncryptedIndexTables)
                 || !(searchToken instanceof SearchTokenBytes)) {
             throw new IllegalArgumentException(
@@ -109,14 +116,23 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
         final var encryptedCounterTable2 =
                 ((DifferentiallyPrivateEncryptedIndexTables) encryptedIndex).getCounterTable(1);
         final var token = ((SearchTokenBytes) searchToken).token();
-        final var hashedToken = Math.floorMod(Arrays.hashCode(token), getTableSize());
-        ciphertexts.add(encryptedCounterTable[hashedToken]);
-        ciphertexts.add(encryptedCounterTable2[hashedToken]);
+        final int numberOfValues = 1; // TODO: SET CORRECTLY!
+        final int tableSize = getTableSize();
+        for (int i = 0; i < numberOfValues; i++) {
+            final var expand1 =
+                    CastingHelpers.fromByteArrayToHashModN(
+                            DPRF.evaluateDPRF(token, i, 0), tableSize);
+            final var expand2 =
+                    CastingHelpers.fromByteArrayToHashModN(
+                            DPRF.evaluateDPRF(token, i, 1), tableSize);
+            ciphertexts.add(encryptedCounterTable[expand1]);
+            ciphertexts.add(encryptedCounterTable2[expand2]);
+        }
         return ciphertexts;
     }
 
     public Set<Ciphertext> search2(
-            final SearchToken searchToken, final EncryptedIndex encryptedIndex) {
+            final SearchToken searchToken, final EncryptedIndex encryptedIndex) throws IOException {
         if (!(encryptedIndex instanceof DifferentiallyPrivateEncryptedIndexTables)
                 || !(searchToken instanceof SearchTokenIntBytes token)) {
             throw new IllegalArgumentException(
@@ -132,11 +148,17 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
         final var encryptedIndexTable1 = tables.getTable(0);
         final var encryptedIndexTable2 = tables.getTable(1);
         final var numberOfValues = token.token();
-        final var hashedToken = Math.floorMod(Arrays.hashCode(token.token2()), getTableSize());
+        final int tableSize = getTableSize();
         int i = 0;
         while (i < numberOfValues) {
-            ciphertexts.add(encryptedIndexTable1[hashedToken]);
-            ciphertexts.add(encryptedIndexTable2[hashedToken]);
+            final var expand1 =
+                    CastingHelpers.fromByteArrayToHashModN(
+                            DPRF.evaluateDPRF(token.token2(), i, 0), tableSize);
+            final var expand2 =
+                    CastingHelpers.fromByteArrayToHashModN(
+                            DPRF.evaluateDPRF(token.token2(), i, 1), tableSize);
+            ciphertexts.add(encryptedIndexTable1[expand1]);
+            ciphertexts.add(encryptedIndexTable2[expand2]);
             i++;
         }
         return ciphertexts;

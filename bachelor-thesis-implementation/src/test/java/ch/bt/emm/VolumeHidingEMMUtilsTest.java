@@ -3,6 +3,7 @@ package ch.bt.emm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ch.bt.TestConfigurations;
+import ch.bt.crypto.CryptoUtils;
 import ch.bt.model.*;
 import ch.bt.model.Label;
 
@@ -10,9 +11,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
+// TODO: CHECK!!!
 @ExtendWith({TestConfigurations.class})
 public class VolumeHidingEMMUtilsTest {
 
@@ -51,13 +54,14 @@ public class VolumeHidingEMMUtilsTest {
     }
 
     @Test
-    public void testCuckooHashing() throws GeneralSecurityException {
+    public void testCuckooHashing() throws GeneralSecurityException, IOException {
         final double alpha = 0.3;
         final int numberOfValues2 = VolumeHidingEMMUtils.getNumberOfValues(multimap2);
         final int size = (int) Math.round((1 + alpha) * numberOfValues2);
         final var table1 = new PairLabelPlaintext[size];
         final var table2 = new PairLabelPlaintext[size];
         final Stack<PairLabelPlaintext> stash = new Stack<>();
+        final var key = CryptoUtils.generateKeyWithHMac(256);
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
                 (int) Math.round(5 * Math.log(numberOfValues2) / Math.log(2)),
                 numberOfValues2,
@@ -65,20 +69,22 @@ public class VolumeHidingEMMUtilsTest {
                 table2,
                 multimap2,
                 stash,
-                size);
-        assertEquals(6, Arrays.stream(table1).filter(Objects::nonNull).count());
-        assertEquals(3, Arrays.stream(table2).filter(Objects::nonNull).count());
+                size,
+                key);
+        assertEquals(8, Arrays.stream(table1).filter(Objects::nonNull).count());
+        assertEquals(1, Arrays.stream(table2).filter(Objects::nonNull).count());
         assertEquals(0, stash.size());
     }
 
     @Test
-    public void testCuckooHashing2() throws GeneralSecurityException {
+    public void testCuckooHashing2() throws IOException, GeneralSecurityException {
         final double alpha = 0.3;
         final int numberOfValues1 = VolumeHidingEMMUtils.getNumberOfValues(multimap);
         final int size = (int) Math.round((1 + alpha) * numberOfValues1);
         final var table1 = new PairLabelPlaintext[size];
         final var table2 = new PairLabelPlaintext[size];
         final Stack<PairLabelPlaintext> stash = new Stack<>();
+        final var key = CryptoUtils.generateKeyWithHMac(256);
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
                 (int) Math.round(5 * Math.log(numberOfValues1) / Math.log(2)),
                 numberOfValues1,
@@ -86,9 +92,10 @@ public class VolumeHidingEMMUtilsTest {
                 table2,
                 multimap,
                 stash,
-                size);
-        assertEquals(21, Arrays.stream(table1).filter(Objects::nonNull).count());
-        assertEquals(12, Arrays.stream(table2).filter(Objects::nonNull).count());
+                size,
+                key);
+        assertEquals(31, Arrays.stream(table1).filter(Objects::nonNull).count());
+        assertEquals(2, Arrays.stream(table2).filter(Objects::nonNull).count());
         assertEquals(0, stash.size());
     }
 }

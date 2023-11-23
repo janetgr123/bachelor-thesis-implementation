@@ -2,7 +2,7 @@ package ch.bt.emm;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import ch.bt.TestConfigurations;
+import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
 import ch.bt.model.Label;
 import ch.bt.model.Plaintext;
@@ -17,20 +17,23 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
-@ExtendWith({TestConfigurations.class})
+@ExtendWith({TestConfigurationsWithDB.class})
 public class VolumeHidingEMMTest {
     private static final Map<Integer, VolumeHidingEMM> volumeHidingEMMs = new HashMap<>();
-    private static final Map<Label, Set<Plaintext>> multiMap = TestUtils.multimap;
+    private static Map<Label, Set<Plaintext>> multiMap;
 
-    private static final Label searchLabel = TestUtils.searchLabel;
+    private static Label searchLabel;
 
     @BeforeAll
     public static void init() {
+        multiMap = TestUtils.multimap;
+        searchLabel = TestUtils.searchLabel;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
                         securityParameter -> {
                             try {
-                                final var emm = new VolumeHidingEMM(securityParameter, TestUtils.ALPHA);
+                                final var emm =
+                                        new VolumeHidingEMM(securityParameter, TestUtils.ALPHA);
                                 volumeHidingEMMs.put(securityParameter, emm);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
@@ -40,7 +43,8 @@ public class VolumeHidingEMMTest {
 
     @ParameterizedTest
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
-    public void testCorrectness(final int securityParameter) throws GeneralSecurityException, IOException {
+    public void testCorrectness(final int securityParameter)
+            throws GeneralSecurityException, IOException {
         final var volumeHidingEMM = volumeHidingEMMs.get(securityParameter);
         final var encryptedIndex = volumeHidingEMM.buildIndex(multiMap);
         final var searchToken = volumeHidingEMM.trapdoor(searchLabel);
@@ -54,7 +58,8 @@ public class VolumeHidingEMMTest {
 
     @ParameterizedTest
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
-    public void testBuildIndex(final int securityParameter) throws GeneralSecurityException {
+    public void testBuildIndex(final int securityParameter)
+            throws GeneralSecurityException, IOException {
         final var volumeHidingEMM = volumeHidingEMMs.get(securityParameter);
         final var table11 =
                 ((EncryptedIndexTables) volumeHidingEMM.buildIndex(multiMap)).getTable(0);

@@ -1,18 +1,19 @@
 package ch.bt.emm;
 
-import ch.bt.crypto.CryptoUtils;
+import ch.bt.crypto.CastingHelpers;
+import ch.bt.crypto.DPRF;
 import ch.bt.model.*;
 import ch.bt.model.Label;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
 import ch.bt.model.searchtoken.SearchToken;
-import ch.bt.model.searchtoken.SearchTokenCiphertext;
+import ch.bt.model.searchtoken.SearchTokenBytes;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.util.*;
+
+import javax.crypto.SecretKey;
 
 /** SSE scheme from Patel et al. (2019) With improved communication using delegatable PRFs */
 public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
@@ -27,31 +28,34 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
     public SearchToken trapdoor(final Label searchLabel)
             throws GeneralSecurityException, IOException {
         addSearchLabel(searchLabel);
-        // TODO: DPRF!!
-        key = CryptoUtils.generateKeyForAES(getSecurityParameter());
-        final var encryptedLabel = CryptoUtils.cbcEncrypt(key, searchLabel.label());
-        return new SearchTokenCiphertext(encryptedLabel);
+        return new SearchTokenBytes(DPRF.generateToken(getPrfKey(), searchLabel));
     }
 
     @Override
     public Set<Ciphertext> search(
             final SearchToken searchToken, final EncryptedIndex encryptedIndex)
-            throws GeneralSecurityException {
+            throws GeneralSecurityException, IOException {
         if (!(encryptedIndex instanceof EncryptedIndexTables)
-                || !(searchToken instanceof SearchTokenCiphertext)) {
+                || !(searchToken instanceof SearchTokenBytes)) {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
         Set<Ciphertext> ciphertexts = new HashSet<>();
         final var encryptedIndexTable1 = ((EncryptedIndexTables) encryptedIndex).getTable(0);
         final var encryptedIndexTable2 = ((EncryptedIndexTables) encryptedIndex).getTable(1);
-        final var token = ((SearchTokenCiphertext) searchToken).token();
-        // TODO: DPRF!!!
-        final var label = CryptoUtils.cbcDecrypt(key, token);
-        final var expand1 = new BigInteger(CryptoUtils.calculateSha3Digest(label)).intValue();
-        final var expand2 = new BigInteger(CryptoUtils.calculateSha3Digest(label)).intValue();
-        ciphertexts.add(encryptedIndexTable1[expand1]);
-        ciphertexts.add(encryptedIndexTable2[expand2]);
+        final var token = ((SearchTokenBytes) searchToken).token();
+        final int numberOfValues = 1; // TODO: SET CORRECTLY!
+        final int tableSize = getTableSize();
+        for (int i = 0; i < numberOfValues; i++) {
+            final var expand1 =
+                    CastingHelpers.fromByteArrayToHashModN(
+                            DPRF.evaluateDPRF(token, i, 0), tableSize);
+            final var expand2 =
+                    CastingHelpers.fromByteArrayToHashModN(
+                            DPRF.evaluateDPRF(token, i, 1), tableSize);
+            ciphertexts.add(encryptedIndexTable1[expand1]);
+            ciphertexts.add(encryptedIndexTable2[expand2]);
+        }
         return ciphertexts;
     }
 }

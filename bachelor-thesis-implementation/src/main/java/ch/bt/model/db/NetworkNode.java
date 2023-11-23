@@ -1,2 +1,2 @@
-package ch.bt.model;
+package ch.bt.model.db;
 public record NetworkNode(int id, double latitude, double longitude) {}
