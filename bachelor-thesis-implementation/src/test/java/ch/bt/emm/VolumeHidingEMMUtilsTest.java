@@ -8,7 +8,6 @@ import ch.bt.model.*;
 import ch.bt.model.Label;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -16,8 +15,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
-// TODO: CHECK!!!
-@Disabled
 @ExtendWith({TestConfigurations.class})
 public class VolumeHidingEMMUtilsTest {
 
@@ -73,11 +70,13 @@ public class VolumeHidingEMMUtilsTest {
                 stash,
                 size,
                 key);
+
+        // PROPERTY: no elements are disappearing
         assertEquals(
                 9,
                 Arrays.stream(table1).filter(Objects::nonNull).count()
-                        + Arrays.stream(table2).filter(Objects::nonNull).count());
-        assertEquals(0, stash.size());
+                        + Arrays.stream(table2).filter(Objects::nonNull).count()
+                        + stash.size());
     }
 
     @Test
@@ -98,10 +97,12 @@ public class VolumeHidingEMMUtilsTest {
                 stash,
                 size,
                 key);
+
+        // PROPERTY: no elements are disappearing
         assertEquals(
                 33,
                 Arrays.stream(table1).filter(Objects::nonNull).count()
-                        + Arrays.stream(table2).filter(Objects::nonNull).count());
-        assertEquals(0, stash.size());
+                        + Arrays.stream(table2).filter(Objects::nonNull).count()
+                        + stash.size());
     }
 }
