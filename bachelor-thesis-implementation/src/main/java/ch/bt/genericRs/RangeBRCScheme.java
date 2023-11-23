@@ -40,7 +40,7 @@ public class RangeBRCScheme implements GenericRSScheme {
         this.graph = graph;
         this.rangeCoveringAlgorithm = rangeCoveringAlgorithm;
         this.root = root;
-        final var key = this.setup(securityParameter);
+        this.setup(securityParameter);
     }
 
     @Override

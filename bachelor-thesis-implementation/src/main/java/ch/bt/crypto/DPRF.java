@@ -29,7 +29,7 @@ public class DPRF {
     public static byte[] expandData(final byte[] data, final long left) throws IOException {
         final int length = data.length * 2;
         FipsXOFOperatorFactory<FipsSHS.Parameters> factory =
-                new FipsSHS.XOFOperatorFactory<FipsSHS.Parameters>();
+                new FipsSHS.XOFOperatorFactory<>();
         OutputXOFCalculator<FipsSHS.Parameters> calculator =
                 factory.createOutputXOFCalculator(FipsSHS.SHAKE256);
         OutputStream digestStream = calculator.getFunctionStream();

@@ -5,7 +5,6 @@ import org.apache.commons.compress.utils.BitInputStream;
 import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 
 public class CastingHelpers {
 

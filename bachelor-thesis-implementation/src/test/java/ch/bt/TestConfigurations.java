@@ -6,8 +6,6 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.security.Security;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * <a
@@ -17,10 +15,9 @@ import java.sql.SQLException;
  */
 public class TestConfigurations implements BeforeAllCallback {
     private static boolean started = false;
-    public static Connection connection;
 
     @Override
-    public void beforeAll(ExtensionContext extensionContext) throws SQLException {
+    public void beforeAll(ExtensionContext extensionContext) {
         if (!started) {
             started = true;
             Security.addProvider(new BouncyCastleFipsProvider());

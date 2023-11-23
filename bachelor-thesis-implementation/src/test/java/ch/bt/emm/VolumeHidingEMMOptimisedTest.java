@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
-import ch.bt.crypto.CastingHelpers;
 import ch.bt.model.Label;
 import ch.bt.model.Plaintext;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
