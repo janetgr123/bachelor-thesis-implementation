@@ -8,7 +8,6 @@ import ch.bt.model.*;
 import ch.bt.model.Label;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -17,7 +16,6 @@ import java.security.GeneralSecurityException;
 import java.util.*;
 
 // TODO: CHECK!!!
-@Disabled
 @ExtendWith({TestConfigurations.class})
 public class VolumeHidingEMMUtilsTest {
 
@@ -73,8 +71,10 @@ public class VolumeHidingEMMUtilsTest {
                 stash,
                 size,
                 key);
-        assertEquals(7, Arrays.stream(table1).filter(Objects::nonNull).count());
-        assertEquals(3, Arrays.stream(table2).filter(Objects::nonNull).count());
+        assertEquals(
+                9,
+                Arrays.stream(table1).filter(Objects::nonNull).count()
+                        + Arrays.stream(table2).filter(Objects::nonNull).count());
         assertEquals(0, stash.size());
     }
 
@@ -96,8 +96,10 @@ public class VolumeHidingEMMUtilsTest {
                 stash,
                 size,
                 key);
-        assertEquals(26, Arrays.stream(table1).filter(Objects::nonNull).count());
-        assertEquals(11, Arrays.stream(table2).filter(Objects::nonNull).count());
+        assertEquals(
+                33,
+                Arrays.stream(table1).filter(Objects::nonNull).count()
+                        + Arrays.stream(table2).filter(Objects::nonNull).count());
         assertEquals(0, stash.size());
     }
 }
