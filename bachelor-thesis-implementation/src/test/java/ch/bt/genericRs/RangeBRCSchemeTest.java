@@ -47,7 +47,7 @@ public class RangeBRCSchemeTest {
     private static Graph<Vertex, DefaultEdge> graph;
     private static Vertex root;
 
-    private static final CustomRange range = new CustomRange(27, 30);
+    private static final CustomRange range = new CustomRange(27, 37);
 
     @BeforeAll
     public static void init() {
