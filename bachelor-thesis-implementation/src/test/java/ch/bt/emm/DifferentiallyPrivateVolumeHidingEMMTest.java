@@ -93,7 +93,7 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
                         differentiallyPrivateVolumeHidingEMM, table21, table22);
 
         // PROPERTY 1:  Encrypted labels for fixed EMM scheme and multimap are deterministic.
-        // REASON:      Construction uses Cuckoo Hashing with stash with SHA3 hashes that are
+        // REASON:      Construction uses Cuckoo Hashing with stash with dPRF that are
         //              deterministic.
         assertEquals(labels, labels2);
 
