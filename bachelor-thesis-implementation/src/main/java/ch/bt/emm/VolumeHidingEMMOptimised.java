@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
-import javax.crypto.SecretKey;
-
 /** SSE scheme from Patel et al. (2019) With improved communication using delegatable PRFs */
 public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
 

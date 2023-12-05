@@ -45,7 +45,6 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
         final Stack<PairLabelNumberValues> counterStash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStashCT(
                 getMaxNumberOfEvictions(),
-                maxStashSize,
                 counterTable1,
                 counterTable2,
                 multiMap,

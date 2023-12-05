@@ -1,8 +1,11 @@
 package ch.bt.emm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ch.bt.TestConfigurations;
+import ch.bt.TestConfigurationsWithDB;
+import ch.bt.TestUtils;
 import ch.bt.crypto.CryptoUtils;
 import ch.bt.model.*;
 import ch.bt.model.Label;
@@ -16,10 +19,15 @@ import java.security.GeneralSecurityException;
 import java.util.*;
 
 @ExtendWith({TestConfigurations.class})
+@ExtendWith({TestConfigurationsWithDB.class})
 public class VolumeHidingEMMUtilsTest {
 
     private static final Map<Label, Set<Plaintext>> multimap = new HashMap<>();
     private static final Map<Label, Set<Plaintext>> multimap2 = new HashMap<>();
+
+    private static Map<Label, Set<Plaintext>> multimapWithRealData;
+
+    private static final double ALPHA = 0.3;
 
     @BeforeAll
     public static void init() {
@@ -50,47 +58,35 @@ public class VolumeHidingEMMUtilsTest {
         multimap.put(labels.get(3), set2);
         multimap.put(labels.get(4), set2);
         multimap.put(labels.get(5), set2);
+
+        multimapWithRealData = TestUtils.multimap;
     }
 
     @Test
     public void testCuckooHashing() throws GeneralSecurityException, IOException {
-        final double alpha = 0.3;
-        final int numberOfValues2 = VolumeHidingEMMUtils.getNumberOfValues(multimap2);
-        final int size = (int) Math.round((1 + alpha) * numberOfValues2);
-        final var table1 = new PairLabelPlaintext[size];
-        final var table2 = new PairLabelPlaintext[size];
-        final Stack<PairLabelPlaintext> stash = new Stack<>();
-        final var key = CryptoUtils.generateKeyWithHMac(256);
-        VolumeHidingEMMUtils.doCuckooHashingWithStash(
-                (int) Math.round(5 * Math.log(numberOfValues2) / Math.log(2)),
-                numberOfValues2,
-                table1,
-                table2,
-                multimap2,
-                stash,
-                size,
-                key);
-
-        // PROPERTY: no elements are disappearing
-        assertEquals(
-                9,
-                Arrays.stream(table1).filter(Objects::nonNull).count()
-                        + Arrays.stream(table2).filter(Objects::nonNull).count()
-                        + stash.size());
+        testCuckooHashingWithMultimap(multimap);
     }
 
     @Test
     public void testCuckooHashing2() throws IOException, GeneralSecurityException {
-        final double alpha = 0.3;
-        final int numberOfValues1 = VolumeHidingEMMUtils.getNumberOfValues(multimap);
-        final int size = (int) Math.round((1 + alpha) * numberOfValues1);
+        testCuckooHashingWithMultimap(multimap2);
+    }
+
+    @Test
+    public void testCuckooHashingWithRealData() throws IOException, GeneralSecurityException {
+        testCuckooHashingWithMultimap(multimapWithRealData);
+    }
+
+    private void testCuckooHashingWithMultimap(final Map<Label, Set<Plaintext>> multimap)
+            throws GeneralSecurityException, IOException {
+        final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multimap);
+        final int size = (int) Math.round((1 + ALPHA) * numberOfValues);
         final var table1 = new PairLabelPlaintext[size];
         final var table2 = new PairLabelPlaintext[size];
         final Stack<PairLabelPlaintext> stash = new Stack<>();
         final var key = CryptoUtils.generateKeyWithHMac(256);
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
-                (int) Math.round(5 * Math.log(numberOfValues1) / Math.log(2)),
-                numberOfValues1,
+                (int) Math.round(5 * Math.log(numberOfValues) / Math.log(2)),
                 table1,
                 table2,
                 multimap,
@@ -98,11 +94,14 @@ public class VolumeHidingEMMUtilsTest {
                 size,
                 key);
 
-        // PROPERTY: no elements are disappearing
+        // PROPERTY 1   : no elements are disappearing
         assertEquals(
-                33,
+                numberOfValues,
                 Arrays.stream(table1).filter(Objects::nonNull).count()
                         + Arrays.stream(table2).filter(Objects::nonNull).count()
                         + stash.size());
+
+        // PROPERTY 2:  stash size is less than numberOfValues / 10
+        assertTrue(stash.size() <= numberOfValues / 10);
     }
 }

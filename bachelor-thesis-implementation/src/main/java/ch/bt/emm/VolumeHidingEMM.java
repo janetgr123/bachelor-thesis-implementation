@@ -60,7 +60,6 @@ public class VolumeHidingEMM implements EMM {
         final Stack<PairLabelPlaintext> stash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
                 maxNumberOfEvictions,
-                maxStashSize,
                 table1,
                 table2,
                 multiMap,

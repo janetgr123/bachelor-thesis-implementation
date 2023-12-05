@@ -19,6 +19,8 @@ public class VolumeHidingEMMUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(VolumeHidingEMMUtils.class);
 
+    private static final int maxStashSize = 3;
+
     public static int getNumberOfValues(final Map<Label, Set<Plaintext>> multiMap) {
         int n = 0;
         final var labels = multiMap.keySet();
@@ -30,12 +32,13 @@ public class VolumeHidingEMMUtils {
 
     public static void doCuckooHashingWithStash(
             final int maxNumberOfEvictions,
-            final int maxStashSize,
             final PairLabelPlaintext[] table1,
             final PairLabelPlaintext[] table2,
             final Map<Label, Set<Plaintext>> multiMap,
             final Stack<PairLabelPlaintext> stash,
-            final int tableSize, final SecretKey key) throws IOException {
+            final int tableSize,
+            final SecretKey key)
+            throws IOException {
         final var labels = multiMap.keySet();
 
         final Map<Label, List<Plaintext>> indices = new HashMap<>();
@@ -49,8 +52,12 @@ public class VolumeHidingEMMUtils {
             final var values = indices.get(label);
             for (final var value : values) {
                 PairLabelPlaintext toInsert = new PairLabelPlaintext(label, value);
-                while (evictionCounter < maxNumberOfEvictions && toInsert != null) {
-                    logger.debug("Inserting in table 1: {}", toInsert);
+                boolean firstTime = true;
+                while (toInsert != null && (firstTime || evictionCounter < maxNumberOfEvictions)) {
+                    if (firstTime) {
+                        evictionCounter = 0;
+                    }
+                    logger.info("Inserting in table 1: {}", toInsert);
                     toInsert =
                             insert(
                                     table1,
@@ -58,11 +65,12 @@ public class VolumeHidingEMMUtils {
                                             toInsert.label(),
                                             values.indexOf(toInsert.value()),
                                             0,
-                                            tableSize, key),
+                                            tableSize,
+                                            key),
                                     toInsert);
                     if (toInsert != null) {
-                        logger.debug("COLLISION! Evict from table 1: {}", toInsert);
-                        logger.debug("Inserting in table 2: {}", toInsert);
+                        logger.info("COLLISION! Evict from table 1: {}", toInsert);
+                        logger.info("Inserting in table 2: {}", toInsert);
                         evictionCounter++;
                         toInsert =
                                 insert(
@@ -71,16 +79,18 @@ public class VolumeHidingEMMUtils {
                                                 toInsert.label(),
                                                 values.indexOf(toInsert.value()),
                                                 1,
-                                                tableSize, key),
+                                                tableSize,
+                                                key),
                                         toInsert);
                         if (toInsert != null) {
-                            logger.debug("COLLISION! Evict from table 2: {}", toInsert);
+                            logger.info("COLLISION! Evict from table 2: {}", toInsert);
                             evictionCounter++;
+                            firstTime = false;
                         }
                     }
                 }
                 if (toInsert != null) {
-                    logger.debug("Could not insert element. Putting onto stash: {}", toInsert);
+                    logger.info("Could not insert element. Putting onto stash: {}", toInsert);
                     stash.add(toInsert);
                 }
             }
@@ -93,12 +103,13 @@ public class VolumeHidingEMMUtils {
 
     public static void doCuckooHashingWithStashCT(
             final int maxNumberOfEvictions,
-            final int maxStashSize,
             final PairLabelNumberValues[] table1,
             final PairLabelNumberValues[] table2,
             final Map<Label, Set<Plaintext>> multiMap,
             final Stack<PairLabelNumberValues> stash,
-            final int tableSize, final SecretKey key) throws IOException {
+            final int tableSize,
+            final SecretKey key)
+            throws IOException {
         final var labels = multiMap.keySet();
 
         int evictionCounter = 0;
@@ -106,21 +117,25 @@ public class VolumeHidingEMMUtils {
             final var numberOfValues = multiMap.get(label).size();
             PairLabelNumberValues toInsert = new PairLabelNumberValues(label, numberOfValues);
             while (evictionCounter < maxNumberOfEvictions && toInsert != null) {
-                logger.debug("Inserting in table 1: {}", toInsert);
+                logger.info("Inserting in table 1: {}", toInsert);
                 toInsert = insert(table1, getHashCT(toInsert.label(), 0, tableSize, key), toInsert);
                 if (toInsert != null) {
-                    logger.debug("COLLISION! Evict from table 1: {}", toInsert);
-                    logger.debug("Inserting in table 2: {}", toInsert);
+                    logger.info("COLLISION! Evict from table 1: {}", toInsert);
+                    logger.info("Inserting in table 2: {}", toInsert);
                     evictionCounter++;
-                    toInsert = insert(table2, getHashCT(toInsert.label(), 1, tableSize, key), toInsert);
+                    toInsert =
+                            insert(
+                                    table2,
+                                    getHashCT(toInsert.label(), 1, tableSize, key),
+                                    toInsert);
                     if (toInsert != null) {
-                        logger.debug("COLLISION! Evict from table 2: {}", toInsert);
+                        logger.info("COLLISION! Evict from table 2: {}", toInsert);
                         evictionCounter++;
                     }
                 }
             }
             if (toInsert != null) {
-                logger.debug("Could not insert element. Putting onto stash: {}", toInsert);
+                logger.info("Could not insert element. Putting onto stash: {}", toInsert);
                 stash.add(toInsert);
             }
         }
@@ -138,13 +153,16 @@ public class VolumeHidingEMMUtils {
                         label.label(),
                         CastingHelpers.fromIntToByteArray(i),
                         CastingHelpers.fromIntToByteArray(tableNo));
+        final var tmp =
+                DPRF.calculateFk(
+                        CastingHelpers.fromByteArrayToBitInputStream(toHash), key.getEncoded());
         final var result =
                 CastingHelpers.fromByteArrayToHashModN(
                         DPRF.calculateFk(
                                 CastingHelpers.fromByteArrayToBitInputStream(toHash),
                                 key.getEncoded()),
                         n);
-        logger.debug("Hashing element {}. The hash evaluates to {}.", toHash, result);
+        logger.info("Hashing element {}. The hash evaluates to {}.", toHash, result);
         return result;
     }
 
@@ -162,7 +180,7 @@ public class VolumeHidingEMMUtils {
                                 CastingHelpers.fromByteArrayToBitInputStream(toHash),
                                 key.getEncoded()),
                         n);
-        logger.debug("Hashing element {}. The hash evaluates to {}.", toHash, result);
+        logger.info("Hashing element {}. The hash evaluates to {}.", toHash, result);
         return result;
     }
 
