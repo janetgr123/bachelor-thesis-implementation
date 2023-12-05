@@ -116,7 +116,11 @@ public class VolumeHidingEMMUtils {
         for (final var label : labels) {
             final var numberOfValues = multiMap.get(label).size();
             PairLabelNumberValues toInsert = new PairLabelNumberValues(label, numberOfValues);
-            while (evictionCounter < maxNumberOfEvictions && toInsert != null) {
+            boolean firstTime = true;
+            while (toInsert != null && (firstTime || evictionCounter < maxNumberOfEvictions)) {
+                if (firstTime) {
+                    evictionCounter = 0;
+                }
                 logger.info("Inserting in table 1: {}", toInsert);
                 toInsert = insert(table1, getHashCT(toInsert.label(), 0, tableSize, key), toInsert);
                 if (toInsert != null) {
@@ -131,6 +135,7 @@ public class VolumeHidingEMMUtils {
                     if (toInsert != null) {
                         logger.info("COLLISION! Evict from table 2: {}", toInsert);
                         evictionCounter++;
+                        firstTime = false;
                     }
                 }
             }

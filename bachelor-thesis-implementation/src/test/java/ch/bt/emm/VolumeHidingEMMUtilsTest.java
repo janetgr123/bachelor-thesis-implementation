@@ -63,18 +63,21 @@ public class VolumeHidingEMMUtilsTest {
     }
 
     @Test
-    public void testCuckooHashing() throws GeneralSecurityException, IOException {
+    public void testCuckooHashingWithSmallMap() throws GeneralSecurityException, IOException {
         testCuckooHashingWithMultimap(multimap);
+        testCuckooHashingCTWithMultimap(multimap);
     }
 
     @Test
-    public void testCuckooHashing2() throws IOException, GeneralSecurityException {
+    public void testCuckooHashingWithSmallMap2() throws IOException, GeneralSecurityException {
         testCuckooHashingWithMultimap(multimap2);
+        testCuckooHashingCTWithMultimap(multimap2);
     }
 
     @Test
     public void testCuckooHashingWithRealData() throws IOException, GeneralSecurityException {
         testCuckooHashingWithMultimap(multimapWithRealData);
+        testCuckooHashingCTWithMultimap(multimapWithRealData);
     }
 
     private void testCuckooHashingWithMultimap(final Map<Label, Set<Plaintext>> multimap)
@@ -97,6 +100,34 @@ public class VolumeHidingEMMUtilsTest {
         // PROPERTY 1   : no elements are disappearing
         assertEquals(
                 numberOfValues,
+                Arrays.stream(table1).filter(Objects::nonNull).count()
+                        + Arrays.stream(table2).filter(Objects::nonNull).count()
+                        + stash.size());
+
+        // PROPERTY 2:  stash size is less than numberOfValues / 10
+        assertTrue(stash.size() <= numberOfValues / 10);
+    }
+
+    private void testCuckooHashingCTWithMultimap(final Map<Label, Set<Plaintext>> multimap)
+            throws GeneralSecurityException, IOException {
+        final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multimap);
+        final int size = (int) Math.round((1 + ALPHA) * numberOfValues);
+        final var table1 = new PairLabelNumberValues[size];
+        final var table2 = new PairLabelNumberValues[size];
+        final Stack<PairLabelNumberValues> stash = new Stack<>();
+        final var key = CryptoUtils.generateKeyWithHMac(256);
+        VolumeHidingEMMUtils.doCuckooHashingWithStashCT(
+                (int) Math.round(5 * Math.log(numberOfValues) / Math.log(2)),
+                table1,
+                table2,
+                multimap,
+                stash,
+                size,
+                key);
+
+        // PROPERTY 1   : no elements are disappearing
+        assertEquals(
+                multimap.size(),
                 Arrays.stream(table1).filter(Objects::nonNull).count()
                         + Arrays.stream(table2).filter(Objects::nonNull).count()
                         + stash.size());
