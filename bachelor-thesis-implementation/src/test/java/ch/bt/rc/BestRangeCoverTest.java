@@ -35,7 +35,7 @@ public class BestRangeCoverTest {
     @Test
     public void testBRCWithInterval2_6() {
         final var rangeQuery = new CustomRange(2, 6);
-        final var rangeCover = new BestRangeCover().getRangeCover(graph, rangeQuery, root);
+        final var rangeCover = new BestRangeCover().getRangeCover(rangeQuery, root);
         assertEquals(3, rangeCover.size());
 
         final var expectedCover = new HashSet<Vertex>();
@@ -48,7 +48,7 @@ public class BestRangeCoverTest {
     @Test
     public void testBRCWithInterval2_7() {
         final var rangeQuery = new CustomRange(2, 7);
-        final var rangeCover = new BestRangeCover().getRangeCover(graph, rangeQuery, root);
+        final var rangeCover = new BestRangeCover().getRangeCover(rangeQuery, root);
         assertEquals(2, rangeCover.size());
 
         final var expectedCover = new HashSet<Vertex>();
@@ -60,7 +60,7 @@ public class BestRangeCoverTest {
     @Test
     public void testBRCWithInterval0_7() {
         final var rangeQuery = new CustomRange(0, 7);
-        final var rangeCover = new BestRangeCover().getRangeCover(graph, rangeQuery, root);
+        final var rangeCover = new BestRangeCover().getRangeCover(rangeQuery, root);
         assertEquals(1, rangeCover.size());
 
         final var expectedCover = new HashSet<Vertex>();
@@ -71,7 +71,7 @@ public class BestRangeCoverTest {
     @Test
     public void testBRCWithIntervalEmpty() {
         final var rangeQuery = new CustomRange(1, 0);
-        final var rangeCover = new BestRangeCover().getRangeCover(graph, rangeQuery, root);
+        final var rangeCover = new BestRangeCover().getRangeCover(rangeQuery, root);
         assertEquals(0, rangeCover.size());
 
         final var expectedCover = new HashSet<Vertex>();
@@ -81,7 +81,7 @@ public class BestRangeCoverTest {
     @Test
     public void testBRCWithIntervalSingle() {
         final var rangeQuery = new CustomRange(4, 4);
-        final var rangeCover = new BestRangeCover().getRangeCover(graph, rangeQuery, root);
+        final var rangeCover = new BestRangeCover().getRangeCover(rangeQuery, root);
         assertEquals(1, rangeCover.size());
 
         final var expectedCover = new HashSet<Vertex>();

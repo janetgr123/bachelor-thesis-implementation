@@ -1,5 +1,8 @@
 package ch.bt.model.rc;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
@@ -64,5 +67,21 @@ public class CustomRange {
             values.add(i);
         }
         return values.stream();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CustomRange that = (CustomRange) o;
+
+        return new EqualsBuilder().append(from, that.from).append(to, that.to).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(from).append(to).toHashCode();
     }
 }

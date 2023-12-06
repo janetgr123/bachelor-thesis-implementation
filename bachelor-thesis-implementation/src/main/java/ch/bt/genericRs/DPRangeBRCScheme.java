@@ -2,9 +2,9 @@ package ch.bt.genericRs;
 
 import ch.bt.crypto.CastingHelpers;
 import ch.bt.emm.EMM;
+import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
-import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
@@ -60,7 +60,7 @@ public class DPRangeBRCScheme implements TwoRoundGenericRSScheme {
     public List<SearchToken> trapdoor(CustomRange q) {
         final var rangeCover =
                 rangeCoveringAlgorithm.getRangeCover(
-                        graph, q, RangeCoverUtils.getVertex(graph, root.id()));
+                        q, RangeCoverUtils.getVertex(graph, root.id()));
         final var token =
                 rangeCover.stream()
                         .map(Vertex::range)

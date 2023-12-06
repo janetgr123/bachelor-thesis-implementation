@@ -2,18 +2,14 @@ package ch.bt.genericRs;
 
 import ch.bt.crypto.CastingHelpers;
 import ch.bt.emm.EMM;
+import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
-import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
 import ch.bt.model.searchtoken.SearchToken;
-import ch.bt.rc.RangeCoverUtils;
 import ch.bt.rc.RangeCoveringAlgorithm;
-
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -25,7 +21,6 @@ import javax.crypto.SecretKey;
 /** Falzon et al. */
 public class RangeBRCScheme implements GenericRSScheme {
     private final EMM emmScheme;
-    private final Graph<Vertex, DefaultEdge> graph;
     private final RangeCoveringAlgorithm rangeCoveringAlgorithm;
 
     private final Vertex root;
@@ -33,12 +28,10 @@ public class RangeBRCScheme implements GenericRSScheme {
     public RangeBRCScheme(
             final int securityParameter,
             final EMM emmScheme,
-            final Graph<Vertex, DefaultEdge> graph,
             final RangeCoveringAlgorithm rangeCoveringAlgorithm,
             final Vertex root)
             throws GeneralSecurityException, IOException {
         this.emmScheme = emmScheme;
-        this.graph = graph;
         this.rangeCoveringAlgorithm = rangeCoveringAlgorithm;
         this.root = root;
         this.setup(securityParameter);
@@ -60,7 +53,7 @@ public class RangeBRCScheme implements GenericRSScheme {
     public List<SearchToken> trapdoor(CustomRange q) {
         final var rangeCover =
                 rangeCoveringAlgorithm.getRangeCover(
-                        graph, q, RangeCoverUtils.getVertex(graph, root.id()));
+                        q, root);
         final var token =
                 rangeCover.stream()
                         .map(Vertex::range)

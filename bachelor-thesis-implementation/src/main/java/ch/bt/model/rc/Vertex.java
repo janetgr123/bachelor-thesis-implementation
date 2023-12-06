@@ -3,6 +3,7 @@ package ch.bt.model.rc;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
 public class Vertex implements Comparable<Vertex> {
@@ -44,5 +45,13 @@ public class Vertex implements Comparable<Vertex> {
                 .append(id, vertex.id)
                 .append(range, vertex.range)
                 .toComparison();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("range", range)
+                .toString();
     }
 }

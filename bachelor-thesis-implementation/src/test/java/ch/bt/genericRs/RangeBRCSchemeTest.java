@@ -14,8 +14,6 @@ import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
 import ch.bt.rc.BestRangeCover;
 
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +37,6 @@ public class RangeBRCSchemeTest {
 
     private static Map<Label, Set<Plaintext>> multimap;
 
-    private static Graph<Vertex, DefaultEdge> graph;
     private static Vertex root;
 
     private static final CustomRange range = new CustomRange(27, 30);
@@ -47,7 +44,6 @@ public class RangeBRCSchemeTest {
     @BeforeAll
     public static void init() {
         multimap = TestUtils.multimap;
-        graph = TestUtils.graph;
         root = TestUtils.root;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
@@ -74,7 +70,7 @@ public class RangeBRCSchemeTest {
             throws GeneralSecurityException, IOException {
         final var basicEMM = basicEMMs.get(securityParameter);
         final var rangeScheme =
-                new RangeBRCScheme(securityParameter, basicEMM, graph, new BestRangeCover(), root);
+                new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
         testRangeSchemeWithEMM(rangeScheme);
     }
 
@@ -86,8 +82,7 @@ public class RangeBRCSchemeTest {
             throws GeneralSecurityException, IOException {
         final var volumeHidingEMM = volumeHidingEMMs.get(securityParameter);
         final var rangeScheme =
-                new RangeBRCScheme(
-                        securityParameter, volumeHidingEMM, graph, new BestRangeCover(), root);
+                new RangeBRCScheme(securityParameter, volumeHidingEMM, new BestRangeCover(), root);
         testRangeSchemeWithEMM(rangeScheme);
     }
 
@@ -97,8 +92,7 @@ public class RangeBRCSchemeTest {
             throws GeneralSecurityException, IOException {
         final var volumeHidingOEMM = volumeHidingOptimisedEMMs.get(securityParameter);
         final var rangeScheme =
-                new RangeBRCScheme(
-                        securityParameter, volumeHidingOEMM, graph, new BestRangeCover(), root);
+                new RangeBRCScheme(securityParameter, volumeHidingOEMM, new BestRangeCover(), root);
         testRangeSchemeWithEMM(rangeScheme);
     }
 
