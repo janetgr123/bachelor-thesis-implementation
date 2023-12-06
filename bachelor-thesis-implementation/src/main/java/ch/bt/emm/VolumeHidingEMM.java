@@ -153,10 +153,6 @@ public class VolumeHidingEMM implements EMM {
         return tableSize;
     }
 
-    public int getMaxStashSize() {
-        return maxStashSize;
-    }
-
     public int getMaxNumberOfEvictions() {
         return maxNumberOfEvictions;
     }

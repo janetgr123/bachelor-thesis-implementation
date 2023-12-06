@@ -18,13 +18,11 @@ import javax.crypto.SecretKey;
 public class BasicEMM implements EMM {
     private final SEScheme seScheme;
     private final SecretKey hmacKey;
-    private final SecretKey encryptionKey;
 
     public BasicEMM(final int securityParameter) throws GeneralSecurityException {
         final var keys = this.setup(securityParameter);
         this.hmacKey = keys.get(0);
-        this.encryptionKey = keys.get(1);
-        seScheme = new AESSEScheme(encryptionKey);
+        seScheme = new AESSEScheme(keys.get(1));
     }
 
     @Override
