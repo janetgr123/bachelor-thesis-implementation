@@ -41,15 +41,20 @@ public class VolumeHidingEMMUtils {
             throws IOException {
         final var labels = multiMap.keySet();
 
-        final Map<Label, List<Plaintext>> indices = new HashMap<>();
+        final Map<PairLabelPlaintext, Integer> indices = new HashMap<>();
         for (final var label : labels) {
             final var values = multiMap.get(label).stream().toList();
-            indices.put(label, values);
+            int i = 0;
+            for (final var value : values) {
+                PairLabelPlaintext pair = new PairLabelPlaintext(label, value);
+                indices.put(pair, i);
+                i++;
+            }
         }
 
         int evictionCounter = 0;
         for (final var label : labels) {
-            final var values = indices.get(label);
+            final var values = multiMap.get(label);
             for (final var value : values) {
                 PairLabelPlaintext toInsert = new PairLabelPlaintext(label, value);
                 boolean firstTime = true;
@@ -63,7 +68,7 @@ public class VolumeHidingEMMUtils {
                                     table1,
                                     getHash(
                                             toInsert.label(),
-                                            values.indexOf(toInsert.value()),
+                                            indices.get(toInsert),
                                             0,
                                             tableSize,
                                             key),
@@ -77,7 +82,7 @@ public class VolumeHidingEMMUtils {
                                         table2,
                                         getHash(
                                                 toInsert.label(),
-                                                values.indexOf(toInsert.value()),
+                                                indices.get(toInsert),
                                                 1,
                                                 tableSize,
                                                 key),

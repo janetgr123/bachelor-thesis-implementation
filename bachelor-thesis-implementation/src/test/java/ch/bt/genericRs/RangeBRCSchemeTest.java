@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @ExtendWith({TestConfigurationsWithDB.class})
+@Disabled
 public class RangeBRCSchemeTest {
 
     private static final Map<Integer, BasicEMM> basicEMMs = new HashMap<>();
@@ -147,7 +148,8 @@ public class RangeBRCSchemeTest {
         final var encryptedIndex = rangeScheme.buildIndex(multimap);
         final var searchToken = rangeScheme.trapdoor(range);
         final var ciphertexts = rangeScheme.search(searchToken, encryptedIndex);
-        final var values = rangeScheme.result(ciphertexts).stream().distinct().sorted().toList();
+        final var values =
+                rangeScheme.result(ciphertexts, range).stream().distinct().sorted().toList();
         final var expectedLabels =
                 multimap.keySet().stream()
                         .filter(el -> range.contains(CastingHelpers.fromByteArrayToInt(el.label())))

@@ -24,7 +24,6 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
     @Override
     public SearchToken trapdoor(final Label searchLabel)
             throws GeneralSecurityException, IOException {
-        addSearchLabel(searchLabel);
         return new SearchTokenBytes(DPRF.generateToken(getPrfKey(), searchLabel));
     }
 
@@ -41,9 +40,9 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
         final var encryptedIndexTable1 = ((EncryptedIndexTables) encryptedIndex).getTable(0);
         final var encryptedIndexTable2 = ((EncryptedIndexTables) encryptedIndex).getTable(1);
         final var token = ((SearchTokenBytes) searchToken).token();
-        final int numberOfValues = 1; // TODO: SET CORRECTLY!
         final int tableSize = getTableSize();
-        for (int i = 0; i < numberOfValues; i++) {
+        final int size = getMaxNumberOfValuesPerLabel();
+        for (int i = 0; i < size; i++) {
             final var expand1 =
                     CastingHelpers.fromByteArrayToHashModN(
                             DPRF.evaluateDPRF(token, i, 0), tableSize);

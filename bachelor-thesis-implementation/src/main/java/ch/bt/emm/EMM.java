@@ -24,5 +24,5 @@ public interface EMM {
     Set<Ciphertext> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex)
             throws GeneralSecurityException, IOException;
 
-    Set<Plaintext> result(final Set<Ciphertext> ciphertexts) throws GeneralSecurityException;
+    Set<Plaintext> result(final Set<Ciphertext> ciphertexts, final Label searchLabel) throws GeneralSecurityException;
 }

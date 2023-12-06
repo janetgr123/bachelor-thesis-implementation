@@ -25,11 +25,10 @@ public class VolumeHidingEMM implements EMM {
     private int maxNumberOfEvictions;
     private Stack<PairLabelPlaintext> stash;
     private final double alpha;
-    private Map<Label, Set<Plaintext>> multiMap;
-
-    private final List<Label> searchLabels = new LinkedList<>();
 
     private final SecretKey prfKey;
+
+    private int maxNumberOfValuesPerLabel = 0;
 
     public VolumeHidingEMM(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
@@ -37,6 +36,16 @@ public class VolumeHidingEMM implements EMM {
         this.prfKey = keys.get(0);
         this.seScheme = new AESSEScheme(keys.get(1));
         this.alpha = alpha;
+    }
+
+    private void setMaxNumberOfValuesPerLabel(final Map<Label, Set<Plaintext>> multiMap) {
+        final var keys = multiMap.keySet();
+        for (final var key : keys) {
+            final var num = multiMap.get(key).size();
+            if (num > maxNumberOfValuesPerLabel) {
+                maxNumberOfValuesPerLabel = num;
+            }
+        }
     }
 
     @Override
@@ -49,7 +58,7 @@ public class VolumeHidingEMM implements EMM {
     @Override
     public EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
             throws GeneralSecurityException, IOException {
-        this.multiMap = multiMap;
+        setMaxNumberOfValuesPerLabel(multiMap);
         final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multiMap);
         this.tableSize = (int) Math.round((1 + alpha) * numberOfValues);
         this.maxNumberOfEvictions = (int) Math.round(5 * Math.log(numberOfValues) / Math.log(2));
@@ -59,13 +68,7 @@ public class VolumeHidingEMM implements EMM {
         final PairLabelPlaintext[] table2 = new PairLabelPlaintext[tableSize];
         final Stack<PairLabelPlaintext> stash = new Stack<>();
         VolumeHidingEMMUtils.doCuckooHashingWithStash(
-                maxNumberOfEvictions,
-                table1,
-                table2,
-                multiMap,
-                stash,
-                tableSize,
-                prfKey);
+                maxNumberOfEvictions, table1, table2, multiMap, stash, tableSize, prfKey);
         VolumeHidingEMMUtils.fillEmptyValues(table1);
         VolumeHidingEMMUtils.fillEmptyValues(table2);
         this.stash = stash;
@@ -81,15 +84,9 @@ public class VolumeHidingEMM implements EMM {
     @Override
     public SearchToken trapdoor(final Label searchLabel)
             throws GeneralSecurityException, IOException {
-        this.searchLabels.add(searchLabel);
-        final var valueSet = multiMap.get(searchLabel);
-        int valueSetSize = 0;
-        if (valueSet != null) {
-            valueSetSize = valueSet.size();
-        }
         final var token = new ArrayList<SearchTokenInts>();
         int i = 0;
-        while (i < valueSetSize) {
+        while (i < maxNumberOfValuesPerLabel) {
             final var token1 = VolumeHidingEMMUtils.getHash(searchLabel, i, 0, tableSize, prfKey);
             final var token2 = VolumeHidingEMMUtils.getHash(searchLabel, i, 1, tableSize, prfKey);
             token.add(new SearchTokenInts(token1, token2));
@@ -120,7 +117,7 @@ public class VolumeHidingEMM implements EMM {
     }
 
     @Override
-    public Set<Plaintext> result(final Set<Ciphertext> ciphertexts)
+    public Set<Plaintext> result(final Set<Ciphertext> ciphertexts, final Label searchLabel)
             throws GeneralSecurityException {
         final var plaintexts =
                 ciphertexts.stream()
@@ -137,12 +134,12 @@ public class VolumeHidingEMM implements EMM {
                                 })
                         .map(PairLabelPlaintext.class::cast)
                         .filter(el -> !Arrays.equals(el.label().label(), new byte[0]))
-                        .filter(el -> searchLabels.contains(el.label()))
+                        .filter(el -> searchLabel.equals(el.label()))
                         .map(PairLabelPlaintext::value)
                         .collect(Collectors.toSet());
         plaintexts.addAll(
                 stash.stream()
-                        .filter(el -> searchLabels.contains(el.label()))
+                        .filter(el -> searchLabel.equals(el.label()))
                         .map(PairLabelPlaintext::value)
                         .collect(Collectors.toSet()));
         return plaintexts;
@@ -168,7 +165,7 @@ public class VolumeHidingEMM implements EMM {
         return prfKey;
     }
 
-    public void addSearchLabel(final Label label) {
-        this.searchLabels.add(label);
+    public int getMaxNumberOfValuesPerLabel() {
+        return maxNumberOfValuesPerLabel;
     }
 }

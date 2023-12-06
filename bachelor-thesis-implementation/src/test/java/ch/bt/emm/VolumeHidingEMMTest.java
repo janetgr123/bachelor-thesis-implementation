@@ -21,13 +21,12 @@ import java.util.*;
 public class VolumeHidingEMMTest {
     private static final Map<Integer, VolumeHidingEMM> volumeHidingEMMs = new HashMap<>();
     private static Map<Label, Set<Plaintext>> multiMap;
-
-    private static Label searchLabel;
+    private static Map<Label, Set<Plaintext>> multiMapSmall;
 
     @BeforeAll
     public static void init() {
         multiMap = TestUtils.multimap;
-        searchLabel = TestUtils.searchLabel;
+        multiMapSmall = TestUtils.multimapSmall;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
                         securityParameter -> {
@@ -47,13 +46,34 @@ public class VolumeHidingEMMTest {
             throws GeneralSecurityException, IOException {
         final var volumeHidingEMM = volumeHidingEMMs.get(securityParameter);
         final var encryptedIndex = volumeHidingEMM.buildIndex(multiMap);
-        final var searchToken = volumeHidingEMM.trapdoor(searchLabel);
-        final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
-        final var values = volumeHidingEMM.result(ciphertexts).stream().sorted().toList();
-        final var expectedValues = multiMap.get(searchLabel).stream().sorted().toList();
+        final var keys = multiMap.keySet().stream().sorted().toList();
+        for (final var key : keys) {
+            final var searchToken = volumeHidingEMM.trapdoor(key);
+            final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
+            final var values = volumeHidingEMM.result(ciphertexts, key).stream().sorted().toList();
+            final var expectedValues = multiMap.get(key).stream().sorted().toList();
 
-        // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
-        assertEquals(expectedValues, values);
+            // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
+            assertEquals(expectedValues, values);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
+    public void testCorrectnessSmall(final int securityParameter)
+            throws GeneralSecurityException, IOException {
+        final var keys = multiMapSmall.keySet();
+        final var volumeHidingEMM = volumeHidingEMMs.get(securityParameter);
+        final var encryptedIndex = volumeHidingEMM.buildIndex(multiMapSmall);
+        for (final var key : keys) {
+            final var searchToken = volumeHidingEMM.trapdoor(key);
+            final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
+            final var values = volumeHidingEMM.result(ciphertexts, key).stream().sorted().toList();
+            final var expectedValues = multiMapSmall.get(key).stream().sorted().toList();
+
+            // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
+            assertEquals(expectedValues, values);
+        }
     }
 
     @ParameterizedTest
@@ -75,7 +95,7 @@ public class VolumeHidingEMMTest {
                 VolumeHidingEMMUtils.getDecryptedLabels(volumeHidingEMM, table21, table22);
 
         // PROPERTY 1:  Encrypted labels for fixed EMM scheme and multimap are deterministic.
-        // REASON:      Construction uses Cuckoo Hashing with stash with SHA3 hashes that are
+        // REASON:      Construction uses Cuckoo Hashing with stash with DPRF hashes that are
         //              deterministic.
         assertEquals(labels, labels2);
 

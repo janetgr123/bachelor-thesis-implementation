@@ -22,8 +22,8 @@ import java.util.*;
 @ExtendWith({TestConfigurationsWithDB.class})
 public class VolumeHidingEMMUtilsTest {
 
-    private static final Map<Label, Set<Plaintext>> multimap = new HashMap<>();
-    private static final Map<Label, Set<Plaintext>> multimap2 = new HashMap<>();
+    private static Map<Label, Set<Plaintext>> multimap = new HashMap<>();
+    private static Map<Label, Set<Plaintext>> multimap2 = new HashMap<>();
 
     private static Map<Label, Set<Plaintext>> multimapWithRealData;
 
@@ -31,34 +31,8 @@ public class VolumeHidingEMMUtilsTest {
 
     @BeforeAll
     public static void init() {
-        final var set1 = new HashSet<Plaintext>();
-        final List<Plaintext> plaintexts = new ArrayList<>();
-        plaintexts.add(new Plaintext(new byte[] {0}));
-        plaintexts.add(new Plaintext(new byte[] {1}));
-        plaintexts.add(new Plaintext(new byte[] {2}));
-        plaintexts.add(new Plaintext(new byte[] {3}));
-        plaintexts.add(new Plaintext(new byte[] {4}));
-        plaintexts.add(new Plaintext(new byte[] {5}));
-        final List<Label> labels = new ArrayList<>();
-        labels.add(new Label(new byte[] {0}));
-        labels.add(new Label(new byte[] {1}));
-        labels.add(new Label(new byte[] {2}));
-        labels.add(new Label(new byte[] {3}));
-        labels.add(new Label(new byte[] {4}));
-        labels.add(new Label(new byte[] {5}));
-        set1.add(plaintexts.get(0));
-        set1.add(plaintexts.get(1));
-        set1.add(plaintexts.get(2));
-        multimap.put(labels.get(0), set1);
-        multimap2.put(labels.get(0), set1);
-        final var set2 = new HashSet<>(plaintexts);
-        multimap.put(labels.get(1), set2);
-        multimap2.put(labels.get(1), set2);
-        multimap.put(labels.get(2), set2);
-        multimap.put(labels.get(3), set2);
-        multimap.put(labels.get(4), set2);
-        multimap.put(labels.get(5), set2);
-
+        multimap = TestUtils.multimapSmall;
+        multimap2 = TestUtils.multimapSmall2;
         multimapWithRealData = TestUtils.multimap;
     }
 

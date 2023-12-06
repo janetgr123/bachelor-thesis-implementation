@@ -25,12 +25,9 @@ public class VolumeHidingEMMOptimisedTest {
 
     private static Map<Label, Set<Plaintext>> multiMap;
 
-    private static Label searchLabel;
-
     @BeforeAll
     public static void init() {
         multiMap = TestUtils.multimap;
-        searchLabel = TestUtils.searchLabel;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
                         securityParameter -> {
@@ -49,15 +46,19 @@ public class VolumeHidingEMMOptimisedTest {
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
     public void testCorrectness(final int securityParameter)
             throws GeneralSecurityException, IOException {
+        // searchLabel = new Label(new byte[] {16, -39});
         final var volumeHidingEMM = volumeHidingEMMOptimised.get(securityParameter);
         final var encryptedIndex = volumeHidingEMM.buildIndex(multiMap);
-        final var searchToken = volumeHidingEMM.trapdoor(searchLabel);
-        final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
-        final var values = volumeHidingEMM.result(ciphertexts).stream().sorted().toList();
-        final var expectedValues = multiMap.get(searchLabel).stream().sorted().toList();
+        final var keys = multiMap.keySet();
+        for (final var key : keys) {
+            final var searchToken = volumeHidingEMM.trapdoor(key);
+            final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
+            final var values = volumeHidingEMM.result(ciphertexts, key).stream().sorted().toList();
+            final var expectedValues = multiMap.get(key).stream().sorted().toList();
 
-        // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
-        assertEquals(expectedValues, values);
+            // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
+            assertEquals(expectedValues, values);
+        }
     }
 
     @ParameterizedTest

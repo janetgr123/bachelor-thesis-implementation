@@ -46,13 +46,16 @@ public class BasicEMMTest {
     public void testCorrectness(final int securityParameter) throws GeneralSecurityException {
         final var basicEMM = basicEMMMs.get(securityParameter);
         final var encryptedIndex = basicEMM.buildIndex(multimap);
-        final var searchToken = basicEMM.trapdoor(searchLabel);
-        final var ciphertexts = basicEMM.search(searchToken, encryptedIndex);
-        final var values = basicEMM.result(ciphertexts).stream().sorted().toList();
-        final var expectedValues = multimap.get(searchLabel).stream().sorted().toList();
+        final var keys = multimap.keySet().stream().sorted().toList();
+        for (final var key : keys) {
+            final var searchToken = basicEMM.trapdoor(key);
+            final var ciphertexts = basicEMM.search(searchToken, encryptedIndex);
+            final var values = basicEMM.result(ciphertexts, searchLabel).stream().sorted().toList();
+            final var expectedValues = multimap.get(key).stream().sorted().toList();
 
-        // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
-        assertEquals(values, expectedValues);
+            // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
+            assertEquals(values, expectedValues);
+        }
     }
 
     @ParameterizedTest

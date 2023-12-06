@@ -48,7 +48,8 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
 
     @ParameterizedTest
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
-    public void testCorrectness(final int securityParameter) throws GeneralSecurityException, IOException {
+    public void testCorrectness(final int securityParameter)
+            throws GeneralSecurityException, IOException {
         final var differentiallyPrivateVolumeHidingEMM =
                 differentiallyPrivateVolumeHidingEMMs.get(securityParameter);
         final var encryptedIndex = differentiallyPrivateVolumeHidingEMM.buildIndex(multiMap);
@@ -60,7 +61,9 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
         final var ciphertexts =
                 differentiallyPrivateVolumeHidingEMM.search2(searchToken2, encryptedIndex);
         final var values =
-                differentiallyPrivateVolumeHidingEMM.result(ciphertexts).stream().sorted().toList();
+                differentiallyPrivateVolumeHidingEMM.result(ciphertexts, searchLabel).stream()
+                        .sorted()
+                        .toList();
         final var expectedValues = multiMap.get(searchLabel).stream().sorted().toList();
 
         // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]

@@ -37,7 +37,6 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
             throws GeneralSecurityException, IOException {
         final var encryptedIndex = super.buildIndex(multiMap);
         final int tableSize = getTableSize();
-        final var maxStashSize = getMaxStashSize();
         final var seScheme = getSeScheme();
 
         final PairLabelNumberValues[] counterTable1 = new PairLabelNumberValues[tableSize];
@@ -71,7 +70,6 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
     @Override
     public SearchToken trapdoor(final Label searchLabel)
             throws GeneralSecurityException, IOException {
-        addSearchLabel(searchLabel);
         return new SearchTokenBytes(
                 DPRF.generateToken(
                         getPrfKey(),

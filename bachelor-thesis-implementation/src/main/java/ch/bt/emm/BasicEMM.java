@@ -89,7 +89,7 @@ public class BasicEMM implements EMM {
     }
 
     @Override
-    public Set<Plaintext> result(final Set<Ciphertext> ciphertextWithIVS) {
+    public Set<Plaintext> result(final Set<Ciphertext> ciphertextWithIVS, final Label searchLabel) {
         Set<Plaintext> plaintextValues = new HashSet<>();
         ciphertextWithIVS.forEach(
                 encryptedValue -> {

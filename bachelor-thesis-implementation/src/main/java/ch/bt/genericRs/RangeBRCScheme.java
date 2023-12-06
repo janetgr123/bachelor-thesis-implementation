@@ -95,7 +95,9 @@ public class RangeBRCScheme implements GenericRSScheme {
     }
 
     @Override
-    public Set<Plaintext> result(Set<Ciphertext> ciphertexts) throws GeneralSecurityException {
-        return emmScheme.result(ciphertexts);
+    public Set<Plaintext> result(Set<Ciphertext> ciphertexts, final CustomRange q)
+            throws GeneralSecurityException {
+        // TODO: FIX
+        return emmScheme.result(ciphertexts, new Label(new byte[0]));
     }
 }
