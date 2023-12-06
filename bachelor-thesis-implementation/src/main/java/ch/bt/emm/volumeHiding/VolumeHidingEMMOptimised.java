@@ -1,9 +1,9 @@
-package ch.bt.emm;
+package ch.bt.emm.volumeHiding;
 
 import ch.bt.crypto.CastingHelpers;
 import ch.bt.crypto.DPRF;
-import ch.bt.model.*;
-import ch.bt.model.Label;
+import ch.bt.model.multimap.Ciphertext;
+import ch.bt.model.multimap.Label;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
 import ch.bt.model.searchtoken.SearchToken;

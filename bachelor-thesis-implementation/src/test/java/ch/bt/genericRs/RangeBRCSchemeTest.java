@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
 import ch.bt.crypto.CastingHelpers;
-import ch.bt.emm.BasicEMM;
-import ch.bt.emm.DifferentiallyPrivateVolumeHidingEMM;
-import ch.bt.emm.VolumeHidingEMM;
-import ch.bt.emm.VolumeHidingEMMOptimised;
-import ch.bt.model.Label;
-import ch.bt.model.Plaintext;
+import ch.bt.emm.basic.BasicEMM;
+import ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised;
+import ch.bt.model.multimap.Label;
+import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
 import ch.bt.rc.BestRangeCover;
@@ -110,37 +110,6 @@ public class RangeBRCSchemeTest {
                 new RangeBRCScheme(
                         securityParameter, volumeHidingOEMM, graph, new BestRangeCover(), root);
         testRangeSchemeWithEMM(rangeScheme);
-    }
-
-    // TODO: HOW TO INTEGRATE TWO ROUND DP-VH-EMM INTO RANGE-SCHEME???
-    @Disabled
-    @ParameterizedTest
-    @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
-    public void testCorrectnessWithDPVHEMM(final int securityParameter)
-            throws GeneralSecurityException, IOException {
-        final var dpVolumeHidingOEMM = dpVolumeHidingEMMs.get(securityParameter);
-        final var rangeScheme =
-                new RangeBRCScheme(
-                        securityParameter, dpVolumeHidingOEMM, graph, new BestRangeCover(), root);
-        final var encryptedIndex = rangeScheme.buildIndex(multimap);
-        final var searchToken = rangeScheme.trapdoor(range);
-        final var values = new ArrayList<>();
-
-        final var expectedLabels =
-                multimap.keySet().stream()
-                        .filter(el -> range.contains(CastingHelpers.fromByteArrayToInt(el.label())))
-                        .collect(Collectors.toSet());
-        final var expectedValues =
-                expectedLabels.stream()
-                        .map(el -> multimap.get(el))
-                        .flatMap(Collection::stream)
-                        .distinct()
-                        .sorted()
-                        .toList();
-
-        // PROPERTY:    Result(Search(Trapdoor(range), BuildIndex(multiMap))) =
-        //              union(multiMap[label] : label in range)
-        assertEquals(expectedValues, values.stream().distinct().sorted().toList());
     }
 
     private void testRangeSchemeWithEMM(final GenericRSScheme rangeScheme)

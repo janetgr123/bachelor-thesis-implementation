@@ -1,6 +1,6 @@
 package ch.bt.model.encryptedindex;
 
-import ch.bt.model.PairLabelCiphertext;
+import ch.bt.model.multimap.PairLabelCiphertext;
 public class EncryptedIndexTables implements EncryptedIndex {
     private final PairLabelCiphertext[] table1;
     private final PairLabelCiphertext[] table2;

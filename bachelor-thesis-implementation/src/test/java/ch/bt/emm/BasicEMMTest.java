@@ -4,8 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
-import ch.bt.model.Label;
-import ch.bt.model.Plaintext;
+import ch.bt.emm.basic.BasicEMM;
+import ch.bt.model.multimap.Label;
+import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.encryptedindex.EncryptedIndexMap;
 
 import org.junit.jupiter.api.BeforeAll;

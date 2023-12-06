@@ -1,9 +1,11 @@
-package ch.bt.emm;
+package ch.bt.emm.basic;
 
 import ch.bt.crypto.*;
-import ch.bt.model.*;
-import ch.bt.model.Label;
-import ch.bt.model.Plaintext;
+import ch.bt.emm.EMM;
+import ch.bt.model.multimap.Ciphertext;
+import ch.bt.model.multimap.CiphertextWithIV;
+import ch.bt.model.multimap.Label;
+import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.encryptedindex.EncryptedIndexMap;
 import ch.bt.model.searchtoken.SearchToken;

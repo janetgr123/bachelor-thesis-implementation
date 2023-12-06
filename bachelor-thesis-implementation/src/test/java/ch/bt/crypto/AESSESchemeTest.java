@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ch.bt.TestConfigurations;
 import ch.bt.TestUtils;
-import ch.bt.model.Plaintext;
+import ch.bt.model.multimap.Plaintext;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;

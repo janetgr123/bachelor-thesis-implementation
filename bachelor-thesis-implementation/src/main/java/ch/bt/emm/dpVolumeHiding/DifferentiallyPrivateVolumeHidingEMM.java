@@ -1,12 +1,12 @@
-package ch.bt.emm;
+package ch.bt.emm.dpVolumeHiding;
 
-import ch.bt.crypto.CastingHelpers;
-import ch.bt.crypto.DPRF;
-import ch.bt.model.*;
-import ch.bt.model.Label;
+import ch.bt.crypto.*;
+import ch.bt.emm.TwoRoundEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMMUtils;
 import ch.bt.model.encryptedindex.DifferentiallyPrivateEncryptedIndexTables;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
+import ch.bt.model.multimap.*;
 import ch.bt.model.searchtoken.SearchToken;
 import ch.bt.model.searchtoken.SearchTokenBytes;
 import ch.bt.model.searchtoken.SearchTokenIntBytes;
@@ -17,54 +17,73 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
+import javax.crypto.SecretKey;
+
 /** SSE scheme from Patel et al. (2019) */
-public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
+public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
 
     private static final int correctionFactor = 5610;
 
     private final double epsilon;
-    private Stack<PairLabelNumberValues> counterStash;
+    private Stack<Ciphertext> counterStash;
+    private final SEScheme seScheme;
+    private int tableSize;
+
+    private Stack<Ciphertext> stash;
+    private final double alpha;
+
+    private final SecretKey prfKey;
+
+    private int maxNumberOfValuesPerLabel = 0;
 
     public DifferentiallyPrivateVolumeHidingEMM(
             final int securityParameter, final double epsilon, final double alpha)
             throws GeneralSecurityException {
-        super(securityParameter, alpha);
+        final var keys = this.setup(securityParameter);
+        this.prfKey = keys.get(0);
+        this.seScheme = new AESSEScheme(keys.get(1));
+        this.alpha = alpha;
         this.epsilon = epsilon;
+    }
+
+    private void setMaxNumberOfValuesPerLabel(final Map<Label, Set<Plaintext>> multiMap) {
+        final var keys = multiMap.keySet();
+        for (final var key : keys) {
+            final var num = multiMap.get(key).size();
+            if (num > maxNumberOfValuesPerLabel) {
+                maxNumberOfValuesPerLabel = num;
+            }
+        }
+    }
+
+    @Override
+    public List<SecretKey> setup(int securityParameter) throws GeneralSecurityException {
+        final var key1 = CryptoUtils.generateKeyWithHMac(securityParameter);
+        final var key2 = CryptoUtils.generateKeyForAES(securityParameter);
+        return List.of(key1, key2);
     }
 
     @Override
     public EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
             throws GeneralSecurityException, IOException {
-        final var encryptedIndex = super.buildIndex(multiMap);
-        final int tableSize = getTableSize();
-        final var seScheme = getSeScheme();
+        final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multiMap);
+        this.tableSize = (int) Math.round((1 + alpha) * numberOfValues);
 
-        final PairLabelNumberValues[] counterTable1 = new PairLabelNumberValues[tableSize];
-        final PairLabelNumberValues[] counterTable2 = new PairLabelNumberValues[tableSize];
-        final Stack<PairLabelNumberValues> counterStash = new Stack<>();
-        VolumeHidingEMMUtils.doCuckooHashingWithStashCT(
-                getMaxNumberOfEvictions(),
-                counterTable1,
-                counterTable2,
-                multiMap,
-                counterStash,
-                tableSize,
-                getPrfKey());
-        VolumeHidingEMMUtils.fillEmptyValues(counterTable1);
-        VolumeHidingEMMUtils.fillEmptyValues(counterTable2);
-        this.counterStash = counterStash;
+        setMaxNumberOfValuesPerLabel(multiMap);
+        final var encryptedIndexWithStash =
+                VolumeHidingEMMUtils.calculateEncryptedIndexAndStash(
+                        tableSize, numberOfValues, multiMap, prfKey, seScheme);
 
-        final PairLabelCiphertext[] encryptedCounterTable1 = new PairLabelCiphertext[tableSize];
-        final PairLabelCiphertext[] encryptedCounterTable2 = new PairLabelCiphertext[tableSize];
-        VolumeHidingEMMUtils.encryptCounterTables(
-                counterTable1,
-                counterTable2,
-                encryptedCounterTable1,
-                encryptedCounterTable2,
-                seScheme);
+        final var encryptedIndex = encryptedIndexWithStash.encryptedIndex();
+        this.stash = encryptedIndexWithStash.stash();
 
-        return new DifferentiallyPrivateEncryptedIndexTables(
-                encryptedIndex, encryptedCounterTable1, encryptedCounterTable2);
+        final var encryptedCTIndexWithStash =
+                DPVolumeHidingEMMUtils.calculateEncryptedCTIndex(
+                        tableSize, numberOfValues, multiMap, prfKey, seScheme);
+        final var encryptedCTIndex = encryptedCTIndexWithStash.encryptedIndex();
+        this.counterStash = encryptedCTIndexWithStash.stash();
+
+        return new DifferentiallyPrivateEncryptedIndexTables(encryptedIndex, encryptedCTIndex);
     }
 
     @Override
@@ -72,30 +91,34 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
             throws GeneralSecurityException, IOException {
         return new SearchTokenBytes(
                 DPRF.generateToken(
-                        getPrfKey(),
+                        prfKey,
                         new Label(
                                 org.bouncycastle.util.Arrays.concatenate(
                                         CastingHelpers.fromStringToByteArray("CT"),
                                         searchLabel.label()))));
     }
 
+    @Override
     public SearchToken trapdoor(final Label label, final Set<Ciphertext> ciphertexts)
             throws GeneralSecurityException, IOException {
-        final var encryptedLabel = getSeScheme().encryptLabel(label);
+        final var encryptedLabel = seScheme.encryptLabel(label);
         final var matchingEntries =
                 ciphertexts.stream()
                         .map(PairLabelCiphertext.class::cast)
                         .filter(el -> el.label().equals(encryptedLabel))
                         .count();
         final var matchingEntriesInStash =
-                counterStash.stream().filter(el -> el.label().equals(label)).count();
+                counterStash.stream()
+                        .map(PairLabelPlaintext.class::cast)
+                        .filter(el -> el.label().equals(label))
+                        .count();
         final var mu = 0;
         final var beta = 2 / epsilon;
         final var laplaceDistribution = new LaplaceDistribution(mu, beta);
         final var noise = laplaceDistribution.sample();
         final var numberOfValuesWithNoise =
                 (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
-        final var token = DPRF.generateToken(getPrfKey(), label);
+        final var token = DPRF.generateToken(prfKey, label);
         return new SearchTokenIntBytes(numberOfValuesWithNoise, token);
     }
 
@@ -108,14 +131,14 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
                     "types of encrypted index or search token are not matching");
         }
         Set<Ciphertext> ciphertexts = new HashSet<>();
-        final var encryptedCounterTable =
-                ((DifferentiallyPrivateEncryptedIndexTables) encryptedIndex).getCounterTable(0);
-        final var encryptedCounterTable2 =
-                ((DifferentiallyPrivateEncryptedIndexTables) encryptedIndex).getCounterTable(1);
+        final var encryptedCouterIndex =
+                (EncryptedIndexTables)
+                        ((DifferentiallyPrivateEncryptedIndexTables) encryptedIndex)
+                                .encryptedIndexCT();
+        final var encryptedCounterTable = encryptedCouterIndex.getTable(0);
+        final var encryptedCounterTable2 = encryptedCouterIndex.getTable(1);
         final var token = ((SearchTokenBytes) searchToken).token();
-        final int numberOfValues = getMaxNumberOfValuesPerLabel();
-        final int tableSize = getTableSize();
-        for (int i = 0; i < numberOfValues; i++) {
+        for (int i = 0; i < maxNumberOfValuesPerLabel; i++) {
             final var expand1 =
                     CastingHelpers.fromByteArrayToHashModN(
                             DPRF.evaluateDPRF(token, i, 0), tableSize);
@@ -128,6 +151,13 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
         return ciphertexts;
     }
 
+    @Override
+    public Set<Plaintext> result(Set<Ciphertext> ciphertexts, Label searchLabel)
+            throws GeneralSecurityException {
+        return VolumeHidingEMMUtils.getPlaintexts(ciphertexts, seScheme, searchLabel, stash);
+    }
+
+    @Override
     public Set<Ciphertext> search2(
             final SearchToken searchToken, final EncryptedIndex encryptedIndex) throws IOException {
         if (!(encryptedIndex instanceof DifferentiallyPrivateEncryptedIndexTables)
@@ -137,15 +167,12 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
         }
         Set<Ciphertext> ciphertexts = new HashSet<>();
         final var encryptedIndexTables =
-                ((DifferentiallyPrivateEncryptedIndexTables) encryptedIndex)
-                        .getEncryptedIndexTables();
-        if (!(encryptedIndexTables instanceof EncryptedIndexTables tables)) {
-            throw new IllegalArgumentException("types of encrypted index tables are not matching");
-        }
-        final var encryptedIndexTable1 = tables.getTable(0);
-        final var encryptedIndexTable2 = tables.getTable(1);
+                (EncryptedIndexTables)
+                        ((DifferentiallyPrivateEncryptedIndexTables) encryptedIndex)
+                                .encryptedIndex();
+        final var encryptedIndexTable1 = encryptedIndexTables.getTable(0);
+        final var encryptedIndexTable2 = encryptedIndexTables.getTable(1);
         final var numberOfValues = token.token();
-        final int tableSize = getTableSize();
         int i = 0;
         while (i < numberOfValues) {
             final var expand1 =
@@ -159,5 +186,9 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
             i++;
         }
         return ciphertexts;
+    }
+
+    public SEScheme getSeScheme() {
+        return seScheme;
     }
 }

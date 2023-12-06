@@ -15,7 +15,7 @@ import java.util.Set;
 
 import javax.crypto.SecretKey;
 
-public interface GenericRSScheme {
+public interface TwoRoundGenericRSScheme {
     List<SecretKey> setup(final int securityParameter) throws GeneralSecurityException, IOException;
 
     EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
@@ -23,7 +23,16 @@ public interface GenericRSScheme {
 
     List<SearchToken> trapdoor(final CustomRange q);
 
-    Set<Ciphertext> search(final List<SearchToken> searchToken, final EncryptedIndex encryptedIndex);
+    List<SearchToken> trapdoor(final CustomRange q, final Set<Ciphertext> ciphertexts)
+            throws GeneralSecurityException, IOException;
 
-    Set<Plaintext> result(final Set<Ciphertext> values, final CustomRange q) throws GeneralSecurityException;
+    Set<Ciphertext> search(
+            final List<SearchToken> searchToken, final EncryptedIndex encryptedIndex);
+
+    Set<Ciphertext> search2(
+            final List<SearchToken> searchToken, final EncryptedIndex encryptedIndex)
+            throws IOException;
+
+    Set<Plaintext> result(final Set<Ciphertext> values, final CustomRange q)
+            throws GeneralSecurityException;
 }

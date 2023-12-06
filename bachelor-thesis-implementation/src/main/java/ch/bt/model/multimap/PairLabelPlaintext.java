@@ -1,14 +1,14 @@
-package ch.bt.model;
+package ch.bt.model.multimap;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class PairLabelCiphertext extends Ciphertext {
-    private final CiphertextWithIV label;
-    private final CiphertextWithIV value;
+public class PairLabelPlaintext extends Ciphertext {
+    private final Label label;
+    private final Plaintext value;
 
-    public PairLabelCiphertext(CiphertextWithIV label, CiphertextWithIV value) {
+    public PairLabelPlaintext(Label label, Plaintext value) {
         this.label = label;
         this.value = value;
     }
@@ -24,11 +24,11 @@ public class PairLabelCiphertext extends Ciphertext {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        PairLabelCiphertext pairLabelValue = (PairLabelCiphertext) o;
+        PairLabelPlaintext pairLabelPlaintext = (PairLabelPlaintext) o;
 
         return new EqualsBuilder()
-                .append(label, pairLabelValue.label)
-                .append(value, pairLabelValue.value)
+                .append(label, pairLabelPlaintext.label)
+                .append(value, pairLabelPlaintext.value)
                 .isEquals();
     }
 
@@ -37,11 +37,11 @@ public class PairLabelCiphertext extends Ciphertext {
         return new HashCodeBuilder(17, 37).append(label).append(value).toHashCode();
     }
 
-    public CiphertextWithIV label() {
+    public Label label() {
         return label;
     }
 
-    public CiphertextWithIV value() {
+    public Plaintext value() {
         return value;
     }
 }

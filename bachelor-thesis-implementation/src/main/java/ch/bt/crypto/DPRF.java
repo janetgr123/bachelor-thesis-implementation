@@ -1,6 +1,6 @@
 package ch.bt.crypto;
 
-import ch.bt.model.Label;
+import ch.bt.model.multimap.Label;
 
 import org.apache.commons.compress.utils.BitInputStream;
 import org.bouncycastle.crypto.OutputXOFCalculator;

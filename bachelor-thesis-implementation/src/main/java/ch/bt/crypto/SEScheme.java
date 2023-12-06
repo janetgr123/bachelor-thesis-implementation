@@ -1,8 +1,8 @@
 package ch.bt.crypto;
 
-import ch.bt.model.CiphertextWithIV;
-import ch.bt.model.Label;
-import ch.bt.model.Plaintext;
+import ch.bt.model.multimap.CiphertextWithIV;
+import ch.bt.model.multimap.Label;
+import ch.bt.model.multimap.Plaintext;
 
 import java.security.GeneralSecurityException;
 

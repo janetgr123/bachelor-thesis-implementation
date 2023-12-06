@@ -7,8 +7,10 @@ import ch.bt.TestConfigurations;
 import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
 import ch.bt.crypto.CryptoUtils;
-import ch.bt.model.*;
-import ch.bt.model.Label;
+import ch.bt.cuckoHashing.CuckooHashing;
+import ch.bt.cuckoHashing.CuckooHashingCT;
+import ch.bt.emm.volumeHiding.VolumeHidingEMMUtils;
+import ch.bt.model.multimap.*;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -62,7 +64,7 @@ public class VolumeHidingEMMUtilsTest {
         final var table2 = new PairLabelPlaintext[size];
         final Stack<PairLabelPlaintext> stash = new Stack<>();
         final var key = CryptoUtils.generateKeyWithHMac(256);
-        VolumeHidingEMMUtils.doCuckooHashingWithStash(
+        CuckooHashing.doCuckooHashingWithStash(
                 (int) Math.round(5 * Math.log(numberOfValues) / Math.log(2)),
                 table1,
                 table2,
@@ -88,9 +90,9 @@ public class VolumeHidingEMMUtilsTest {
         final int size = (int) Math.round((1 + ALPHA) * numberOfValues);
         final var table1 = new PairLabelNumberValues[size];
         final var table2 = new PairLabelNumberValues[size];
-        final Stack<PairLabelNumberValues> stash = new Stack<>();
+        final Stack<Ciphertext> stash = new Stack<>();
         final var key = CryptoUtils.generateKeyWithHMac(256);
-        VolumeHidingEMMUtils.doCuckooHashingWithStashCT(
+        CuckooHashingCT.doCuckooHashingWithStashCT(
                 (int) Math.round(5 * Math.log(numberOfValues) / Math.log(2)),
                 table1,
                 table2,

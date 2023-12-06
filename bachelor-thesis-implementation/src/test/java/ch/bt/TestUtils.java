@@ -1,8 +1,8 @@
 package ch.bt;
 
 import ch.bt.crypto.CastingHelpers;
-import ch.bt.model.Label;
-import ch.bt.model.Plaintext;
+import ch.bt.model.multimap.Label;
+import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
 import ch.bt.rc.RangeCoverUtils;
@@ -40,7 +40,6 @@ public class TestUtils {
     public static void init() {
         try {
             multimap = getDataFromDB();
-            multimap2 = getDataFromDB2();
             graph = generateGraph(multimap);
             final var intervalsWith0 =
                     graph.vertexSet().stream()
@@ -77,19 +76,6 @@ public class TestUtils {
                                     (int) (Math.pow(10, 6) * rs.getDouble("longitude")))));
             multiMap.put(
                     new Label(CastingHelpers.fromIntToByteArray(rs.getInt("pk_node_id"))), set);
-        }
-        return multiMap;
-    }
-
-    public static Map<Label, Set<Plaintext>> getDataFromDB2() throws SQLException {
-        Statement stmt = TestConfigurationsWithDB.connection.createStatement();
-        ResultSet rs = stmt.executeQuery("select pk_edge_id, start_node from t_network_edges");
-        final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
-        while (rs.next()) {
-            final var set = new HashSet<Plaintext>();
-            set.add(new Plaintext(CastingHelpers.fromIntToByteArray(rs.getInt("start_node"))));
-            multiMap.put(
-                    new Label(CastingHelpers.fromIntToByteArray(rs.getInt("pk_edge_id"))), set);
         }
         return multiMap;
     }

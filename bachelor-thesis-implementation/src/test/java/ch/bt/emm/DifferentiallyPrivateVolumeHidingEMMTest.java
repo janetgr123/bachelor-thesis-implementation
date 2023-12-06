@@ -4,10 +4,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
-import ch.bt.model.Label;
-import ch.bt.model.Plaintext;
+import ch.bt.emm.dpVolumeHiding.DPVolumeHidingEMMUtils;
+import ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM;
 import ch.bt.model.encryptedindex.DifferentiallyPrivateEncryptedIndexTables;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
+import ch.bt.model.multimap.Label;
+import ch.bt.model.multimap.Plaintext;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,20 +81,20 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
         final var encryptedIndexTables1 =
                 ((DifferentiallyPrivateEncryptedIndexTables)
                                 differentiallyPrivateVolumeHidingEMM.buildIndex(multiMap))
-                        .getEncryptedIndexTables();
+                        .encryptedIndex();
         final var encryptedIndexTables2 =
                 ((DifferentiallyPrivateEncryptedIndexTables)
                                 differentiallyPrivateVolumeHidingEMM.buildIndex(multiMap))
-                        .getEncryptedIndexTables();
+                        .encryptedIndex();
         final var table11 = ((EncryptedIndexTables) encryptedIndexTables1).getTable(0);
         final var table12 = ((EncryptedIndexTables) encryptedIndexTables1).getTable(1);
         final var table21 = ((EncryptedIndexTables) encryptedIndexTables2).getTable(0);
         final var table22 = ((EncryptedIndexTables) encryptedIndexTables2).getTable(1);
         final var labels =
-                VolumeHidingEMMUtils.getDecryptedLabels(
+                DPVolumeHidingEMMUtils.getDecryptedLabels(
                         differentiallyPrivateVolumeHidingEMM, table11, table12);
         final var labels2 =
-                VolumeHidingEMMUtils.getDecryptedLabels(
+                DPVolumeHidingEMMUtils.getDecryptedLabels(
                         differentiallyPrivateVolumeHidingEMM, table21, table22);
 
         // PROPERTY 1:  Encrypted labels for fixed EMM scheme and multimap are deterministic.
@@ -101,10 +103,10 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
         assertEquals(labels, labels2);
 
         final var values =
-                VolumeHidingEMMUtils.getDecryptedValues(
+                DPVolumeHidingEMMUtils.getDecryptedValues(
                         differentiallyPrivateVolumeHidingEMM, table11, table12);
         final var values2 =
-                VolumeHidingEMMUtils.getDecryptedValues(
+                DPVolumeHidingEMMUtils.getDecryptedValues(
                         differentiallyPrivateVolumeHidingEMM, table21, table22);
 
         // PROPERTY 2:  Encrypted values for fixed EMM scheme and multimap decrypt to identical

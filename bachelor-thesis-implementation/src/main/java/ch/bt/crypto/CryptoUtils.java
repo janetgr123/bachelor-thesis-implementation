@@ -1,6 +1,6 @@
 package ch.bt.crypto;
 
-import ch.bt.model.CiphertextWithIV;
+import ch.bt.model.multimap.CiphertextWithIV;
 
 import org.bouncycastle.crypto.EntropySourceProvider;
 import org.bouncycastle.crypto.OutputXOFCalculator;

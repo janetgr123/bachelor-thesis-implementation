@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 
 /** Falzon et al. */
-public class RangeBRCScheme implements GenericRSScheme {
+public class DPRangeBRCScheme implements TwoRoundGenericRSScheme {
     private final EMM emmScheme;
     private final Graph<Vertex, DefaultEdge> graph;
     private final RangeCoveringAlgorithm rangeCoveringAlgorithm;
 
     private final Vertex root;
 
-    public RangeBRCScheme(
+    public DPRangeBRCScheme(
             final int securityParameter,
             final EMM emmScheme,
             final Graph<Vertex, DefaultEdge> graph,
@@ -81,6 +81,11 @@ public class RangeBRCScheme implements GenericRSScheme {
     }
 
     @Override
+    public List<SearchToken> trapdoor(CustomRange q, Set<Ciphertext> ciphertexts) throws GeneralSecurityException, IOException {
+        return null;
+    }
+
+    @Override
     public Set<Ciphertext> search(List<SearchToken> searchToken, EncryptedIndex encryptedIndex) {
         return searchToken.stream()
                 .map(
@@ -93,6 +98,11 @@ public class RangeBRCScheme implements GenericRSScheme {
                         })
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<Ciphertext> search2(List<SearchToken> searchToken, EncryptedIndex encryptedIndex) throws IOException {
+        return null;
     }
 
     @Override

@@ -3,7 +3,7 @@ package ch.bt.crypto;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import ch.bt.TestConfigurations;
-import ch.bt.model.Label;
+import ch.bt.model.multimap.Label;
 
 import org.apache.commons.compress.utils.BitInputStream;
 import org.junit.jupiter.api.Test;

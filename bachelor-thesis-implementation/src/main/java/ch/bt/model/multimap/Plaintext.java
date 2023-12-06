@@ -1,4 +1,4 @@
-package ch.bt.model;
+package ch.bt.model.multimap;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
