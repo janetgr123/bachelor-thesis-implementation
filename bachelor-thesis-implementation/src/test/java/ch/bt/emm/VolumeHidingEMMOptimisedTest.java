@@ -46,7 +46,6 @@ public class VolumeHidingEMMOptimisedTest {
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
     public void testCorrectness(final int securityParameter)
             throws GeneralSecurityException, IOException {
-        // searchLabel = new Label(new byte[] {16, -39});
         final var volumeHidingEMM = volumeHidingEMMOptimised.get(securityParameter);
         final var encryptedIndex = volumeHidingEMM.buildIndex(multiMap);
         final var keys = multiMap.keySet();
