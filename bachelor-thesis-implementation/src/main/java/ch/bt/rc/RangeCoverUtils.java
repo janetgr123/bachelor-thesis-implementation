@@ -1,5 +1,8 @@
 package ch.bt.rc;
 
+import ch.bt.crypto.CastingHelpers;
+import ch.bt.model.multimap.Label;
+import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
 
@@ -7,6 +10,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class RangeCoverUtils {
@@ -65,5 +69,19 @@ public class RangeCoverUtils {
                                 String.valueOf(rightInterval.getMinimum()),
                                 String.valueOf(rightInterval.getMaximum())),
                         rightInterval));
+    }
+
+    public static Vertex getRoot(final Map<Label, Set<Plaintext>> multiMap) {
+        final var keys =
+                multiMap.keySet().stream()
+                        .map(Label::label)
+                        .map(CastingHelpers::fromByteArrayToInt)
+                        .sorted()
+                        .toList();
+        final var size = keys.size();
+        final var min = keys.get(0);
+        final var max = keys.get(size - 1);
+        final var root = new CustomRange(min, max);
+        return new Vertex(String.join("-", String.valueOf(min), String.valueOf(max)), root);
     }
 }

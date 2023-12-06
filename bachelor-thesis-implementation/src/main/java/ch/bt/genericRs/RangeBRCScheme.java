@@ -9,6 +9,7 @@ import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
 import ch.bt.model.searchtoken.SearchToken;
+import ch.bt.rc.RangeCoverUtils;
 import ch.bt.rc.RangeCoveringAlgorithm;
 
 import java.io.IOException;
@@ -53,12 +54,7 @@ public class RangeBRCScheme implements GenericRSScheme {
                         .map(CastingHelpers::fromByteArrayToInt)
                         .sorted()
                         .toList();
-        final var size = keys.size();
-        final var min = keys.get(0);
-        final var max = keys.get(size - 1);
-        final var root = new CustomRange(min, max);
-        final var rootVertex =
-                new Vertex(String.join("-", String.valueOf(min), String.valueOf(max)), root);
+        final var rootVertex = RangeCoverUtils.getRoot(multiMap);
         RangeBRCSchemeUtils.addVertex(rootVertex, multiMapAccordingToGraph, keys, multiMap);
         return emmScheme.buildIndex(multiMapAccordingToGraph);
     }

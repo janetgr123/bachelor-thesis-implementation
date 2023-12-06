@@ -3,13 +3,8 @@ package ch.bt;
 import ch.bt.crypto.CastingHelpers;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
-import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
 import ch.bt.rc.RangeCoverUtils;
-
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.DirectedAcyclicGraph;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,28 +27,12 @@ public class TestUtils {
 
     public static Label searchLabel;
 
-    public static Graph<Vertex, DefaultEdge> graph;
-
     public static Vertex root;
 
     public static void init() {
         try {
             multimap = getDataFromDB();
-            graph = generateGraph(multimap);
-            final var intervalsWith0 =
-                    graph.vertexSet().stream()
-                            .filter(el -> el.id().startsWith("0-"))
-                            .map(Vertex::range)
-                            .map(CustomRange::getMaximum)
-                            .sorted()
-                            .toList();
-            root =
-                    RangeCoverUtils.getVertex(
-                            graph,
-                            String.join(
-                                    "-",
-                                    "0",
-                                    intervalsWith0.get(intervalsWith0.size() - 1).toString()));
+            root = RangeCoverUtils.getRoot(multimap);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -89,19 +68,6 @@ public class TestUtils {
 
     public static Stream<Integer> getInvalidSecurityParametersForAES() {
         return INVALID_SECURITY_PARAMETERS_FOR_AES.stream();
-    }
-
-    public static Graph<Vertex, DefaultEdge> generateGraph(
-            final Map<Label, Set<Plaintext>> multiMap) {
-        final var graph = new DirectedAcyclicGraph<Vertex, DefaultEdge>(DefaultEdge.class);
-        final Set<Vertex> vertices = new HashSet<>();
-        final var keys = multiMap.keySet();
-        final int n = keys.size();
-        final var size = (int) Math.ceil(Math.log(n) / Math.log(2));
-        for (int i = 0; i < size + 1; i++) {
-            RangeCoverUtils.addVerticesAndEdgesForLevel(vertices, graph, i, n);
-        }
-        return graph;
     }
 
     public static void generateTwoSmallMultimaps() {

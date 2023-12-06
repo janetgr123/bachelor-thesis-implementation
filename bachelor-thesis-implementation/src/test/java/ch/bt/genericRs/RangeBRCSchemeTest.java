@@ -35,16 +35,13 @@ public class RangeBRCSchemeTest {
 
     private static Map<Label, Set<Plaintext>> multimap;
 
-    private static Map<Label, Set<Plaintext>> multiMapSmall;
-
     private static Vertex root;
 
-    private static final CustomRange range = new CustomRange(27, 30);
+    private static final CustomRange range = new CustomRange(27,53);
 
     @BeforeAll
     public static void init() {
         multimap = TestUtils.multimap;
-        multiMapSmall = TestUtils.multimapSmall;
         root = TestUtils.root;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
