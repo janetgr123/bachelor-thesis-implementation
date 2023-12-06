@@ -27,7 +27,6 @@ public class TestUtils {
     public static final List<Integer> VALID_SECURITY_PARAMETERS_FOR_HMAC = List.of(128, 256, 512);
 
     public static Map<Label, Set<Plaintext>> multimap = new HashMap<>();
-    public static Map<Label, Set<Plaintext>> multimap2 = new HashMap<>();
     public static Map<Label, Set<Plaintext>> multimapSmall = new HashMap<>();
     public static Map<Label, Set<Plaintext>> multimapSmall2 = new HashMap<>();
 

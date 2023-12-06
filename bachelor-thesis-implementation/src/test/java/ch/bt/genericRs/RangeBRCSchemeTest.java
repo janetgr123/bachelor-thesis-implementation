@@ -6,7 +6,6 @@ import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
 import ch.bt.crypto.CastingHelpers;
 import ch.bt.emm.basic.BasicEMM;
-import ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM;
 import ch.bt.emm.volumeHiding.VolumeHidingEMM;
 import ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised;
 import ch.bt.model.multimap.Label;
@@ -38,11 +37,6 @@ public class RangeBRCSchemeTest {
     private static final Map<Integer, VolumeHidingEMMOptimised> volumeHidingOptimisedEMMs =
             new HashMap<>();
 
-    private static final Map<Integer, DifferentiallyPrivateVolumeHidingEMM> dpVolumeHidingEMMs =
-            new HashMap<>();
-
-    private static final double EPSILON = 0.2;
-
     private static Map<Label, Set<Plaintext>> multimap;
 
     private static Graph<Vertex, DefaultEdge> graph;
@@ -68,10 +62,6 @@ public class RangeBRCSchemeTest {
                                         new VolumeHidingEMMOptimised(
                                                 securityParameter, TestUtils.ALPHA);
                                 volumeHidingOptimisedEMMs.put(securityParameter, vhOEmm);
-                                final var dpVhEmm =
-                                        new DifferentiallyPrivateVolumeHidingEMM(
-                                                securityParameter, EPSILON, TestUtils.ALPHA);
-                                dpVolumeHidingEMMs.put(securityParameter, dpVhEmm);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }

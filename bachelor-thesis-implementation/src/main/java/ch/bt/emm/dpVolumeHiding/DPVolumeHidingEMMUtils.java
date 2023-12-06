@@ -3,7 +3,6 @@ package ch.bt.emm.dpVolumeHiding;
 import ch.bt.crypto.CastingHelpers;
 import ch.bt.crypto.SEScheme;
 import ch.bt.cuckoHashing.CuckooHashingCT;
-import ch.bt.emm.volumeHiding.VolumeHidingEMM;
 import ch.bt.model.EncryptedIndexWithStash;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
 import ch.bt.model.multimap.*;
@@ -110,28 +109,6 @@ public class DPVolumeHidingEMMUtils {
     }
 
     public static List<Label> getDecryptedLabels(
-            final VolumeHidingEMM volumeHidingEMM,
-            final PairLabelCiphertext[] table1,
-            final PairLabelCiphertext[] table2) {
-        final var labelsTable1 = Arrays.stream(table1).map(PairLabelCiphertext::label).toList();
-        final var labelsTable2 = Arrays.stream(table2).map(PairLabelCiphertext::label).toList();
-        final var labelsTables = new ArrayList<>(labelsTable1);
-        labelsTables.addAll(labelsTable2);
-        return labelsTables.stream()
-                .map(
-                        el -> {
-                            try {
-                                return volumeHidingEMM.getSeScheme().decryptLabel(el);
-                            } catch (GeneralSecurityException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                .distinct()
-                .sorted()
-                .toList();
-    }
-
-    public static List<Label> getDecryptedLabels(
             final DifferentiallyPrivateVolumeHidingEMM volumeHidingEMM,
             final PairLabelCiphertext[] table1,
             final PairLabelCiphertext[] table2) {
@@ -144,28 +121,6 @@ public class DPVolumeHidingEMMUtils {
                         el -> {
                             try {
                                 return volumeHidingEMM.getSeScheme().decryptLabel(el);
-                            } catch (GeneralSecurityException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                .distinct()
-                .sorted()
-                .toList();
-    }
-
-    public static List<Plaintext> getDecryptedValues(
-            final VolumeHidingEMM volumeHidingEMM,
-            final PairLabelCiphertext[] table1,
-            final PairLabelCiphertext[] table2) {
-        final var valuesTable1 = Arrays.stream(table1).map(PairLabelCiphertext::value).toList();
-        final var valuesTable2 = Arrays.stream(table2).map(PairLabelCiphertext::value).toList();
-        final var valuesTables = new ArrayList<>(valuesTable1);
-        valuesTables.addAll(valuesTable2);
-        return valuesTables.stream()
-                .map(
-                        el -> {
-                            try {
-                                return volumeHidingEMM.getSeScheme().decrypt(el);
                             } catch (GeneralSecurityException e) {
                                 throw new RuntimeException(e);
                             }

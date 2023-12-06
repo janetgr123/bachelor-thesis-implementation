@@ -62,7 +62,7 @@ public class VolumeHidingEMMUtilsTest {
         final int size = (int) Math.round((1 + ALPHA) * numberOfValues);
         final var table1 = new PairLabelPlaintext[size];
         final var table2 = new PairLabelPlaintext[size];
-        final Stack<PairLabelPlaintext> stash = new Stack<>();
+        final Stack<Ciphertext> stash = new Stack<>();
         final var key = CryptoUtils.generateKeyWithHMac(256);
         CuckooHashing.doCuckooHashingWithStash(
                 (int) Math.round(5 * Math.log(numberOfValues) / Math.log(2)),
