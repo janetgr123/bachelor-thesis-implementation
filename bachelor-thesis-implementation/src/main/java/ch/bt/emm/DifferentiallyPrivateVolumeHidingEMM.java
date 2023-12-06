@@ -113,7 +113,7 @@ public class DifferentiallyPrivateVolumeHidingEMM extends VolumeHidingEMM {
         final var encryptedCounterTable2 =
                 ((DifferentiallyPrivateEncryptedIndexTables) encryptedIndex).getCounterTable(1);
         final var token = ((SearchTokenBytes) searchToken).token();
-        final int numberOfValues = 1; // TODO: SET CORRECTLY!
+        final int numberOfValues = getMaxNumberOfValuesPerLabel();
         final int tableSize = getTableSize();
         for (int i = 0; i < numberOfValues; i++) {
             final var expand1 =
