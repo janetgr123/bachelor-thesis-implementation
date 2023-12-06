@@ -27,6 +27,9 @@ public class TestUtils {
     public static final List<Integer> VALID_SECURITY_PARAMETERS_FOR_HMAC = List.of(128, 256, 512);
 
     public static Map<Label, Set<Plaintext>> multimap = new HashMap<>();
+    public static Map<Label, Set<Plaintext>> multimap2 = new HashMap<>();
+    public static Map<Label, Set<Plaintext>> multimapSmall = new HashMap<>();
+    public static Map<Label, Set<Plaintext>> multimapSmall2 = new HashMap<>();
 
     public static Label searchLabel;
 
@@ -37,6 +40,7 @@ public class TestUtils {
     public static void init() {
         try {
             multimap = getDataFromDB();
+            multimap2 = getDataFromDB2();
             graph = generateGraph(multimap);
             final var intervalsWith0 =
                     graph.vertexSet().stream()
@@ -58,20 +62,34 @@ public class TestUtils {
         final var labels = multimap.keySet().stream().toList();
         final var randomLabelId = (int) ((labels.size() - 1) * Math.random());
         searchLabel = labels.get(randomLabelId);
+        generateTwoSmallMultimaps();
     }
 
     public static Map<Label, Set<Plaintext>> getDataFromDB() throws SQLException {
         Statement stmt = TestConfigurationsWithDB.connection.createStatement();
-        ResultSet rs = stmt.executeQuery("select pk_node_id, latitude from t_network_nodes");
+        ResultSet rs = stmt.executeQuery("select pk_node_id, longitude from t_network_nodes");
         final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
         while (rs.next()) {
             final var set = new HashSet<Plaintext>();
             set.add(
                     new Plaintext(
                             CastingHelpers.fromIntToByteArray(
-                                    (int) (Math.pow(10, 6) * rs.getDouble("latitude")))));
+                                    (int) (Math.pow(10, 6) * rs.getDouble("longitude")))));
             multiMap.put(
                     new Label(CastingHelpers.fromIntToByteArray(rs.getInt("pk_node_id"))), set);
+        }
+        return multiMap;
+    }
+
+    public static Map<Label, Set<Plaintext>> getDataFromDB2() throws SQLException {
+        Statement stmt = TestConfigurationsWithDB.connection.createStatement();
+        ResultSet rs = stmt.executeQuery("select pk_edge_id, start_node from t_network_edges");
+        final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
+        while (rs.next()) {
+            final var set = new HashSet<Plaintext>();
+            set.add(new Plaintext(CastingHelpers.fromIntToByteArray(rs.getInt("start_node"))));
+            multiMap.put(
+                    new Label(CastingHelpers.fromIntToByteArray(rs.getInt("pk_edge_id"))), set);
         }
         return multiMap;
     }
@@ -99,5 +117,35 @@ public class TestUtils {
             RangeCoverUtils.addVerticesAndEdgesForLevel(vertices, graph, i, n);
         }
         return graph;
+    }
+
+    public static void generateTwoSmallMultimaps() {
+        final var set1 = new HashSet<Plaintext>();
+        final List<Plaintext> plaintexts = new ArrayList<>();
+        plaintexts.add(new Plaintext(new byte[] {0}));
+        plaintexts.add(new Plaintext(new byte[] {1}));
+        plaintexts.add(new Plaintext(new byte[] {2}));
+        plaintexts.add(new Plaintext(new byte[] {3}));
+        plaintexts.add(new Plaintext(new byte[] {4}));
+        plaintexts.add(new Plaintext(new byte[] {5}));
+        final List<Label> labels = new ArrayList<>();
+        labels.add(new Label(new byte[] {0}));
+        labels.add(new Label(new byte[] {1}));
+        labels.add(new Label(new byte[] {2}));
+        labels.add(new Label(new byte[] {3}));
+        labels.add(new Label(new byte[] {4}));
+        labels.add(new Label(new byte[] {5}));
+        set1.add(plaintexts.get(0));
+        set1.add(plaintexts.get(1));
+        set1.add(plaintexts.get(2));
+        multimapSmall.put(labels.get(0), set1);
+        multimapSmall2.put(labels.get(0), set1);
+        final var set2 = new HashSet<>(plaintexts);
+        multimapSmall.put(labels.get(1), set2);
+        multimapSmall2.put(labels.get(1), set2);
+        multimapSmall.put(labels.get(2), set2);
+        multimapSmall.put(labels.get(3), set2);
+        multimapSmall.put(labels.get(4), set2);
+        multimapSmall.put(labels.get(5), set2);
     }
 }

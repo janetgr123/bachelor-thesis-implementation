@@ -1,5 +1,6 @@
 package ch.bt;
 
+import ch.bt.model.db.NetworkEdge;
 import ch.bt.model.db.NetworkNode;
 
 import org.apache.commons.csv.CSVFormat;
@@ -48,6 +49,7 @@ public class TestConfigurationsWithDB implements BeforeAllCallback {
             String password = postgreSQLContainer.getPassword();
             connection = DriverManager.getConnection(jdbcUrl, username, password);
             addData();
+            addData2();
             TestUtils.init();
             extensionContext
                     .getRoot()
@@ -93,6 +95,55 @@ public class TestConfigurationsWithDB implements BeforeAllCallback {
                                     + node.latitude()
                                     + ", "
                                     + node.longitude()
+                                    + ")");
+                }
+                counter++;
+            }
+        } catch (IOException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void addData2() {
+        try (final var input = getClass().getResourceAsStream("/data/data2.csv")) {
+            CSVParser parser = new CSVParser(new InputStreamReader(input), CSVFormat.DEFAULT);
+            final var records =
+                    parser.stream()
+                            .map(
+                                    el -> {
+                                        final var string = el.get(0);
+                                        final var split = string.split(" ");
+                                        return new NetworkEdge(
+                                                Integer.parseInt(split[0]),
+                                                Integer.parseInt(split[1]),
+                                                Integer.parseInt(split[2]),
+                                                Double.parseDouble(split[3]));
+                                    })
+                            .toList();
+
+            int counter = 0;
+            Statement stmt = null;
+            for (final var node : records) {
+                if (counter % 10 == 0) {
+                    if (stmt != null) {
+                        int[] updateCounts = stmt.executeBatch();
+                        stmt.close();
+                    }
+                    try {
+                        stmt = connection.createStatement();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    stmt.addBatch(
+                            "insert into test.public.t_network_edges (pk_edge_id, start_node, end_node, distance) VALUES ("
+                                    + node.id()
+                                    + ", "
+                                    + node.startNode()
+                                    + ", "
+                                    + node.endNode()
+                                    + ", "
+                                    + node.distance()
                                     + ")");
                 }
                 counter++;
