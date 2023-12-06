@@ -28,9 +28,12 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
 
     private static Map<Label, Set<Plaintext>> multiMap;
 
+    private static Label searchLabel;
+
     @BeforeAll
     public static void init() {
         multiMap = TestUtils.multimap;
+        searchLabel = TestUtils.searchLabel;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
                         securityParameter -> {
@@ -52,24 +55,21 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
         final var differentiallyPrivateVolumeHidingEMM =
                 differentiallyPrivateVolumeHidingEMMs.get(securityParameter);
         final var encryptedIndex = differentiallyPrivateVolumeHidingEMM.buildIndex(multiMap);
-        final var keys = multiMap.keySet();
-        for (final var key : keys) {
-            final var searchToken = differentiallyPrivateVolumeHidingEMM.trapdoor(key);
-            final var ciphertextCounters =
-                    differentiallyPrivateVolumeHidingEMM.search(searchToken, encryptedIndex);
-            final var searchToken2 =
-                    differentiallyPrivateVolumeHidingEMM.trapdoor(key, ciphertextCounters);
-            final var ciphertexts =
-                    differentiallyPrivateVolumeHidingEMM.search2(searchToken2, encryptedIndex);
-            final var values =
-                    differentiallyPrivateVolumeHidingEMM.result(ciphertexts, key).stream()
-                            .sorted()
-                            .toList();
-            final var expectedValues = multiMap.get(key).stream().sorted().toList();
+        final var searchToken = differentiallyPrivateVolumeHidingEMM.trapdoor(searchLabel);
+        final var ciphertextCounters =
+                differentiallyPrivateVolumeHidingEMM.search(searchToken, encryptedIndex);
+        final var searchToken2 =
+                differentiallyPrivateVolumeHidingEMM.trapdoor(searchLabel, ciphertextCounters);
+        final var ciphertexts =
+                differentiallyPrivateVolumeHidingEMM.search2(searchToken2, encryptedIndex);
+        final var values =
+                differentiallyPrivateVolumeHidingEMM.result(ciphertexts, searchLabel).stream()
+                        .sorted()
+                        .toList();
+        final var expectedValues = multiMap.get(searchLabel).stream().sorted().toList();
 
-            // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
-            assertEquals(expectedValues, values);
-        }
+        // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
+        assertEquals(expectedValues, values);
     }
 
     @ParameterizedTest

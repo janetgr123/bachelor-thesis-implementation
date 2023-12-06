@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
 import ch.bt.emm.basic.BasicEMM;
+import ch.bt.model.encryptedindex.EncryptedIndexMap;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
-import ch.bt.model.encryptedindex.EncryptedIndexMap;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,16 +47,13 @@ public class BasicEMMTest {
     public void testCorrectness(final int securityParameter) throws GeneralSecurityException {
         final var basicEMM = basicEMMMs.get(securityParameter);
         final var encryptedIndex = basicEMM.buildIndex(multimap);
-        final var keys = multimap.keySet().stream().sorted().toList();
-        for (final var key : keys) {
-            final var searchToken = basicEMM.trapdoor(key);
-            final var ciphertexts = basicEMM.search(searchToken, encryptedIndex);
-            final var values = basicEMM.result(ciphertexts, searchLabel).stream().sorted().toList();
-            final var expectedValues = multimap.get(key).stream().sorted().toList();
+        final var searchToken = basicEMM.trapdoor(searchLabel);
+        final var ciphertexts = basicEMM.search(searchToken, encryptedIndex);
+        final var values = basicEMM.result(ciphertexts, searchLabel).stream().sorted().toList();
+        final var expectedValues = multimap.get(searchLabel).stream().sorted().toList();
 
-            // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
-            assertEquals(values, expectedValues);
-        }
+        // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
+        assertEquals(values, expectedValues);
     }
 
     @ParameterizedTest

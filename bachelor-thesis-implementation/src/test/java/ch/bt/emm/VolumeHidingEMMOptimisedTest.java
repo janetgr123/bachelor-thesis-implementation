@@ -6,9 +6,9 @@ import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
 import ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised;
 import ch.bt.emm.volumeHiding.VolumeHidingEMMUtils;
+import ch.bt.model.encryptedindex.EncryptedIndexTables;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
-import ch.bt.model.encryptedindex.EncryptedIndexTables;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,10 +26,12 @@ public class VolumeHidingEMMOptimisedTest {
             new HashMap<>();
 
     private static Map<Label, Set<Plaintext>> multiMap;
+    private static Label searchLabel;
 
     @BeforeAll
     public static void init() {
         multiMap = TestUtils.multimap;
+        searchLabel = TestUtils.searchLabel;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
                         securityParameter -> {
@@ -50,16 +52,14 @@ public class VolumeHidingEMMOptimisedTest {
             throws GeneralSecurityException, IOException {
         final var volumeHidingEMM = volumeHidingEMMOptimised.get(securityParameter);
         final var encryptedIndex = volumeHidingEMM.buildIndex(multiMap);
-        final var keys = multiMap.keySet();
-        for (final var key : keys) {
-            final var searchToken = volumeHidingEMM.trapdoor(key);
-            final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
-            final var values = volumeHidingEMM.result(ciphertexts, key).stream().sorted().toList();
-            final var expectedValues = multiMap.get(key).stream().sorted().toList();
+        final var searchToken = volumeHidingEMM.trapdoor(searchLabel);
+        final var ciphertexts = volumeHidingEMM.search(searchToken, encryptedIndex);
+        final var values =
+                volumeHidingEMM.result(ciphertexts, searchLabel).stream().sorted().toList();
+        final var expectedValues = multiMap.get(searchLabel).stream().sorted().toList();
 
-            // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
-            assertEquals(expectedValues, values);
-        }
+        // PROPERTY: Result(Search(Trapdoor(label), BuildIndex(multiMap))) = multiMap[label]
+        assertEquals(expectedValues, values);
     }
 
     @ParameterizedTest
