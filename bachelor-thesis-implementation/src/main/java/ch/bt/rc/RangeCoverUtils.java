@@ -6,6 +6,7 @@ import ch.bt.model.rc.Vertex;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class RangeCoverUtils {
@@ -38,5 +39,31 @@ public class RangeCoverUtils {
     public static Vertex getVertex(final Graph<Vertex, DefaultEdge> graph, final String id) {
         final var vertex = graph.vertexSet().stream().filter(el -> el.id().equals(id)).findAny();
         return vertex.orElse(null);
+    }
+
+    public static Set<Vertex> getSuccessorsOf(final Vertex v) {
+        if (v.range().size() == 1) {
+            return new HashSet<>();
+        }
+        final var rangeOfV = v.range();
+        final var from = rangeOfV.getMinimum();
+        final var to = rangeOfV.getMaximum();
+        final var size = rangeOfV.size();
+        final var middle = from + size / 2;
+        final var leftInterval = new CustomRange(from, middle - 1);
+        final var rightInterval = new CustomRange(middle, to);
+        return Set.of(
+                new Vertex(
+                        String.join(
+                                "-",
+                                String.valueOf(leftInterval.getMinimum()),
+                                String.valueOf(leftInterval.getMaximum())),
+                        leftInterval),
+                new Vertex(
+                        String.join(
+                                "-",
+                                String.valueOf(rightInterval.getMinimum()),
+                                String.valueOf(rightInterval.getMaximum())),
+                        rightInterval));
     }
 }

@@ -25,35 +25,12 @@ public class BestRangeCover implements RangeCoveringAlgorithm {
         } else {
             if (!v.range().intersectionWith(q).isEmpty()) {
                 final var successorsOfV =
-                        getSuccessorsOf(v).stream()
+                        RangeCoverUtils.getSuccessorsOf(v).stream()
                                 .filter(Predicate.not(explored::contains))
                                 .toList();
                 successorsOfV.forEach(w -> rangeCover.addAll(getRangeCover(q, w)));
             }
         }
         return rangeCover;
-    }
-
-    private Set<Vertex> getSuccessorsOf(final Vertex v) {
-        final var rangeOfV = v.range();
-        final var from = rangeOfV.getMinimum();
-        final var to = rangeOfV.getMaximum();
-        final var size = rangeOfV.size();
-        final var middle = from + size / 2;
-        final var leftInterval = new CustomRange(from, middle - 1);
-        final var rightInterval = new CustomRange(middle, to);
-        return Set.of(
-                new Vertex(
-                        String.join(
-                                "-",
-                                String.valueOf(leftInterval.getMinimum()),
-                                String.valueOf(leftInterval.getMaximum())),
-                        leftInterval),
-                new Vertex(
-                        String.join(
-                                "-",
-                                String.valueOf(rightInterval.getMinimum()),
-                                String.valueOf(rightInterval.getMaximum())),
-                        rightInterval));
     }
 }

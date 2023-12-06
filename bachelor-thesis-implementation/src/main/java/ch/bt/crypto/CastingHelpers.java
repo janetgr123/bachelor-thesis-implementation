@@ -1,5 +1,7 @@
 package ch.bt.crypto;
 
+import ch.bt.model.multimap.Label;
+import ch.bt.model.rc.CustomRange;
 import org.apache.commons.compress.utils.BitInputStream;
 
 import java.io.ByteArrayInputStream;
@@ -26,5 +28,12 @@ public class CastingHelpers {
 
     public static BitInputStream fromByteArrayToBitInputStream(final byte[] array) {
         return new BitInputStream(new ByteArrayInputStream(array), ByteOrder.BIG_ENDIAN);
+    }
+
+    public static Label toLabel(final CustomRange range) {
+        return new Label(
+                org.bouncycastle.util.Arrays.concatenate(
+                        CastingHelpers.fromIntToByteArray(range.getMinimum()),
+                        CastingHelpers.fromIntToByteArray(range.getMaximum())));
     }
 }

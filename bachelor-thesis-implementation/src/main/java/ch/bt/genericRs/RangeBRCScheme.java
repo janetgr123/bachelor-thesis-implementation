@@ -46,20 +46,30 @@ public class RangeBRCScheme implements GenericRSScheme {
     @Override
     public EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
             throws GeneralSecurityException, IOException {
-        return emmScheme.buildIndex(multiMap);
+        final Map<Label, Set<Plaintext>> multiMapAccordingToGraph = new HashMap<>();
+        final var keys =
+                multiMap.keySet().stream()
+                        .map(Label::label)
+                        .map(CastingHelpers::fromByteArrayToInt)
+                        .sorted()
+                        .toList();
+        final var size = keys.size();
+        final var min = keys.get(0);
+        final var max = keys.get(size - 1);
+        final var root = new CustomRange(min, max);
+        final var rootVertex =
+                new Vertex(String.join("-", String.valueOf(min), String.valueOf(max)), root);
+        RangeBRCSchemeUtils.addVertex(rootVertex, multiMapAccordingToGraph, keys, multiMap);
+        return emmScheme.buildIndex(multiMapAccordingToGraph);
     }
 
     @Override
     public List<SearchToken> trapdoor(CustomRange q) {
-        final var rangeCover =
-                rangeCoveringAlgorithm.getRangeCover(
-                        q, root);
+        final var rangeCover = rangeCoveringAlgorithm.getRangeCover(q, root);
         final var token =
                 rangeCover.stream()
                         .map(Vertex::range)
-                        .flatMap(CustomRange::getStream)
-                        .map(CastingHelpers::fromIntToByteArray)
-                        .map(Label::new)
+                        .map(CastingHelpers::toLabel)
                         .map(
                                 el -> {
                                     try {
@@ -91,7 +101,6 @@ public class RangeBRCScheme implements GenericRSScheme {
     @Override
     public Set<Plaintext> result(Set<Ciphertext> ciphertexts, final CustomRange q)
             throws GeneralSecurityException {
-        // TODO: FIX
-        return emmScheme.result(ciphertexts, new Label(new byte[0]));
+        return emmScheme.result(ciphertexts, CastingHelpers.toLabel(q));
     }
 }

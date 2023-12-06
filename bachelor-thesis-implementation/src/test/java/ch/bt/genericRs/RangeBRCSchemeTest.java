@@ -15,7 +15,6 @@ import ch.bt.model.rc.Vertex;
 import ch.bt.rc.BestRangeCover;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,7 +25,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @ExtendWith({TestConfigurationsWithDB.class})
-@Disabled
 public class RangeBRCSchemeTest {
 
     private static final Map<Integer, BasicEMM> basicEMMs = new HashMap<>();
@@ -37,6 +35,8 @@ public class RangeBRCSchemeTest {
 
     private static Map<Label, Set<Plaintext>> multimap;
 
+    private static Map<Label, Set<Plaintext>> multiMapSmall;
+
     private static Vertex root;
 
     private static final CustomRange range = new CustomRange(27, 30);
@@ -44,6 +44,7 @@ public class RangeBRCSchemeTest {
     @BeforeAll
     public static void init() {
         multimap = TestUtils.multimap;
+        multiMapSmall = TestUtils.multimapSmall;
         root = TestUtils.root;
         TestUtils.getValidSecurityParametersForAES()
                 .forEach(
@@ -74,8 +75,6 @@ public class RangeBRCSchemeTest {
         testRangeSchemeWithEMM(rangeScheme);
     }
 
-    // TODO: FIX!!!!
-    @Disabled
     @ParameterizedTest
     @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
     public void testCorrectnessWithVHEMM(final int securityParameter)
@@ -109,7 +108,7 @@ public class RangeBRCSchemeTest {
                         .collect(Collectors.toSet());
         final var expectedValues =
                 expectedLabels.stream()
-                        .map(el -> multimap.get(el))
+                        .map(multimap::get)
                         .flatMap(Collection::stream)
                         .distinct()
                         .sorted()
