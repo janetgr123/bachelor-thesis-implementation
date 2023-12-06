@@ -163,9 +163,6 @@ public class VolumeHidingEMMUtils {
                         label.label(),
                         CastingHelpers.fromIntToByteArray(i),
                         CastingHelpers.fromIntToByteArray(tableNo));
-        final var tmp =
-                DPRF.calculateFk(
-                        CastingHelpers.fromByteArrayToBitInputStream(toHash), key.getEncoded());
         final var result =
                 CastingHelpers.fromByteArrayToHashModN(
                         DPRF.calculateFk(
