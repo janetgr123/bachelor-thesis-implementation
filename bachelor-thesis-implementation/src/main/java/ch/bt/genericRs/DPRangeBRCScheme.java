@@ -1,7 +1,7 @@
 package ch.bt.genericRs;
 
 import ch.bt.crypto.CastingHelpers;
-import ch.bt.emm.EMM;
+import ch.bt.emm.TwoRoundEMM;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
@@ -12,9 +12,6 @@ import ch.bt.model.searchtoken.SearchToken;
 import ch.bt.rc.RangeCoverUtils;
 import ch.bt.rc.RangeCoveringAlgorithm;
 
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
@@ -24,21 +21,19 @@ import javax.crypto.SecretKey;
 
 /** Falzon et al. */
 public class DPRangeBRCScheme implements TwoRoundGenericRSScheme {
-    private final EMM emmScheme;
-    private final Graph<Vertex, DefaultEdge> graph;
+    private final TwoRoundEMM emmScheme;
     private final RangeCoveringAlgorithm rangeCoveringAlgorithm;
-
     private final Vertex root;
+
+    private Set<Vertex> rangeCover;
 
     public DPRangeBRCScheme(
             final int securityParameter,
-            final EMM emmScheme,
-            final Graph<Vertex, DefaultEdge> graph,
+            final TwoRoundEMM emmScheme,
             final RangeCoveringAlgorithm rangeCoveringAlgorithm,
             final Vertex root)
             throws GeneralSecurityException, IOException {
         this.emmScheme = emmScheme;
-        this.graph = graph;
         this.rangeCoveringAlgorithm = rangeCoveringAlgorithm;
         this.root = root;
         this.setup(securityParameter);
@@ -53,20 +48,25 @@ public class DPRangeBRCScheme implements TwoRoundGenericRSScheme {
     @Override
     public EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
             throws GeneralSecurityException, IOException {
-        return emmScheme.buildIndex(multiMap);
+        final Map<Label, Set<Plaintext>> multiMapAccordingToGraph = new HashMap<>();
+        final var keys =
+                multiMap.keySet().stream()
+                        .map(Label::label)
+                        .map(CastingHelpers::fromByteArrayToInt)
+                        .sorted()
+                        .toList();
+        final var rootVertex = RangeCoverUtils.getRoot(multiMap);
+        RangeBRCSchemeUtils.addVertex(rootVertex, multiMapAccordingToGraph, keys, multiMap);
+        return emmScheme.buildIndex(multiMapAccordingToGraph);
     }
 
     @Override
     public List<SearchToken> trapdoor(CustomRange q) {
-        final var rangeCover =
-                rangeCoveringAlgorithm.getRangeCover(
-                        q, RangeCoverUtils.getVertex(graph, root.id()));
+        this.rangeCover = rangeCoveringAlgorithm.getRangeCover(q, root);
         final var token =
                 rangeCover.stream()
                         .map(Vertex::range)
-                        .flatMap(CustomRange::getStream)
-                        .map(CastingHelpers::fromIntToByteArray)
-                        .map(Label::new)
+                        .map(CastingHelpers::toLabel)
                         .map(
                                 el -> {
                                     try {
@@ -81,8 +81,23 @@ public class DPRangeBRCScheme implements TwoRoundGenericRSScheme {
     }
 
     @Override
-    public List<SearchToken> trapdoor(CustomRange q, Set<Ciphertext> ciphertexts) throws GeneralSecurityException, IOException {
-        return null;
+    public List<SearchToken> trapdoor(CustomRange q, Set<Ciphertext> ciphertexts)
+            throws GeneralSecurityException, IOException {
+        final var token =
+                rangeCover.stream()
+                        .map(Vertex::range)
+                        .map(CastingHelpers::toLabel)
+                        .map(
+                                el -> {
+                                    try {
+                                        return emmScheme.trapdoor(el, ciphertexts);
+                                    } catch (GeneralSecurityException | IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                })
+                        .collect(Collectors.toList());
+        Collections.shuffle(token);
+        return token;
     }
 
     @Override
@@ -101,14 +116,36 @@ public class DPRangeBRCScheme implements TwoRoundGenericRSScheme {
     }
 
     @Override
-    public Set<Ciphertext> search2(List<SearchToken> searchToken, EncryptedIndex encryptedIndex) throws IOException {
-        return null;
+    public Set<Ciphertext> search2(List<SearchToken> searchToken, EncryptedIndex encryptedIndex)
+             {
+        return searchToken.stream()
+                .map(
+                        t -> {
+                            try {
+                                return emmScheme.search2(t, encryptedIndex);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<Plaintext> result(Set<Ciphertext> ciphertexts, final CustomRange q)
             throws GeneralSecurityException {
-        // TODO: FIX
-        return emmScheme.result(ciphertexts, new Label(new byte[0]));
+        return rangeCover.stream()
+                .map(Vertex::range)
+                .map(CastingHelpers::toLabel)
+                .map(
+                        el -> {
+                            try {
+                                return emmScheme.result(ciphertexts, el);
+                            } catch (GeneralSecurityException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 }
