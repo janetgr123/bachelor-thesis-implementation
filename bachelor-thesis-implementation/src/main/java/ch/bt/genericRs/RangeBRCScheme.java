@@ -26,6 +26,8 @@ public class RangeBRCScheme implements GenericRSScheme {
 
     private final Vertex root;
 
+    private Set<Vertex> rangeCover;
+
     public RangeBRCScheme(
             final int securityParameter,
             final EMM emmScheme,
@@ -61,7 +63,7 @@ public class RangeBRCScheme implements GenericRSScheme {
 
     @Override
     public List<SearchToken> trapdoor(CustomRange q) {
-        final var rangeCover = rangeCoveringAlgorithm.getRangeCover(q, root);
+        this.rangeCover = rangeCoveringAlgorithm.getRangeCover(q, root);
         final var token =
                 rangeCover.stream()
                         .map(Vertex::range)
@@ -97,6 +99,18 @@ public class RangeBRCScheme implements GenericRSScheme {
     @Override
     public Set<Plaintext> result(Set<Ciphertext> ciphertexts, final CustomRange q)
             throws GeneralSecurityException {
-        return emmScheme.result(ciphertexts, CastingHelpers.toLabel(q));
+        return rangeCover.stream()
+                .map(Vertex::range)
+                .map(CastingHelpers::toLabel)
+                .map(
+                        el -> {
+                            try {
+                                return emmScheme.result(ciphertexts, el);
+                            } catch (GeneralSecurityException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 }

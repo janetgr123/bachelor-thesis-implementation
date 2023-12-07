@@ -70,7 +70,7 @@ public class VolumeHidingEMMUtils {
                                 })
                         .map(PairLabelPlaintext.class::cast)
                         .filter(el -> !Arrays.equals(el.label().label(), new byte[0]))
-                        .filter(el -> searchLabel.equals(el.label()))
+                        .filter(el -> searchLabel.equals(el.label())) // TODO: FIX!
                         .map(PairLabelPlaintext::value)
                         .collect(Collectors.toSet());
         plaintexts.addAll(

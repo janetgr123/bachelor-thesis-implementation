@@ -46,7 +46,9 @@ public class TestUtils {
         Statement stmt = TestConfigurationsWithDB.connection.createStatement();
         ResultSet rs = stmt.executeQuery("select pk_node_id, longitude from t_network_nodes");
         final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
-        while (rs.next()) {
+        // Reduce test data
+        int i = 0;
+        while (rs.next() && i < 100) {
             final var set = new HashSet<Plaintext>();
             set.add(
                     new Plaintext(
@@ -54,6 +56,7 @@ public class TestUtils {
                                     (int) (Math.pow(10, 6) * rs.getDouble("longitude")))));
             multiMap.put(
                     new Label(CastingHelpers.fromIntToByteArray(rs.getInt("pk_node_id"))), set);
+            i++;
         }
         return multiMap;
     }
