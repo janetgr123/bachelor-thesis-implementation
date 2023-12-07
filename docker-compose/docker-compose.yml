@@ -1,0 +1,17 @@
+version: '3.3'
+services:
+  bt_db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: 'bt'
+      POSTGRES_PASSWORD: 'bt' 
+      POSTGRES_DB: 'bt'
+    ports:
+      - '5432:5432'
+    volumes:
+      - bt_db_data:/var/lib/postgresql/data/
+volumes:
+  bt_db_data:
+
+

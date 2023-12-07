@@ -1,21 +1,22 @@
 package ch.bt.crypto;
 
-import ch.bt.model.PairLabelNumberValues;
-import ch.bt.model.PairLabelValue;
+import ch.bt.model.multimap.CiphertextWithIV;
+import ch.bt.model.multimap.Label;
+import ch.bt.model.multimap.Plaintext;
+
+import java.security.GeneralSecurityException;
+
+import javax.crypto.SecretKey;
 
 public interface SEScheme {
 
-    SecretKey generateKey(final int securityParameter);
+    SecretKey generateKey(final int securityParameter) throws GeneralSecurityException;
 
-    byte[] encrypt(final byte[] input);
+    CiphertextWithIV encrypt(final Plaintext input) throws GeneralSecurityException;
 
-    byte[] decrypt(final byte[] input);
+    Plaintext decrypt(final CiphertextWithIV ciphertextWithIV) throws GeneralSecurityException;
 
-    PairLabelValue encrypt(final PairLabelValue input);
+    CiphertextWithIV encryptLabel(final Label input) throws GeneralSecurityException;
 
-    PairLabelValue decrypt(final PairLabelValue input);
-
-    PairLabelNumberValues encrypt(final PairLabelNumberValues input);
-
-    PairLabelNumberValues decrypt(final PairLabelNumberValues input);
+    Label decryptLabel(final CiphertextWithIV ciphertextWithIV) throws GeneralSecurityException;
 }

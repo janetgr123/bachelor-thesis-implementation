@@ -27,5 +27,9 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    - name: Cache Maven Packages
+      uses: actions/cache@v3
+      with: 
+        path: ~/.m2/repository 
     - name: Build with Maven
-      run: mvn -B package --file bachelor-thesis-implementation/pom.xml
+      run: mvn --batch-mode --update-snapshots install --file bachelor-thesis-implementation/pom.xml
