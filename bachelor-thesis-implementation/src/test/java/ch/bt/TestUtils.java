@@ -48,7 +48,7 @@ public class TestUtils {
         final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
         // Reduce test data
         int i = 0;
-        while (rs.next() && i < 100) {
+        while (rs.next() && i < 1000) {
             final var set = new HashSet<Plaintext>();
             set.add(
                     new Plaintext(
