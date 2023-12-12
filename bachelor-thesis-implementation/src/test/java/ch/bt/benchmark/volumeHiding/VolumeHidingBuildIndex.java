@@ -1,15 +1,13 @@
-package ch.bt.benchmark.baseline;
+package ch.bt.benchmark.volumeHiding;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
-import ch.bt.emm.basic.BasicEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMM;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
-import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
-import ch.bt.model.searchtoken.SearchToken;
 import ch.bt.rc.BestRangeCover;
 import ch.bt.rc.RangeCoverUtils;
 
@@ -28,31 +26,25 @@ import java.security.Security;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineTrapdoor {
+public class VolumeHidingBuildIndex {
     @State(Scope.Benchmark)
-    public static class RangePrinter {
+    public static class IndexSizePrinter {
         FileWriter fileWriter;
         CSVFormat csvFormat;
         CSVPrinter printer;
 
-        public void printToCsv(final String map, final int from, final int to) throws IOException {
-            printer.printRecord(map, from, to);
+        public void printToCsv(final String map, final int size) throws IOException {
+            printer.printRecord(map, size);
         }
 
         @Setup(Level.Invocation)
         public void init() throws GeneralSecurityException, IOException, SQLException {
-            fileWriter = new FileWriter("src/test/resources/benchmark/baseline/ranges.csv");
-            csvFormat = CSVFormat.DEFAULT.builder().setHeader("range", "from", "to").build();
+            fileWriter = new FileWriter("src/test/resources/benchmark/volumeHiding/index-sizes.csv");
+            csvFormat = CSVFormat.DEFAULT.builder().setHeader("map", "size").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
-        }
-
-        @TearDown(Level.Invocation)
-        public void tearDown() throws IOException {
-            printer.close();
         }
     }
 
@@ -79,33 +71,26 @@ public class BaselineTrapdoor {
 
             multimap = TestUtils.getDataFromDB(connection);
             final Vertex root = RangeCoverUtils.getRoot(multimap);
+
             final int securityParameter = 256;
 
-            final var basicEMM = new BasicEMM(securityParameter);
+            final var emm = new VolumeHidingEMM(securityParameter, TestUtils.ALPHA);
             rangeBRCScheme =
-                    new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
-            encryptedIndex = rangeBRCScheme.buildIndex(multimap);
+                    new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
         }
-    }
 
-    @State(Scope.Thread)
-    public static class RangeSchemeState {
-        CustomRange range;
-        List<SearchToken> searchToken;
-
-        @Setup(Level.Iteration)
-        public void sampleRange(@NotNull RangePrinter printer) throws IOException {
-            int size = (int) (Math.random() + 1) * 10;
-            int from = (int) (Math.random() + 1) * 100;
-            range = new CustomRange(from, from + size - 1);
-            printer.printToCsv("baseline", range.getMinimum(), range.getMaximum());
+        @TearDown(Level.Invocation)
+        public void tearDown(@NotNull IndexSizePrinter printer) throws IOException {
+            printer.printToCsv("multimap", multimap.size());
+            printer.printToCsv("encrypted index baseline", encryptedIndex.size());
+            printer.printer.close();
         }
     }
 
     @Benchmark
-    public List<SearchToken> trapdoor(
-            @NotNull Parameters rangeSchemeParameters, @NotNull RangeSchemeState state) {
-        state.searchToken = rangeSchemeParameters.rangeBRCScheme.trapdoor(state.range);
-        return state.searchToken;
+    public EncryptedIndex buildIndex(@NotNull Parameters parameters)
+            throws GeneralSecurityException, IOException {
+        parameters.encryptedIndex = parameters.rangeBRCScheme.buildIndex(parameters.multimap);
+        return parameters.encryptedIndex;
     }
 }

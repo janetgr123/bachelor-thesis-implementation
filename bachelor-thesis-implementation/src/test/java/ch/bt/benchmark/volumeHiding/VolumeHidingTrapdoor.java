@@ -1,8 +1,8 @@
-package ch.bt.benchmark.baseline;
+package ch.bt.benchmark.volumeHiding;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
-import ch.bt.emm.basic.BasicEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMM;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineTrapdoor {
+public class VolumeHidingTrapdoor {
     @State(Scope.Benchmark)
     public static class RangePrinter {
         FileWriter fileWriter;
@@ -45,11 +45,10 @@ public class BaselineTrapdoor {
 
         @Setup(Level.Invocation)
         public void init() throws GeneralSecurityException, IOException, SQLException {
-            fileWriter = new FileWriter("src/test/resources/benchmark/baseline/ranges.csv");
+            fileWriter = new FileWriter("src/test/resources/benchmark/volumeHiding/ranges.csv");
             csvFormat = CSVFormat.DEFAULT.builder().setHeader("range", "from", "to").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
-
         @TearDown(Level.Invocation)
         public void tearDown() throws IOException {
             printer.close();
@@ -81,9 +80,8 @@ public class BaselineTrapdoor {
             final Vertex root = RangeCoverUtils.getRoot(multimap);
             final int securityParameter = 256;
 
-            final var basicEMM = new BasicEMM(securityParameter);
-            rangeBRCScheme =
-                    new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
+            final var emm = new VolumeHidingEMM(securityParameter, TestUtils.ALPHA);
+            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
     }
@@ -98,7 +96,7 @@ public class BaselineTrapdoor {
             int size = (int) (Math.random() + 1) * 10;
             int from = (int) (Math.random() + 1) * 100;
             range = new CustomRange(from, from + size - 1);
-            printer.printToCsv("baseline", range.getMinimum(), range.getMaximum());
+            printer.printToCsv("volume hiding", range.getMinimum(), range.getMaximum());
         }
     }
 

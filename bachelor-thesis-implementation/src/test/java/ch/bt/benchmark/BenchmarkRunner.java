@@ -1,6 +1,12 @@
 package ch.bt.benchmark;
 
 import ch.bt.benchmark.baseline.BaselineBuildIndex;
+import ch.bt.benchmark.baseline.BaselineTrapdoor;
+import ch.bt.benchmark.volumeHiding.VolumeHidingBuildIndex;
+import ch.bt.benchmark.volumeHiding.VolumeHidingTrapdoor;
+import ch.bt.benchmark.volumeHidingOpt.VolumeHidingOptBuildIndex;
+import ch.bt.benchmark.volumeHidingOpt.VolumeHidingOptTrapdoor;
+
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -28,9 +34,11 @@ public class BenchmarkRunner {
                 new OptionsBuilder()
                         .jvmArgsPrepend("-server")
                         .include(BaselineBuildIndex.class.getSimpleName())
-                        //.include(VolumeHidingRSBuildIndex.class.getSimpleName())
-                        //.include(VolumeHidingOptRSBuildIndex.class.getSimpleName())
-                        //.include(DPVolumeHidingRSBuildIndex.class.getSimpleName())
+                        .include(VolumeHidingBuildIndex.class.getSimpleName())
+                        .include(VolumeHidingOptBuildIndex.class.getSimpleName())
+                        .include(BaselineTrapdoor.class.getSimpleName())
+                        .include(VolumeHidingTrapdoor.class.getSimpleName())
+                        .include(VolumeHidingOptTrapdoor.class.getSimpleName())
                         .mode(Mode.AverageTime)
                         .timeUnit(TimeUnit.MILLISECONDS)
                         .warmupMode(WarmupMode.BULK_INDI)
