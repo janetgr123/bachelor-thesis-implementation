@@ -29,10 +29,6 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-@Fork(0)
-@Measurement(iterations = BenchmarkRunner.ITERATIONS)
-@Warmup(iterations = BenchmarkRunner.WARM_UPS)
-@State(Scope.Benchmark)
 public class BaselineBuildIndex {
 
     @State(Scope.Benchmark)
@@ -44,6 +40,13 @@ public class BaselineBuildIndex {
         public void printToCsv(final String map, final int size) throws IOException {
             printer.printRecord(map, size);
         }
+
+        @Setup(Level.Invocation)
+        public void init() throws GeneralSecurityException, IOException, SQLException {
+            fileWriter = new FileWriter("src/test/resources/index_sizes_baseline.csv");
+            csvFormat = CSVFormat.DEFAULT.builder().setHeader("Map", "size").build();
+            printer = new CSVPrinter(fileWriter, csvFormat);
+        }
     }
 
     @State(Scope.Benchmark)
@@ -51,59 +54,55 @@ public class BaselineBuildIndex {
         Map<Label, Set<Plaintext>> multimap;
         RangeBRCScheme rangeBRCScheme;
         EncryptedIndex encryptedIndex;
+
+        @Setup(Level.Invocation)
+        public void init(@NotNull IndexSizePrinter printer)
+                throws GeneralSecurityException, IOException, SQLException {
+            final int securityParameter = 256;
+
+            Security.addProvider(new BouncyCastleFipsProvider());
+
+            PostgreSQLContainer<?> postgreSQLContainer =
+                    new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
+                            .withReuse(true)
+                            .withInitScript("init.sql");
+            postgreSQLContainer.start();
+            String jdbcUrl = postgreSQLContainer.getJdbcUrl();
+            String username = postgreSQLContainer.getUsername();
+            String password = postgreSQLContainer.getPassword();
+            Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
+            BenchmarkUtils.addData(connection);
+
+            multimap = TestUtils.getDataFromDB(connection);
+            final Vertex root = RangeCoverUtils.getRoot(multimap);
+            final var basicEMM = new BasicEMM(securityParameter);
+            rangeBRCScheme =
+                    new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
+            printer.printToCsv("multimap", multimap.size());
+        }
+
+        @TearDown(Level.Iteration)
+        public void tearDown(@NotNull IndexSizePrinter printer) throws IOException {
+            printer.printToCsv("encrypted index", encryptedIndex.size());
+            printer.printer.close();
+        }
     }
 
     @State(Scope.Thread)
     public static class RangeSchemeState {
         CustomRange range;
-    }
 
-    @Setup(Level.Invocation)
-    public void init(@NotNull Parameters parameters, @NotNull IndexSizePrinter printer)
-            throws GeneralSecurityException, IOException, SQLException {
-        final int securityParameter = 256;
-
-        Security.addProvider(new BouncyCastleFipsProvider());
-
-        PostgreSQLContainer<?> postgreSQLContainer =
-                new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
-                        .withReuse(true)
-                        .withInitScript("init.sql");
-        postgreSQLContainer.start();
-        String jdbcUrl = postgreSQLContainer.getJdbcUrl();
-        String username = postgreSQLContainer.getUsername();
-        String password = postgreSQLContainer.getPassword();
-        Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
-        BenchmarkUtils.addData(connection);
-
-        parameters.multimap = TestUtils.getDataFromDB(connection);
-        final Vertex root = RangeCoverUtils.getRoot(parameters.multimap);
-        final var basicEMM = new BasicEMM(securityParameter);
-        parameters.rangeBRCScheme =
-                new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
-
-        printer.fileWriter = new FileWriter("src/test/resources/index_sizes_baseline.csv");
-        printer.csvFormat = CSVFormat.DEFAULT.builder().setHeader("Map", "size").build();
-        printer.printer = new CSVPrinter(printer.fileWriter, printer.csvFormat);
-        printer.printToCsv("multimap", parameters.multimap.size());
-    }
-
-    @Setup(Level.Iteration)
-    public void sampleRange(@NotNull RangeSchemeState state) {
-        int size = (int) (Math.random() + 1) * 10;
-        int from = (int) (Math.random() + 1) * 100;
-        state.range = new CustomRange(from, from + size - 1);
-    }
-
-    @TearDown(Level.Invocation)
-    public void tearDown(@NotNull Parameters parameters, @NotNull IndexSizePrinter printer)
-            throws IOException {
-        printer.printToCsv("encrypted index", parameters.encryptedIndex.size());
-        printer.printer.close();
+        @Setup(Level.Iteration)
+        public void sampleRange() {
+            int size = (int) (Math.random() + 1) * 10;
+            int from = (int) (Math.random() + 1) * 100;
+            range = new CustomRange(from, from + size - 1);
+        }
     }
 
     @Benchmark
-    public EncryptedIndex buildIndex(@NotNull Parameters parameters)
+    public EncryptedIndex buildIndex(
+            @NotNull Parameters parameters, @NotNull IndexSizePrinter printer)
             throws GeneralSecurityException, IOException {
         parameters.encryptedIndex = parameters.rangeBRCScheme.buildIndex(parameters.multimap);
         return parameters.encryptedIndex;
