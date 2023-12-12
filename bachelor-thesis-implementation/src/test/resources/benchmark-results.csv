@@ -1,2 +1,2 @@
 "Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit"
-"ch.bt.benchmark.BaselineBuildIndex.buildIndex","avgt",1,2,53.412713,NaN,"ms/op"
+"ch.bt.benchmark.BaselineBuildIndex.buildIndex","avgt",1,2,60.096554,NaN,"ms/op"

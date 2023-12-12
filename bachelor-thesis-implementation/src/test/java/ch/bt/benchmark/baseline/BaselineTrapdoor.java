@@ -1,6 +1,7 @@
-package ch.bt.benchmark;
+package ch.bt.benchmark.baseline;
 
 import ch.bt.TestUtils;
+import ch.bt.benchmark.BenchmarkUtils;
 import ch.bt.emm.basic.BasicEMM;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
@@ -8,6 +9,7 @@ import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
+import ch.bt.model.searchtoken.SearchToken;
 import ch.bt.rc.BestRangeCover;
 import ch.bt.rc.RangeCoverUtils;
 
@@ -26,25 +28,25 @@ import java.security.Security;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineBuildIndex {
-
+public class BaselineTrapdoor {
     @State(Scope.Benchmark)
-    public static class IndexSizePrinter {
+    public static class RangePrinter {
         FileWriter fileWriter;
         CSVFormat csvFormat;
         CSVPrinter printer;
 
-        public void printToCsv(final String map, final int size) throws IOException {
-            printer.printRecord(map, size);
+        public void printToCsv(final String map, final int from, final int to) throws IOException {
+            printer.printRecord(map, from, to);
         }
 
         @Setup(Level.Invocation)
         public void init() throws GeneralSecurityException, IOException, SQLException {
-            fileWriter = new FileWriter("src/test/resources/index_sizes_baseline.csv");
-            csvFormat = CSVFormat.DEFAULT.builder().setHeader("Map", "size").build();
+            fileWriter = new FileWriter("src/test/resources/benchmark/baseline/ranges.csv");
+            csvFormat = CSVFormat.DEFAULT.builder().setHeader("range", "from", "to").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
     }
@@ -56,10 +58,7 @@ public class BaselineBuildIndex {
         EncryptedIndex encryptedIndex;
 
         @Setup(Level.Invocation)
-        public void init(@NotNull IndexSizePrinter printer)
-                throws GeneralSecurityException, IOException, SQLException {
-            final int securityParameter = 256;
-
+        public void init() throws GeneralSecurityException, IOException, SQLException {
             Security.addProvider(new BouncyCastleFipsProvider());
 
             PostgreSQLContainer<?> postgreSQLContainer =
@@ -75,35 +74,33 @@ public class BaselineBuildIndex {
 
             multimap = TestUtils.getDataFromDB(connection);
             final Vertex root = RangeCoverUtils.getRoot(multimap);
+            final int securityParameter = 256;
+
             final var basicEMM = new BasicEMM(securityParameter);
             rangeBRCScheme =
                     new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
-            printer.printToCsv("multimap", multimap.size());
-        }
-
-        @TearDown(Level.Iteration)
-        public void tearDown(@NotNull IndexSizePrinter printer) throws IOException {
-            printer.printToCsv("encrypted index", encryptedIndex.size());
-            printer.printer.close();
+            encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
     }
 
     @State(Scope.Thread)
     public static class RangeSchemeState {
         CustomRange range;
+        List<SearchToken> searchToken;
 
         @Setup(Level.Iteration)
-        public void sampleRange() {
+        public void sampleRange(@NotNull RangePrinter printer) throws IOException {
             int size = (int) (Math.random() + 1) * 10;
             int from = (int) (Math.random() + 1) * 100;
             range = new CustomRange(from, from + size - 1);
+            printer.printToCsv("baseline", range.getMinimum(), range.getMaximum());
         }
     }
 
     @Benchmark
-    public EncryptedIndex buildIndex(@NotNull Parameters parameters)
-            throws GeneralSecurityException, IOException {
-        parameters.encryptedIndex = parameters.rangeBRCScheme.buildIndex(parameters.multimap);
-        return parameters.encryptedIndex;
+    public List<SearchToken> trapdoor(
+            @NotNull Parameters rangeSchemeParameters, @NotNull RangeSchemeState state) {
+        state.searchToken = rangeSchemeParameters.rangeBRCScheme.trapdoor(state.range);
+        return state.searchToken;
     }
 }

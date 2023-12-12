@@ -1,12 +1,12 @@
-package ch.bt.benchmark;
+package ch.bt.benchmark.baseline;
 
 import ch.bt.TestUtils;
-import ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised;
+import ch.bt.benchmark.BenchmarkUtils;
+import ch.bt.emm.basic.BasicEMM;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
-import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
 import ch.bt.rc.BestRangeCover;
 import ch.bt.rc.RangeCoverUtils;
@@ -29,8 +29,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-public class VolumeHidingOptRSBuildIndex {
-
+public class BaselineBuildIndex {
     @State(Scope.Benchmark)
     public static class IndexSizePrinter {
         FileWriter fileWriter;
@@ -43,8 +42,8 @@ public class VolumeHidingOptRSBuildIndex {
 
         @Setup(Level.Invocation)
         public void init() throws GeneralSecurityException, IOException, SQLException {
-            fileWriter = new FileWriter("src/test/resources/index_sizes_vh_opt.csv");
-            csvFormat = CSVFormat.DEFAULT.builder().setHeader("Map", "size").build();
+            fileWriter = new FileWriter("src/test/resources/benchmark/baseline/index-sizes.csv");
+            csvFormat = CSVFormat.DEFAULT.builder().setHeader("map", "size").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
     }
@@ -56,10 +55,7 @@ public class VolumeHidingOptRSBuildIndex {
         EncryptedIndex encryptedIndex;
 
         @Setup(Level.Invocation)
-        public void init(@NotNull IndexSizePrinter printer)
-                throws GeneralSecurityException, IOException, SQLException {
-            final int securityParameter = 256;
-
+        public void init() throws GeneralSecurityException, IOException, SQLException {
             Security.addProvider(new BouncyCastleFipsProvider());
 
             PostgreSQLContainer<?> postgreSQLContainer =
@@ -75,27 +71,19 @@ public class VolumeHidingOptRSBuildIndex {
 
             multimap = TestUtils.getDataFromDB(connection);
             final Vertex root = RangeCoverUtils.getRoot(multimap);
-            final var emm = new VolumeHidingEMMOptimised(securityParameter, TestUtils.ALPHA);
-            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
-            printer.printToCsv("multimap", multimap.size());
+
+            final int securityParameter = 256;
+
+            final var basicEMM = new BasicEMM(securityParameter);
+            rangeBRCScheme =
+                    new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
         }
 
-        @TearDown(Level.Iteration)
+        @TearDown(Level.Invocation)
         public void tearDown(@NotNull IndexSizePrinter printer) throws IOException {
-            printer.printToCsv("encrypted index", encryptedIndex.size());
+            printer.printToCsv("multimap", multimap.size());
+            printer.printToCsv("encrypted index baseline", encryptedIndex.size());
             printer.printer.close();
-        }
-    }
-
-    @State(Scope.Thread)
-    public static class RangeSchemeState {
-        CustomRange range;
-
-        @Setup(Level.Iteration)
-        public void sampleRange() {
-            int size = (int) (Math.random() + 1) * 10;
-            int from = (int) (Math.random() + 1) * 100;
-            range = new CustomRange(from, from + size - 1);
         }
     }
 
