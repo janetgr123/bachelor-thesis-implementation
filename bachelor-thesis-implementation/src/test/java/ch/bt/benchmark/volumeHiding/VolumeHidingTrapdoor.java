@@ -39,7 +39,11 @@ public class VolumeHidingTrapdoor {
         CSVFormat csvFormat;
         CSVPrinter printer;
 
-        public void printToCsv(final String map, final int from, final int to) throws IOException {
+        public void printToCsv(final String map, final int from, final int to)
+                throws IOException, SQLException, GeneralSecurityException {
+            if (printer == null) {
+                init();
+            }
             printer.printRecord(map, from, to);
         }
 
@@ -49,6 +53,7 @@ public class VolumeHidingTrapdoor {
             csvFormat = CSVFormat.DEFAULT.builder().setHeader("range", "from", "to").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
+
         @TearDown(Level.Invocation)
         public void tearDown() throws IOException {
             printer.close();
@@ -92,7 +97,8 @@ public class VolumeHidingTrapdoor {
         List<SearchToken> searchToken;
 
         @Setup(Level.Iteration)
-        public void sampleRange(@NotNull RangePrinter printer) throws IOException {
+        public void sampleRange(@NotNull RangePrinter printer)
+                throws IOException, SQLException, GeneralSecurityException {
             int size = (int) (Math.random() + 1) * 10;
             int from = (int) (Math.random() + 1) * 100;
             range = new CustomRange(from, from + size - 1);

@@ -36,7 +36,11 @@ public class BaselineBuildIndex {
         CSVFormat csvFormat;
         CSVPrinter printer;
 
-        public void printToCsv(final String map, final int size) throws IOException {
+        public void printToCsv(final String map, final int size)
+                throws IOException, SQLException, GeneralSecurityException {
+            if (printer == null) {
+                init();
+            }
             printer.printRecord(map, size);
         }
 
@@ -80,10 +84,11 @@ public class BaselineBuildIndex {
         }
 
         @TearDown(Level.Invocation)
-        public void tearDown(@NotNull IndexSizePrinter printer) throws IOException {
+        public void tearDown(@NotNull IndexSizePrinter printer)
+                throws IOException, SQLException, GeneralSecurityException {
             printer.printToCsv("multimap", multimap.size());
             printer.printToCsv("encrypted index baseline", encryptedIndex.size());
-            printer.printer.close();
+            // printer.printer.close();
         }
     }
 

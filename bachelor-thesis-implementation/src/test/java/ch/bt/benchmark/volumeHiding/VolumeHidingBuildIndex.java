@@ -36,13 +36,18 @@ public class VolumeHidingBuildIndex {
         CSVFormat csvFormat;
         CSVPrinter printer;
 
-        public void printToCsv(final String map, final int size) throws IOException {
+        public void printToCsv(final String map, final int size)
+                throws IOException, SQLException, GeneralSecurityException {
+            if (printer == null) {
+                init();
+            }
             printer.printRecord(map, size);
         }
 
         @Setup(Level.Invocation)
         public void init() throws GeneralSecurityException, IOException, SQLException {
-            fileWriter = new FileWriter("src/test/resources/benchmark/volumeHiding/index-sizes.csv");
+            fileWriter =
+                    new FileWriter("src/test/resources/benchmark/volumeHiding/index-sizes.csv");
             csvFormat = CSVFormat.DEFAULT.builder().setHeader("map", "size").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
@@ -75,12 +80,12 @@ public class VolumeHidingBuildIndex {
             final int securityParameter = 256;
 
             final var emm = new VolumeHidingEMM(securityParameter, TestUtils.ALPHA);
-            rangeBRCScheme =
-                    new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
+            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
         }
 
         @TearDown(Level.Invocation)
-        public void tearDown(@NotNull IndexSizePrinter printer) throws IOException {
+        public void tearDown(@NotNull IndexSizePrinter printer)
+                throws IOException, SQLException, GeneralSecurityException {
             printer.printToCsv("multimap", multimap.size());
             printer.printToCsv("encrypted index baseline", encryptedIndex.size());
             printer.printer.close();
