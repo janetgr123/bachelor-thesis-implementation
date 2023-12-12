@@ -48,7 +48,7 @@ public class TestConfigurationsWithDB implements BeforeAllCallback {
             String password = postgreSQLContainer.getPassword();
             connection = DriverManager.getConnection(jdbcUrl, username, password);
             addData();
-            TestUtils.init();
+            TestUtils.init(connection);
             extensionContext
                     .getRoot()
                     .getStore(ExtensionContext.Namespace.GLOBAL)
