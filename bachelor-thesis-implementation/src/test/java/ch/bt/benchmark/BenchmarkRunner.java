@@ -1,7 +1,6 @@
 package ch.bt.benchmark;
 
 import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.profile.*;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -28,11 +27,13 @@ public class BenchmarkRunner {
                 new OptionsBuilder()
                         .jvmArgsPrepend("-server")
                         .include(BaselineBuildIndex.class.getSimpleName())
-                        // .include(VolumeHidingRSBuildIndex.class.getSimpleName())
+                        .include(VolumeHidingRSBuildIndex.class.getSimpleName())
+                        .include(VolumeHidingOptRSBuildIndex.class.getSimpleName())
+                        .include(DPVolumeHidingRSBuildIndex.class.getSimpleName())
                         .mode(Mode.AverageTime)
                         .timeUnit(TimeUnit.MILLISECONDS)
                         .warmupMode(WarmupMode.BULK_INDI)
-                        .warmupForks(2)
+                        .warmupForks(1)
                         .warmupIterations(WARM_UPS)
                         .forks(FORKS)
                         .threads(THREADS)

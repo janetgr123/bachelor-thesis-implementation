@@ -1,8 +1,8 @@
 package ch.bt.benchmark;
 
 import ch.bt.TestUtils;
-import ch.bt.emm.basic.BasicEMM;
-import ch.bt.genericRs.RangeBRCScheme;
+import ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM;
+import ch.bt.genericRs.DPRangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
@@ -29,7 +29,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineBuildIndex {
+public class DPVolumeHidingRSBuildIndex {
 
     @State(Scope.Benchmark)
     public static class IndexSizePrinter {
@@ -43,7 +43,7 @@ public class BaselineBuildIndex {
 
         @Setup(Level.Invocation)
         public void init() throws GeneralSecurityException, IOException, SQLException {
-            fileWriter = new FileWriter("src/test/resources/index_sizes_baseline.csv");
+            fileWriter = new FileWriter("src/test/resources/index_sizes_dp_vh.csv");
             csvFormat = CSVFormat.DEFAULT.builder().setHeader("Map", "size").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
@@ -52,7 +52,7 @@ public class BaselineBuildIndex {
     @State(Scope.Benchmark)
     public static class Parameters {
         Map<Label, Set<Plaintext>> multimap;
-        RangeBRCScheme rangeBRCScheme;
+        DPRangeBRCScheme rangeBRCScheme;
         EncryptedIndex encryptedIndex;
 
         @Setup(Level.Invocation)
@@ -75,9 +75,11 @@ public class BaselineBuildIndex {
 
             multimap = TestUtils.getDataFromDB(connection);
             final Vertex root = RangeCoverUtils.getRoot(multimap);
-            final var basicEMM = new BasicEMM(securityParameter);
+            final var emm =
+                    new DifferentiallyPrivateVolumeHidingEMM(
+                            securityParameter, 0.2, TestUtils.ALPHA);
             rangeBRCScheme =
-                    new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
+                    new DPRangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             printer.printToCsv("multimap", multimap.size());
         }
 

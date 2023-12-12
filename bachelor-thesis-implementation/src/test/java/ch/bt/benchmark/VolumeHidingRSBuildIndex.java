@@ -1,7 +1,7 @@
 package ch.bt.benchmark;
 
 import ch.bt.TestUtils;
-import ch.bt.emm.basic.BasicEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMM;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
@@ -29,7 +29,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineBuildIndex {
+public class VolumeHidingRSBuildIndex {
 
     @State(Scope.Benchmark)
     public static class IndexSizePrinter {
@@ -43,7 +43,7 @@ public class BaselineBuildIndex {
 
         @Setup(Level.Invocation)
         public void init() throws GeneralSecurityException, IOException, SQLException {
-            fileWriter = new FileWriter("src/test/resources/index_sizes_baseline.csv");
+            fileWriter = new FileWriter("src/test/resources/index_sizes_vh.csv");
             csvFormat = CSVFormat.DEFAULT.builder().setHeader("Map", "size").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
@@ -75,9 +75,8 @@ public class BaselineBuildIndex {
 
             multimap = TestUtils.getDataFromDB(connection);
             final Vertex root = RangeCoverUtils.getRoot(multimap);
-            final var basicEMM = new BasicEMM(securityParameter);
-            rangeBRCScheme =
-                    new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
+            final var emm = new VolumeHidingEMM(securityParameter, TestUtils.ALPHA);
+            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             printer.printToCsv("multimap", multimap.size());
         }
 
