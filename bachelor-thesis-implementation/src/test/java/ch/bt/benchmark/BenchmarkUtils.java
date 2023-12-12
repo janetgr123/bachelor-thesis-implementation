@@ -4,6 +4,7 @@ import ch.bt.model.db.NetworkNode;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -57,6 +58,8 @@ public class BenchmarkUtils {
             throw new RuntimeException(e);
         }
     }
+
+
 }
 
 

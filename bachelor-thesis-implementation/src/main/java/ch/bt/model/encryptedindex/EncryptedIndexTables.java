@@ -1,6 +1,7 @@
 package ch.bt.model.encryptedindex;
 
 import ch.bt.model.multimap.PairLabelCiphertext;
+
 public class EncryptedIndexTables implements EncryptedIndex {
     private final PairLabelCiphertext[] table1;
     private final PairLabelCiphertext[] table2;
@@ -12,5 +13,10 @@ public class EncryptedIndexTables implements EncryptedIndex {
 
     public PairLabelCiphertext[] getTable(final int number) {
         return number == 0 ? table1 : table2;
+    }
+
+    @Override
+    public int size() {
+        return table1.length + table2.length;
     }
 }
