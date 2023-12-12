@@ -1,9 +1,9 @@
-package ch.bt.benchmark.volumeHiding;
+package ch.bt.benchmark.dpVolumeHiding;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
-import ch.bt.emm.volumeHiding.VolumeHidingEMM;
-import ch.bt.genericRs.RangeBRCScheme;
+import ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM;
+import ch.bt.genericRs.DPRangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
@@ -29,7 +29,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-public class VolumeHidingBuildIndex {
+public class DPVolumeHidingBuildIndex {
     @State(Scope.Benchmark)
     public static class IndexSizePrinter {
         FileWriter fileWriter;
@@ -47,7 +47,7 @@ public class VolumeHidingBuildIndex {
         @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
             fileWriter =
-                    new FileWriter("src/test/resources/benchmark/volumeHiding/index-sizes.csv");
+                    new FileWriter("src/test/resources/benchmark/dpVolumeHiding/index-sizes.csv");
             csvFormat = CSVFormat.DEFAULT.builder().setHeader("map", "size").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
@@ -61,7 +61,7 @@ public class VolumeHidingBuildIndex {
     @State(Scope.Benchmark)
     public static class Parameters {
         Map<Label, Set<Plaintext>> multimap;
-        RangeBRCScheme rangeBRCScheme;
+        DPRangeBRCScheme rangeBRCScheme;
         EncryptedIndex encryptedIndex;
 
         @Setup(Level.Trial)
@@ -84,15 +84,18 @@ public class VolumeHidingBuildIndex {
 
             final int securityParameter = 256;
 
-            final var emm = new VolumeHidingEMM(securityParameter, TestUtils.ALPHA);
-            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
+            final var emm =
+                    new DifferentiallyPrivateVolumeHidingEMM(
+                            securityParameter, 0.2, TestUtils.ALPHA);
+            rangeBRCScheme =
+                    new DPRangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
         }
 
         @TearDown(Level.Trial)
         public void tearDown(@NotNull IndexSizePrinter printer)
                 throws IOException, SQLException, GeneralSecurityException {
             printer.printToCsv("multimap", multimap.size());
-            printer.printToCsv("encrypted index volume hiding", encryptedIndex.size());
+            printer.printToCsv("encrypted index dp volume hiding", encryptedIndex.size());
         }
     }
 

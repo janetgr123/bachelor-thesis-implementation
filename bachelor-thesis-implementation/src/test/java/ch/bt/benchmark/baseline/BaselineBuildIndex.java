@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class BaselineBuildIndex {
+
     @State(Scope.Benchmark)
     public static class IndexSizePrinter {
         FileWriter fileWriter;
@@ -44,11 +45,16 @@ public class BaselineBuildIndex {
             printer.printRecord(map, size);
         }
 
-        @Setup(Level.Invocation)
+        @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
             fileWriter = new FileWriter("src/test/resources/benchmark/baseline/index-sizes.csv");
             csvFormat = CSVFormat.DEFAULT.builder().setHeader("map", "size").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
+        }
+
+        @TearDown(Level.Trial)
+        public void tearDown() throws IOException {
+            printer.close();
         }
     }
 
@@ -58,7 +64,7 @@ public class BaselineBuildIndex {
         RangeBRCScheme rangeBRCScheme;
         EncryptedIndex encryptedIndex;
 
-        @Setup(Level.Invocation)
+        @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
             Security.addProvider(new BouncyCastleFipsProvider());
 
@@ -83,12 +89,11 @@ public class BaselineBuildIndex {
                     new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
         }
 
-        @TearDown(Level.Invocation)
+        @TearDown(Level.Trial)
         public void tearDown(@NotNull IndexSizePrinter printer)
                 throws IOException, SQLException, GeneralSecurityException {
             printer.printToCsv("multimap", multimap.size());
             printer.printToCsv("encrypted index baseline", encryptedIndex.size());
-            // printer.printer.close();
         }
     }
 

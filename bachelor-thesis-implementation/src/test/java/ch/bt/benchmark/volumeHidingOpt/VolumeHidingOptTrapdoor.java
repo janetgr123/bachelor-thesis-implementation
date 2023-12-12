@@ -47,14 +47,14 @@ public class VolumeHidingOptTrapdoor {
             printer.printRecord(map, from, to);
         }
 
-        @Setup(Level.Invocation)
+        @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
             fileWriter = new FileWriter("src/test/resources/benchmark/volumeHidingOpt/ranges.csv");
             csvFormat = CSVFormat.DEFAULT.builder().setHeader("range", "from", "to").build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
 
-        @TearDown(Level.Invocation)
+        @TearDown(Level.Trial)
         public void tearDown() throws IOException {
             printer.close();
         }
@@ -66,7 +66,7 @@ public class VolumeHidingOptTrapdoor {
         RangeBRCScheme rangeBRCScheme;
         EncryptedIndex encryptedIndex;
 
-        @Setup(Level.Invocation)
+        @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
             Security.addProvider(new BouncyCastleFipsProvider());
 
@@ -99,8 +99,8 @@ public class VolumeHidingOptTrapdoor {
         @Setup(Level.Iteration)
         public void sampleRange(@NotNull RangePrinter printer)
                 throws IOException, SQLException, GeneralSecurityException {
-            int size = (int) (Math.random() + 1) * 10;
-            int from = (int) (Math.random() + 1) * 100;
+            int size = (int) (Math.random() * 10) + 1;
+            int from = (int) (Math.random() * 100) + 1;
             range = new CustomRange(from, from + size - 1);
             printer.printToCsv("volume hiding opt", range.getMinimum(), range.getMaximum());
         }

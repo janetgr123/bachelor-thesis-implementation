@@ -2,6 +2,8 @@ package ch.bt.benchmark;
 
 import ch.bt.benchmark.baseline.BaselineBuildIndex;
 import ch.bt.benchmark.baseline.BaselineTrapdoor;
+import ch.bt.benchmark.dpVolumeHiding.DPVolumeHidingBuildIndex;
+import ch.bt.benchmark.dpVolumeHiding.DPVolumeHidingTrapdoor;
 import ch.bt.benchmark.volumeHiding.VolumeHidingBuildIndex;
 import ch.bt.benchmark.volumeHiding.VolumeHidingTrapdoor;
 import ch.bt.benchmark.volumeHidingOpt.VolumeHidingOptBuildIndex;
@@ -34,14 +36,16 @@ public class BenchmarkRunner {
                 new OptionsBuilder()
                         .jvmArgsPrepend("-server")
                         .include(BaselineBuildIndex.class.getSimpleName())
-                        //.include(VolumeHidingBuildIndex.class.getSimpleName())
-                        //.include(VolumeHidingOptBuildIndex.class.getSimpleName())
+                        .include(VolumeHidingBuildIndex.class.getSimpleName())
+                        .include(VolumeHidingOptBuildIndex.class.getSimpleName())
+                        .include(DPVolumeHidingBuildIndex.class.getSimpleName())
                         .include(BaselineTrapdoor.class.getSimpleName())
-                        //.include(VolumeHidingTrapdoor.class.getSimpleName())
-                        //.include(VolumeHidingOptTrapdoor.class.getSimpleName())
+                        .include(VolumeHidingTrapdoor.class.getSimpleName())
+                        .include(VolumeHidingOptTrapdoor.class.getSimpleName())
+                        .include(DPVolumeHidingTrapdoor.class.getSimpleName())
                         .mode(Mode.AverageTime)
                         .timeUnit(TimeUnit.MILLISECONDS)
-                        .warmupMode(WarmupMode.BULK_INDI)
+                        .warmupMode(WarmupMode.INDI)
                         .warmupForks(1)
                         .warmupIterations(WARM_UPS)
                         .forks(FORKS)
