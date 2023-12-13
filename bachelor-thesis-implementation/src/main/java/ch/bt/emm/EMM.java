@@ -25,4 +25,6 @@ public interface EMM {
             throws GeneralSecurityException, IOException;
 
     Set<Plaintext> result(final Set<Ciphertext> ciphertexts, final Label searchLabel) throws GeneralSecurityException;
+
+    int getNumberOfDummyValues();
 }

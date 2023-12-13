@@ -1,0 +1,4 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit"
+"ch.bt.benchmark.dpVolumeHiding.DpVolumeHidingSearch.search","avgt",1,10,52383512.103530,2298966.056350,"ns/op"
+"ch.bt.benchmark.dpVolumeHiding.DpVolumeHidingSearch2.search2","avgt",1,10,30598416135.600000,751609278.976456,"ns/op"
+"ch.bt.benchmark.volumeHiding.VolumeHidingSearch.search","avgt",1,10,64423.316067,815.613735,"ns/op"

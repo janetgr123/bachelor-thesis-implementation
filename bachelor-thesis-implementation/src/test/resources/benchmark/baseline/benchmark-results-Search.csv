@@ -1,0 +1,2 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit"
+"ch.bt.benchmark.baseline.BaselineSearch.search","avgt",1,10,1063293.838522,34661.854575,"ns/op"

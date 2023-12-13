@@ -109,4 +109,8 @@ public class BasicEMM implements EMM {
     public SEScheme getSeScheme() {
         return this.seScheme;
     }
+
+    public int getNumberOfDummyValues() {
+        return 0;
+    }
 }

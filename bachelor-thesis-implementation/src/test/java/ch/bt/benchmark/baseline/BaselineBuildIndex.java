@@ -2,6 +2,7 @@ package ch.bt.benchmark.baseline;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
+import ch.bt.emm.EMM;
 import ch.bt.emm.basic.BasicEMM;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
@@ -34,7 +35,6 @@ public class BaselineBuildIndex {
     @State(Scope.Benchmark)
     public static class Constants {
         final String folder = "src/test/resources/benchmark/baseline";
-        final String category = "baseline";
 
         final String method = "build-index";
     }
@@ -45,13 +45,12 @@ public class BaselineBuildIndex {
         CSVFormat csvFormat;
         CSVPrinter printer;
 
-        public void printToCsv(
-                final String col1, final int col2, final int col3, @NotNull Constants constants)
+        public void printToCsv(final String col1, final int col2, @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
             if (printer == null) {
                 init(constants);
             }
-            printer.printRecord(col1, col2, col3);
+            printer.printRecord(col1, col2);
         }
 
         @Setup(Level.Trial)
@@ -75,6 +74,7 @@ public class BaselineBuildIndex {
         Map<Label, Set<Plaintext>> multimap;
         RangeBRCScheme rangeBRCScheme;
         EncryptedIndex encryptedIndex;
+        EMM emm;
 
         @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
@@ -96,7 +96,7 @@ public class BaselineBuildIndex {
 
             final int securityParameter = 256;
 
-            final var emm = new BasicEMM(securityParameter);
+            emm = new BasicEMM(securityParameter);
             rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
@@ -104,12 +104,9 @@ public class BaselineBuildIndex {
         @TearDown(Level.Trial)
         public void tearDown(@NotNull ResultPrinter printer, @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
-            printer.printToCsv("multimap", multimap.size(), -1, constants);
-            printer.printToCsv(
-                    String.join(" ", "encrypted index", constants.category),
-                    encryptedIndex.size(),
-                    -1,
-                    constants);
+            printer.printToCsv("multimap", multimap.size(), constants);
+            printer.printToCsv("encrypted index", encryptedIndex.size(), constants);
+            printer.printToCsv("dummy values", emm.getNumberOfDummyValues(), constants);
         }
     }
 

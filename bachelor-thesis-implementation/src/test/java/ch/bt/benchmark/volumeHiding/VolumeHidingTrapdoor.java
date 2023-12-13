@@ -1,8 +1,8 @@
-package ch.bt.benchmark.baseline;
+package ch.bt.benchmark.volumeHiding;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
-import ch.bt.emm.basic.BasicEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMM;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
@@ -35,12 +35,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineTrapdoor {
+public class VolumeHidingTrapdoor {
 
     @State(Scope.Benchmark)
     public static class Constants {
-        final String folder = "src/test/resources/benchmark/baseline";
-
+        final String folder = "src/test/resources/benchmark/volumeHiding";
         final String method = "trapdoor";
     }
 
@@ -111,7 +110,7 @@ public class BaselineTrapdoor {
 
             final int securityParameter = 256;
 
-            final var emm = new BasicEMM(securityParameter);
+            final var emm = new VolumeHidingEMM(securityParameter, TestUtils.ALPHA);
             rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }

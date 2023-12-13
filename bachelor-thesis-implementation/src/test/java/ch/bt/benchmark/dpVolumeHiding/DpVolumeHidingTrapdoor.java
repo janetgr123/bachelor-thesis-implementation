@@ -1,9 +1,9 @@
-package ch.bt.benchmark.baseline;
+package ch.bt.benchmark.dpVolumeHiding;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
-import ch.bt.emm.basic.BasicEMM;
-import ch.bt.genericRs.RangeBRCScheme;
+import ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM;
+import ch.bt.genericRs.DPRangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
@@ -35,12 +35,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineTrapdoor {
+public class DpVolumeHidingTrapdoor {
 
     @State(Scope.Benchmark)
     public static class Constants {
-        final String folder = "src/test/resources/benchmark/baseline";
-
+        final String folder = "src/test/resources/benchmark/dpVolumeHiding";
         final String method = "trapdoor";
     }
 
@@ -87,7 +86,7 @@ public class BaselineTrapdoor {
     @State(Scope.Benchmark)
     public static class Parameters {
         Map<Label, Set<Plaintext>> multimap;
-        RangeBRCScheme rangeBRCScheme;
+        DPRangeBRCScheme rangeBRCScheme;
         Vertex root;
         EncryptedIndex encryptedIndex;
 
@@ -111,8 +110,8 @@ public class BaselineTrapdoor {
 
             final int securityParameter = 256;
 
-            final var emm = new BasicEMM(securityParameter);
-            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
+            final var emm = new DifferentiallyPrivateVolumeHidingEMM(securityParameter, 0.2, TestUtils.ALPHA);
+            rangeBRCScheme = new DPRangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
     }

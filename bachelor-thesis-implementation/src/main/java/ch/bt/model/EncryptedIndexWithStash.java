@@ -6,4 +6,4 @@ import ch.bt.model.multimap.Ciphertext;
 import java.util.Stack;
 
 public record EncryptedIndexWithStash(
-        EncryptedIndex encryptedIndex, Stack<Ciphertext> stash) {}
+        EncryptedIndex encryptedIndex, Stack<Ciphertext> stash, int numberOfDummyValues) {}

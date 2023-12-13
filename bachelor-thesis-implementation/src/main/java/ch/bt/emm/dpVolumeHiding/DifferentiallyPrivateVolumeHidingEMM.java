@@ -36,6 +36,10 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
 
     private int maxNumberOfValuesPerLabel = 0;
 
+    private int numberOfDummyValues;
+
+    private int numberOfDummyCT;
+
     public DifferentiallyPrivateVolumeHidingEMM(
             final int securityParameter, final double epsilon, final double alpha)
             throws GeneralSecurityException {
@@ -76,12 +80,14 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
 
         final var encryptedIndex = encryptedIndexWithStash.encryptedIndex();
         this.stash = encryptedIndexWithStash.stash();
+        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues();
 
         final var encryptedCTIndexWithStash =
                 DPVolumeHidingEMMUtils.calculateEncryptedCTIndex(
                         tableSize, numberOfValues, multiMap, prfKey, seScheme);
         final var encryptedCTIndex = encryptedCTIndexWithStash.encryptedIndex();
         this.counterStash = encryptedCTIndexWithStash.stash();
+        this.numberOfDummyCT = encryptedCTIndexWithStash.numberOfDummyValues();
 
         return new DifferentiallyPrivateEncryptedIndexTables(encryptedIndex, encryptedCTIndex);
     }
@@ -190,5 +196,13 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
 
     public SEScheme getSeScheme() {
         return seScheme;
+    }
+
+    public int getNumberOfDummyValues() {
+        return numberOfDummyValues;
+    }
+
+    public int getNumberOfDummyCT() {
+        return numberOfDummyCT;
     }
 }

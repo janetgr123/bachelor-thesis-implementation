@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BenchmarkRunner {
 
-    public static final int ITERATIONS = 2;
+    public static final int ITERATIONS = 10;
 
     public static final int WARM_UPS = 1;
 
@@ -18,11 +18,16 @@ public class BenchmarkRunner {
 
     public static final int THREADS = 1;
 
+    private static final String FOLDER = "src/test/resources/benchmark";
+
     private static Options createOptions(
             final String folder, final String method, final TimeUnit timeUnit) {
+        final String path = String.valueOf(folder.charAt(0)).toLowerCase() + folder.substring(1);
+        final String logs = String.join("", "benchmark-logs-", method, ".txt");
+        final String results = String.join("", "benchmark-results-", method, ".csv");
         return new OptionsBuilder()
                 .jvmArgsPrepend("-server")
-                .include("[a-z, A-Z]" + method)
+                .include(folder + method + "[0-9]?")
                 .mode(Mode.AverageTime)
                 .timeUnit(timeUnit)
                 .warmupMode(WarmupMode.INDI)
@@ -32,25 +37,26 @@ public class BenchmarkRunner {
                 .threads(THREADS)
                 .measurementIterations(ITERATIONS)
                 .resultFormat(ResultFormatType.CSV)
-                .result(
-                        "src/test/resources/benchmark/"
-                                + folder
-                                + "/benchmark-results-"
-                                + method
-                                + ".csv")
+                .result(String.join("/", FOLDER, path, results))
                 .verbosity(VerboseMode.EXTRA)
-                .output(
-                        "src/test/resources/benchmark/"
-                                + folder
-                                + "/benchmark-logs-"
-                                + method
-                                + ".txt")
+                .output(String.join("/", FOLDER, path, logs))
                 .build();
     }
 
     public static void main(String[] args) throws RunnerException {
-        new Runner(createOptions("baseline", "BuildIndex", TimeUnit.MILLISECONDS)).run();
-        new Runner(createOptions("baseline", "Trapdoor", TimeUnit.MICROSECONDS)).run();
-        new Runner(createOptions("baseline", "Search", TimeUnit.MICROSECONDS)).run();
+        new Runner(createOptions("Baseline", "BuildIndex", TimeUnit.MILLISECONDS)).run();
+        new Runner(createOptions("Baseline", "Trapdoor", TimeUnit.NANOSECONDS)).run();
+        new Runner(createOptions("Baseline", "Search", TimeUnit.NANOSECONDS)).run();
+        new Runner(createOptions("VolumeHiding", "BuildIndex", TimeUnit.MILLISECONDS)).run();
+        new Runner(createOptions("VolumeHiding", "Trapdoor", TimeUnit.NANOSECONDS)).run();
+        new Runner(createOptions("VolumeHiding", "Search", TimeUnit.NANOSECONDS)).run();
+        new Runner(createOptions("VolumeHidingOpt", "BuildIndex", TimeUnit.MILLISECONDS)).run();
+        new Runner(createOptions("VolumeHidingOpt", "Trapdoor", TimeUnit.NANOSECONDS)).run();
+        new Runner(createOptions("VolumeHidingOpt", "Search", TimeUnit.NANOSECONDS)).run();
+        new Runner(createOptions("DpVolumeHiding", "BuildIndex", TimeUnit.MILLISECONDS)).run();
+        new Runner(createOptions("DpVolumeHiding", "Trapdoor", TimeUnit.NANOSECONDS)).run();
+        new Runner(createOptions("DpVolumeHiding", "Search", TimeUnit.NANOSECONDS)).run();
+        new Runner(createOptions("DpVolumeHiding", "Trapdoor2", TimeUnit.NANOSECONDS)).run();
+        new Runner(createOptions("DpVolumeHiding", "Search2", TimeUnit.NANOSECONDS)).run();
     }
 }

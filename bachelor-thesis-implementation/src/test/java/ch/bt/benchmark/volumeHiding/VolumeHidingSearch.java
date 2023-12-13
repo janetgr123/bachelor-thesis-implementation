@@ -1,10 +1,11 @@
-package ch.bt.benchmark.baseline;
+package ch.bt.benchmark.volumeHiding;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
-import ch.bt.emm.basic.BasicEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMM;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
+import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.CustomRange;
@@ -35,13 +36,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineTrapdoor {
+public class VolumeHidingSearch {
 
     @State(Scope.Benchmark)
     public static class Constants {
-        final String folder = "src/test/resources/benchmark/baseline";
-
-        final String method = "trapdoor";
+        final String folder = "src/test/resources/benchmark/volumeHiding";
+        final String method = "search";
     }
 
     @State(Scope.Benchmark)
@@ -56,12 +56,14 @@ public class BaselineTrapdoor {
                 final int col3,
                 final String col4,
                 final int col5,
+                final String col6,
+                final int col7,
                 @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
             if (printer == null) {
                 init(constants);
             }
-            printer.printRecord(col1, col2, col3, col4, col5);
+            printer.printRecord(col1, col2, col3, col4, col5, col6, col7);
         }
 
         @Setup(Level.Trial)
@@ -111,14 +113,15 @@ public class BaselineTrapdoor {
 
             final int securityParameter = 256;
 
-            final var emm = new BasicEMM(securityParameter);
+            final var emm = new VolumeHidingEMM(securityParameter, TestUtils.ALPHA);
             rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
     }
 
-    @State(Scope.Benchmark)
+    @State(Scope.Thread)
     public static class RangeSchemeState {
+        List<SearchToken> searchToken;
         CustomRange range;
 
         @Setup(Level.Trial)
@@ -132,19 +135,25 @@ public class BaselineTrapdoor {
             int size = (int) (Math.random() * rootRange.size());
             int from = (int) (Math.random() * max) + rootRange.getMinimum();
             range = new CustomRange(from, Math.min(from + size - 1, max));
+            searchToken = parameters.rangeBRCScheme.trapdoor(range);
+            final var ciphertexts =
+                    parameters.rangeBRCScheme.search(searchToken, parameters.encryptedIndex);
             printer.printToCsv(
                     "range",
                     range.getMinimum(),
                     range.getMaximum(),
                     "token",
-                    parameters.rangeBRCScheme.trapdoor(range).size(),
+                    searchToken.size(),
+                    "ciphertexts",
+                    ciphertexts.size(),
                     constants);
         }
     }
 
     @Benchmark
-    public List<SearchToken> trapdoor(
+    public Set<Ciphertext> search(
             @NotNull Parameters rangeSchemeParameters, @NotNull RangeSchemeState state) {
-        return rangeSchemeParameters.rangeBRCScheme.trapdoor(state.range);
+        return rangeSchemeParameters.rangeBRCScheme.search(
+                state.searchToken, rangeSchemeParameters.encryptedIndex);
     }
 }

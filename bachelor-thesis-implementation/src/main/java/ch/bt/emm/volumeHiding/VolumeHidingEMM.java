@@ -28,6 +28,8 @@ public class VolumeHidingEMM implements EMM {
 
     private int maxNumberOfValuesPerLabel = 0;
 
+    private int numberOfDummyValues;
+
     public VolumeHidingEMM(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
         final var keys = this.setup(securityParameter);
@@ -63,6 +65,7 @@ public class VolumeHidingEMM implements EMM {
                 VolumeHidingEMMUtils.calculateEncryptedIndexAndStash(
                         tableSize, numberOfValues, multiMap, prfKey, seScheme);
         this.stash = encryptedIndexWithStash.stash();
+        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues();
         return encryptedIndexWithStash.encryptedIndex();
     }
 
@@ -121,5 +124,9 @@ public class VolumeHidingEMM implements EMM {
 
     public int getMaxNumberOfValuesPerLabel() {
         return maxNumberOfValuesPerLabel;
+    }
+
+    public int getNumberOfDummyValues() {
+        return numberOfDummyValues;
     }
 }

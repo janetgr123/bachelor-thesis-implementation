@@ -1,0 +1,2 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit"
+"ch.bt.benchmark.baseline.BaselineTrapdoor.trapdoor","avgt",1,10,603.861214,30.341238,"ns/op"

@@ -22,8 +22,11 @@ import org.openjdk.jmh.annotations.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.security.Security;
 import java.sql.Connection;
@@ -38,23 +41,29 @@ public class BaselineSearch {
     @State(Scope.Benchmark)
     public static class Constants {
         final String folder = "src/test/resources/benchmark/baseline";
-        final String category = "baseline";
         final String method = "search";
     }
 
     @State(Scope.Benchmark)
     public static class ResultPrinter {
-        FileWriter fileWriter;
+        BufferedWriter fileWriter;
         CSVFormat csvFormat;
         CSVPrinter printer;
 
         public void printToCsv(
-                final String col1, final int col2, final int col3, @NotNull Constants constants)
+                final String col1,
+                final int col2,
+                final int col3,
+                final String col4,
+                final int col5,
+                final String col6,
+                final int col7,
+                @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
             if (printer == null) {
                 init(constants);
             }
-            printer.printRecord(col1, col2, col3);
+            printer.printRecord(col1, col2, col3, col4, col5, col6, col7);
         }
 
         @Setup(Level.Trial)
@@ -62,7 +71,11 @@ public class BaselineSearch {
                 throws GeneralSecurityException, IOException, SQLException {
             final String file =
                     String.join(".", String.join("-", "results", constants.method), "csv");
-            fileWriter = new FileWriter(String.join("/", constants.folder, file));
+            fileWriter =
+                    Files.newBufferedWriter(
+                            Paths.get(String.join("/", constants.folder, file)),
+                            StandardOpenOption.APPEND,
+                            StandardOpenOption.CREATE);
             csvFormat = CSVFormat.DEFAULT.builder().build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
@@ -77,6 +90,7 @@ public class BaselineSearch {
     public static class Parameters {
         Map<Label, Set<Plaintext>> multimap;
         RangeBRCScheme rangeBRCScheme;
+        Vertex root;
         EncryptedIndex encryptedIndex;
 
         @Setup(Level.Trial)
@@ -95,7 +109,7 @@ public class BaselineSearch {
             BenchmarkUtils.addData(connection);
 
             multimap = TestUtils.getDataFromDB(connection);
-            final Vertex root = RangeCoverUtils.getRoot(multimap);
+            root = RangeCoverUtils.getRoot(multimap);
 
             final int securityParameter = 256;
 
@@ -103,40 +117,36 @@ public class BaselineSearch {
             rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
-
-        @TearDown(Level.Trial)
-        public void tearDown(@NotNull ResultPrinter printer, @NotNull Constants constants)
-                throws IOException, SQLException, GeneralSecurityException {
-            printer.printToCsv("multimap", multimap.size(), -1, constants);
-            printer.printToCsv(
-                    String.join(" ", "encrypted index", constants.category),
-                    encryptedIndex.size(),
-                    -1,
-                    constants);
-        }
     }
 
     @State(Scope.Thread)
     public static class RangeSchemeState {
-        CustomRange range;
         List<SearchToken> searchToken;
-        Set<Ciphertext> ciphertexts;
+        CustomRange range;
 
-        @Setup(Level.Iteration)
+        @Setup(Level.Trial)
         public void sampleRange(
                 @NotNull ResultPrinter printer,
                 @NotNull Constants constants,
                 @NotNull Parameters parameters)
                 throws IOException, SQLException, GeneralSecurityException {
-            final int max = TestUtils.TEST_DATA_SET_SIZE;
-            int size = (int) (Math.random() * max) + 1;
-            int from = (int) (Math.random() * max) + 1;
+            final var rootRange = parameters.root.range();
+            final int max = rootRange.getMaximum();
+            int size = (int) (Math.random() * rootRange.size());
+            int from = (int) (Math.random() * max) + rootRange.getMinimum();
             range = new CustomRange(from, Math.min(from + size - 1, max));
             searchToken = parameters.rangeBRCScheme.trapdoor(range);
-            ciphertexts = parameters.rangeBRCScheme.search(searchToken, parameters.encryptedIndex);
-            printer.printToCsv("range", range.getMinimum(), range.getMaximum(), constants);
-            printer.printToCsv("token", searchToken.size(), -1, constants);
-            printer.printToCsv("ciphertexts", ciphertexts.size(), -1, constants);
+            final var ciphertexts =
+                    parameters.rangeBRCScheme.search(searchToken, parameters.encryptedIndex);
+            printer.printToCsv(
+                    "range",
+                    range.getMinimum(),
+                    range.getMaximum(),
+                    "token",
+                    searchToken.size(),
+                    "ciphertexts",
+                    ciphertexts.size(),
+                    constants);
         }
     }
 
