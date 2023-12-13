@@ -1,2 +1,0 @@
-"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit"
-"ch.bt.benchmark.volumeHidingOpt.VolumeHidingOptTrapdoor.trapdoor","avgt",1,10,668.915456,81.867448,"ns/op"

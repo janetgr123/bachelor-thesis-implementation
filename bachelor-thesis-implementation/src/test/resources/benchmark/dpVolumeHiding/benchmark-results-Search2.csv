@@ -1,2 +1,0 @@
-"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit"
-"ch.bt.benchmark.dpVolumeHiding.DpVolumeHidingSearch2.search2","avgt",1,10,83.051255,1.349327,"ns/op"

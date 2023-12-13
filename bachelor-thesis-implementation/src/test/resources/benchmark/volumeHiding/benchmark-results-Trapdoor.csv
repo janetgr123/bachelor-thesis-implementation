@@ -1,4 +1,0 @@
-"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit"
-"ch.bt.benchmark.dpVolumeHiding.DpVolumeHidingTrapdoor.trapdoor","avgt",1,10,766.838153,27.276034,"ns/op"
-"ch.bt.benchmark.dpVolumeHiding.DpVolumeHidingTrapdoor2.trapdoor2","avgt",1,10,572586.605559,20440.997971,"ns/op"
-"ch.bt.benchmark.volumeHiding.VolumeHidingTrapdoor.trapdoor","avgt",1,10,708.218381,63.507729,"ns/op"
