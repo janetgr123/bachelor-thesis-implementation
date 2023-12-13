@@ -3,6 +3,7 @@ package ch.bt.benchmark;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.*;
 
 import java.util.concurrent.TimeUnit;
@@ -47,9 +48,9 @@ public class BenchmarkRunner {
                 .build();
     }
 
-    public static void main(String[] args) {
-        new Runner(createOptions("baseline", "BuildIndex", TimeUnit.MILLISECONDS));
-        new Runner(createOptions("baseline", "Trapdoor", TimeUnit.MICROSECONDS));
-        new Runner(createOptions("baseline", "Search", TimeUnit.MICROSECONDS));
+    public static void main(String[] args) throws RunnerException {
+        new Runner(createOptions("baseline", "BuildIndex", TimeUnit.MILLISECONDS)).run();
+        new Runner(createOptions("baseline", "Trapdoor", TimeUnit.MICROSECONDS)).run();
+        new Runner(createOptions("baseline", "Search", TimeUnit.MICROSECONDS)).run();
     }
 }
