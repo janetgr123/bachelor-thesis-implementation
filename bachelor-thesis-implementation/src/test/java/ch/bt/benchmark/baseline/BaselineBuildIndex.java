@@ -32,23 +32,35 @@ import java.util.Set;
 public class BaselineBuildIndex {
 
     @State(Scope.Benchmark)
-    public static class IndexSizePrinter {
+    public static class Constants {
+        final String folder = "src/test/resources/benchmark/baseline";
+        final String category = "baseline";
+
+        final String method = "build-index";
+    }
+
+    @State(Scope.Benchmark)
+    public static class ResultPrinter {
         FileWriter fileWriter;
         CSVFormat csvFormat;
         CSVPrinter printer;
 
-        public void printToCsv(final String map, final int size)
+        public void printToCsv(
+                final String col1, final int col2, final int col3, @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
             if (printer == null) {
-                init();
+                init(constants);
             }
-            printer.printRecord(map, size);
+            printer.printRecord(col1, col2, col3);
         }
 
         @Setup(Level.Trial)
-        public void init() throws GeneralSecurityException, IOException, SQLException {
-            fileWriter = new FileWriter("src/test/resources/benchmark/baseline/index-sizes.csv");
-            csvFormat = CSVFormat.DEFAULT.builder().setHeader("map", "size").build();
+        public void init(@NotNull Constants constants)
+                throws GeneralSecurityException, IOException, SQLException {
+            final String file =
+                    String.join(".", String.join("-", "results", constants.method), "csv");
+            fileWriter = new FileWriter(String.join("/", constants.folder, file));
+            csvFormat = CSVFormat.DEFAULT.builder().build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
 
@@ -84,16 +96,20 @@ public class BaselineBuildIndex {
 
             final int securityParameter = 256;
 
-            final var basicEMM = new BasicEMM(securityParameter);
-            rangeBRCScheme =
-                    new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
+            final var emm = new BasicEMM(securityParameter);
+            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
+            encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
 
         @TearDown(Level.Trial)
-        public void tearDown(@NotNull IndexSizePrinter printer)
+        public void tearDown(@NotNull ResultPrinter printer, @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
-            printer.printToCsv("multimap", multimap.size());
-            printer.printToCsv("encrypted index baseline", encryptedIndex.size());
+            printer.printToCsv("multimap", multimap.size(), -1, constants);
+            printer.printToCsv(
+                    String.join(" ", "encrypted index", constants.category),
+                    encryptedIndex.size(),
+                    -1,
+                    constants);
         }
     }
 

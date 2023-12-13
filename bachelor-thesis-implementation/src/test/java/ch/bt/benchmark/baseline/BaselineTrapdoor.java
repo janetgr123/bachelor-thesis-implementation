@@ -33,24 +33,37 @@ import java.util.Map;
 import java.util.Set;
 
 public class BaselineTrapdoor {
+
     @State(Scope.Benchmark)
-    public static class RangePrinter {
+    public static class Constants {
+        final String folder = "src/test/resources/benchmark/baseline";
+        final String category = "baseline";
+
+        final String method = "trapdoor";
+    }
+
+    @State(Scope.Benchmark)
+    public static class ResultPrinter {
         FileWriter fileWriter;
         CSVFormat csvFormat;
         CSVPrinter printer;
 
-        public void printToCsv(final String map, final int from, final int to)
+        public void printToCsv(
+                final String col1, final int col2, final int col3, @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
             if (printer == null) {
-                init();
+                init(constants);
             }
-            printer.printRecord(map, from, to);
+            printer.printRecord(col1, col2, col3);
         }
 
         @Setup(Level.Trial)
-        public void init() throws GeneralSecurityException, IOException, SQLException {
-            fileWriter = new FileWriter("src/test/resources/benchmark/baseline/ranges.csv");
-            csvFormat = CSVFormat.DEFAULT.builder().setHeader("range", "from", "to").build();
+        public void init(@NotNull Constants constants)
+                throws GeneralSecurityException, IOException, SQLException {
+            final String file =
+                    String.join(".", String.join("-", "results", constants.method), "csv");
+            fileWriter = new FileWriter(String.join("/", constants.folder, file));
+            csvFormat = CSVFormat.DEFAULT.builder().build();
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
 
@@ -83,12 +96,23 @@ public class BaselineTrapdoor {
 
             multimap = TestUtils.getDataFromDB(connection);
             final Vertex root = RangeCoverUtils.getRoot(multimap);
+
             final int securityParameter = 256;
 
-            final var basicEMM = new BasicEMM(securityParameter);
-            rangeBRCScheme =
-                    new RangeBRCScheme(securityParameter, basicEMM, new BestRangeCover(), root);
+            final var emm = new BasicEMM(securityParameter);
+            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
+        }
+
+        @TearDown(Level.Trial)
+        public void tearDown(@NotNull ResultPrinter printer, @NotNull Constants constants)
+                throws IOException, SQLException, GeneralSecurityException {
+            printer.printToCsv("multimap", multimap.size(), -1, constants);
+            printer.printToCsv(
+                    String.join(" ", "encrypted index", constants.category),
+                    encryptedIndex.size(),
+                    -1,
+                    constants);
         }
     }
 
@@ -98,19 +122,24 @@ public class BaselineTrapdoor {
         List<SearchToken> searchToken;
 
         @Setup(Level.Iteration)
-        public void sampleRange(@NotNull RangePrinter printer)
+        public void sampleRange(
+                @NotNull ResultPrinter printer,
+                @NotNull Constants constants,
+                @NotNull Parameters parameters)
                 throws IOException, SQLException, GeneralSecurityException {
-            int size = (int) (Math.random() * 10) + 1;
-            int from = (int) (Math.random() * 100) + 1;
-            range = new CustomRange(from, from + size - 1);
-            printer.printToCsv("baseline", range.getMinimum(), range.getMaximum());
+            final int max = TestUtils.TEST_DATA_SET_SIZE;
+            int size = (int) (Math.random() * max) + 1;
+            int from = (int) (Math.random() * max) + 1;
+            range = new CustomRange(from, Math.min(from + size - 1, max));
+            searchToken = parameters.rangeBRCScheme.trapdoor(range);
+            printer.printToCsv("range", range.getMinimum(), range.getMaximum(), constants);
+            printer.printToCsv("token", searchToken.size(), -1, constants);
         }
     }
 
     @Benchmark
     public List<SearchToken> trapdoor(
             @NotNull Parameters rangeSchemeParameters, @NotNull RangeSchemeState state) {
-        state.searchToken = rangeSchemeParameters.rangeBRCScheme.trapdoor(state.range);
-        return state.searchToken;
+        return rangeSchemeParameters.rangeBRCScheme.trapdoor(state.range);
     }
 }
