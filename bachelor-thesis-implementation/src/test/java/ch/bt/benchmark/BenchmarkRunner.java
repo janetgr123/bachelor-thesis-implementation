@@ -48,8 +48,8 @@ public class BenchmarkRunner {
     }
 
     public static void main(String[] args) {
-        new Runner(createOptions("baseline", "build-index", TimeUnit.MILLISECONDS));
-        new Runner(createOptions("baseline", "trapdoor", TimeUnit.MICROSECONDS));
-        new Runner(createOptions("baseline", "search", TimeUnit.MICROSECONDS));
+        new Runner(createOptions("baseline", "BuildIndex", TimeUnit.MILLISECONDS));
+        new Runner(createOptions("baseline", "Trapdoor", TimeUnit.MICROSECONDS));
+        new Runner(createOptions("baseline", "Search", TimeUnit.MICROSECONDS));
     }
 }

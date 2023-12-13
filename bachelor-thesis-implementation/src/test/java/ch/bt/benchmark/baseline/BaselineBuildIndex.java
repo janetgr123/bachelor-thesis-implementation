@@ -33,7 +33,7 @@ public class BaselineBuildIndex {
 
     @State(Scope.Benchmark)
     public static class Constants {
-        final String folder = "src/test/resources/benchmark/baseline";
+        final String folder = "src/main/resources/benchmark/baseline";
         final String category = "baseline";
 
         final String method = "build-index";
