@@ -143,7 +143,7 @@ public class VolumeHidingSearch2 {
         int from;
 
         @Param("0")
-        int to;
+        int size;
 
         List<SearchToken> searchToken2;
         CustomRange range;
@@ -154,7 +154,7 @@ public class VolumeHidingSearch2 {
                 @NotNull Constants constants,
                 @NotNull Parameters parameters)
                 throws IOException, SQLException, GeneralSecurityException {
-            range = new CustomRange(from, to);
+            range = new CustomRange(from, from + size - 1);
             final var searchToken = parameters.rangeBRCScheme.trapdoor(range);
             final var ciphertexts =
                     parameters.rangeBRCScheme.search(searchToken, parameters.encryptedIndex);

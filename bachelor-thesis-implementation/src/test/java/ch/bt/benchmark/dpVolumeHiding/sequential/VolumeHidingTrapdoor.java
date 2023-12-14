@@ -40,7 +40,7 @@ public class VolumeHidingTrapdoor {
         int from;
 
         @Param("0")
-        int to;
+        int size;
 
         Map<Label, Set<Plaintext>> multimap;
         DPRangeBRCScheme rangeBRCScheme;
@@ -65,7 +65,7 @@ public class VolumeHidingTrapdoor {
 
             multimap = TestUtils.getDataFromDB(connection, numberOfDataSamples);
             root = RangeCoverUtils.getRoot(multimap);
-            range = new CustomRange(from, to);
+            range = new CustomRange(from, from + size - 1);
 
             final int securityParameter = 256;
             final var emm =

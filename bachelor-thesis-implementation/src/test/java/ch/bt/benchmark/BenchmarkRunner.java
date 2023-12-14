@@ -65,9 +65,9 @@ public class BenchmarkRunner {
                                 .map(String::valueOf)
                                 .toArray(String[]::new))
                 .param(
-                        "to",
+                        "size",
                         ranges.get(data).stream()
-                                .map(CustomRange::getMaximum)
+                                .map(CustomRange::size)
                                 .map(String::valueOf)
                                 .toArray(String[]::new))
                 .mode(Mode.AverageTime)
