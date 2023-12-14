@@ -2,6 +2,7 @@ package ch.bt.benchmark.baseline.sequential;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
+import ch.bt.emm.EMM;
 import ch.bt.emm.basic.BasicEMM;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
@@ -40,7 +41,7 @@ public class BaselineSearch {
 
     @State(Scope.Benchmark)
     public static class Constants {
-        final String folder = "src/test/resources/benchmark/baseline/sequential";
+        final String folder = "src/test/resources/benchmark/baseline/sequential/data";
         final String method = "search";
     }
 
@@ -51,19 +52,17 @@ public class BaselineSearch {
         CSVPrinter printer;
 
         public void printToCsv(
-                final String col1,
+                final int col1,
                 final int col2,
                 final int col3,
-                final String col4,
+                final int col4,
                 final int col5,
-                final String col6,
-                final int col7,
                 @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
             if (printer == null) {
                 init(constants);
             }
-            printer.printRecord(col1, col2, col3, col4, col5, col6, col7);
+            printer.printRecord(col1, col2, col3, col4, col5);
         }
 
         @Setup(Level.Trial)
@@ -71,12 +70,25 @@ public class BaselineSearch {
                 throws GeneralSecurityException, IOException, SQLException {
             final String file =
                     String.join(".", String.join("-", "results", constants.method), "csv");
+            final var path = Paths.get(String.join("/", constants.folder, file));
+            final var newFile = path.toFile();
+            if (newFile.exists()) {
+                csvFormat = CSVFormat.DEFAULT.builder().build();
+            } else {
+                csvFormat =
+                        CSVFormat.DEFAULT
+                                .builder()
+                                .setHeader(
+                                        "range from",
+                                        "range to",
+                                        "token size",
+                                        "response size",
+                                        "dummy values")
+                                .build();
+            }
             fileWriter =
                     Files.newBufferedWriter(
-                            Paths.get(String.join("/", constants.folder, file)),
-                            StandardOpenOption.APPEND,
-                            StandardOpenOption.CREATE);
-            csvFormat = CSVFormat.DEFAULT.builder().build();
+                            path, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
             printer = new CSVPrinter(fileWriter, csvFormat);
         }
 
@@ -95,6 +107,7 @@ public class BaselineSearch {
         RangeBRCScheme rangeBRCScheme;
         Vertex root;
         EncryptedIndex encryptedIndex;
+        EMM emm;
 
         @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
@@ -116,7 +129,7 @@ public class BaselineSearch {
 
             final int securityParameter = 256;
 
-            final var emm = new BasicEMM(securityParameter);
+            emm = new BasicEMM(securityParameter);
             rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
@@ -144,13 +157,11 @@ public class BaselineSearch {
             final var ciphertexts =
                     parameters.rangeBRCScheme.search(searchToken, parameters.encryptedIndex);
             printer.printToCsv(
-                    "range",
                     range.getMinimum(),
                     range.getMaximum(),
-                    "token",
                     searchToken.size(),
-                    "ciphertexts",
                     ciphertexts.size(),
+                    parameters.emm.getPaddingOfResponses().stream().reduce(Integer::sum).orElse(0),
                     constants);
         }
     }

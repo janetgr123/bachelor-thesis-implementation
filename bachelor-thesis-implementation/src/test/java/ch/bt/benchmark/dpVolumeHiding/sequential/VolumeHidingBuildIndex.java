@@ -1,10 +1,10 @@
-package ch.bt.benchmark.baseline.sequential;
+package ch.bt.benchmark.dpVolumeHiding.sequential;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
-import ch.bt.emm.EMM;
-import ch.bt.emm.basic.BasicEMM;
-import ch.bt.genericRs.RangeBRCScheme;
+import ch.bt.emm.TwoRoundEMM;
+import ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM;
+import ch.bt.genericRs.DPRangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
@@ -33,11 +33,11 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineBuildIndex {
+public class VolumeHidingBuildIndex {
 
     @State(Scope.Benchmark)
     public static class Constants {
-        final String folder = "src/test/resources/benchmark/baseline/sequential/data";
+        final String folder = "src/test/resources/benchmark/dpVolumeHiding/sequential/data";
 
         final String method = "build-index";
     }
@@ -99,9 +99,9 @@ public class BaselineBuildIndex {
         int numberOfDataSamples;
 
         Map<Label, Set<Plaintext>> multimap;
-        RangeBRCScheme rangeBRCScheme;
+        DPRangeBRCScheme rangeBRCScheme;
         EncryptedIndex encryptedIndex;
-        EMM emm;
+        TwoRoundEMM emm;
 
         @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
@@ -123,8 +123,9 @@ public class BaselineBuildIndex {
 
             final int securityParameter = 256;
 
-            emm = new BasicEMM(securityParameter);
-            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
+            emm = new DifferentiallyPrivateVolumeHidingEMM(securityParameter, 0.2, TestUtils.ALPHA);
+            rangeBRCScheme =
+                    new DPRangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
 

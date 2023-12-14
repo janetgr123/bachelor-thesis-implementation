@@ -1,9 +1,9 @@
-package ch.bt.benchmark.baseline.sequential;
+package ch.bt.benchmark.volumeHiding.parallel;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
-import ch.bt.emm.basic.BasicEMM;
-import ch.bt.genericRs.RangeBRCScheme;
+import ch.bt.emm.volumeHiding.VolumeHidingEMM;
+import ch.bt.genericRs.ParallelRangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineTrapdoor {
+public class VolumeHidingParTrapdoor {
 
     @State(Scope.Benchmark)
     public static class Parameters {
@@ -43,7 +43,7 @@ public class BaselineTrapdoor {
         int to;
 
         Map<Label, Set<Plaintext>> multimap;
-        RangeBRCScheme rangeBRCScheme;
+        ParallelRangeBRCScheme rangeBRCScheme;
         Vertex root;
         EncryptedIndex encryptedIndex;
         CustomRange range;
@@ -68,8 +68,8 @@ public class BaselineTrapdoor {
             range = new CustomRange(from, to);
 
             final int securityParameter = 256;
-            final var emm = new BasicEMM(securityParameter);
-            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
+            final var emm = new VolumeHidingEMM(securityParameter, TestUtils.ALPHA);
+            rangeBRCScheme = new ParallelRangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
     }

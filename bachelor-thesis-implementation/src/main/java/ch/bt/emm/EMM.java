@@ -27,4 +27,5 @@ public interface EMM {
     Set<Plaintext> result(final Set<Ciphertext> ciphertexts, final Label searchLabel) throws GeneralSecurityException;
 
     int getNumberOfDummyValues();
+    List<Integer> getPaddingOfResponses();
 }

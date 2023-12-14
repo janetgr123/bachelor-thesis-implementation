@@ -2,10 +2,10 @@ package ch.bt.emm.volumeHiding;
 
 import ch.bt.crypto.CastingHelpers;
 import ch.bt.crypto.DPRF;
-import ch.bt.model.multimap.Ciphertext;
-import ch.bt.model.multimap.Label;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
+import ch.bt.model.multimap.Ciphertext;
+import ch.bt.model.multimap.Label;
 import ch.bt.model.searchtoken.SearchToken;
 import ch.bt.model.searchtoken.SearchTokenBytes;
 
@@ -49,8 +49,20 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
             final var expand2 =
                     CastingHelpers.fromByteArrayToHashModN(
                             DPRF.evaluateDPRF(token, i, 1), tableSize);
-            ciphertexts.add(encryptedIndexTable1[expand1]);
-            ciphertexts.add(encryptedIndexTable2[expand2]);
+            final var ciphertext1 = encryptedIndexTable1[expand1];
+            final var ciphertext2 = encryptedIndexTable2[expand2];
+            ciphertexts.add(ciphertext1);
+            ciphertexts.add(ciphertext2);
+            try {
+                final var plaintext1 = getSeScheme().decryptLabel(ciphertext1.label());
+                final var plaintext2 = getSeScheme().decryptLabel(ciphertext2.label());
+                int dummy = 0;
+                dummy += Arrays.equals(plaintext1.label(), new byte[0]) ? 1 : 0;
+                dummy += Arrays.equals(plaintext2.label(), new byte[0]) ? 1 : 0;
+                getPaddingOfResponses().add(dummy);
+            } catch (GeneralSecurityException e) {
+                throw new RuntimeException(e);
+            }
         }
         return ciphertexts;
     }

@@ -1,10 +1,10 @@
-package ch.bt.benchmark.baseline.sequential;
+package ch.bt.benchmark.baseline.parallel;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
 import ch.bt.emm.EMM;
 import ch.bt.emm.basic.BasicEMM;
-import ch.bt.genericRs.RangeBRCScheme;
+import ch.bt.genericRs.ParallelRangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
@@ -33,11 +33,11 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineBuildIndex {
+public class BaselineParBuildIndex {
 
     @State(Scope.Benchmark)
     public static class Constants {
-        final String folder = "src/test/resources/benchmark/baseline/sequential/data";
+        final String folder = "src/test/resources/benchmark/baseline/parallel/data";
 
         final String method = "build-index";
     }
@@ -99,7 +99,7 @@ public class BaselineBuildIndex {
         int numberOfDataSamples;
 
         Map<Label, Set<Plaintext>> multimap;
-        RangeBRCScheme rangeBRCScheme;
+        ParallelRangeBRCScheme rangeBRCScheme;
         EncryptedIndex encryptedIndex;
         EMM emm;
 
@@ -124,7 +124,7 @@ public class BaselineBuildIndex {
             final int securityParameter = 256;
 
             emm = new BasicEMM(securityParameter);
-            rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
+            rangeBRCScheme = new ParallelRangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
 

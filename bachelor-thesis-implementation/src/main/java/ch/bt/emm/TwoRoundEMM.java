@@ -32,6 +32,10 @@ public interface TwoRoundEMM {
 
     int getNumberOfDummyCT();
 
+    List<Integer> getPaddingOfResponses();
+
+    List<Integer> getPaddingOfResponses2();
+
     Set<Ciphertext> search2(final SearchToken searchToken, final EncryptedIndex encryptedIndex)
             throws IOException;
 

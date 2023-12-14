@@ -1,0 +1,2 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: numberOfDataSamples"
+"ch.bt.benchmark.baseline.sequential.BaselineBuildIndex.buildIndex","avgt",1,2,2.687765,NaN,"ms/op",10

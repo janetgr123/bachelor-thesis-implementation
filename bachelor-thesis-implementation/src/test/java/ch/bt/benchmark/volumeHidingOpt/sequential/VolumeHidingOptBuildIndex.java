@@ -1,9 +1,9 @@
-package ch.bt.benchmark.baseline.sequential;
+package ch.bt.benchmark.volumeHidingOpt.sequential;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
 import ch.bt.emm.EMM;
-import ch.bt.emm.basic.BasicEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
@@ -33,11 +33,11 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-public class BaselineBuildIndex {
+public class VolumeHidingOptBuildIndex {
 
     @State(Scope.Benchmark)
     public static class Constants {
-        final String folder = "src/test/resources/benchmark/baseline/sequential/data";
+        final String folder = "src/test/resources/benchmark/volumeHidingOpt/sequential/data";
 
         final String method = "build-index";
     }
@@ -123,7 +123,7 @@ public class BaselineBuildIndex {
 
             final int securityParameter = 256;
 
-            emm = new BasicEMM(securityParameter);
+            emm = new VolumeHidingEMMOptimised(securityParameter, TestUtils.ALPHA);
             rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }

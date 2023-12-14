@@ -21,6 +21,8 @@ public class BasicEMM implements EMM {
     private final SEScheme seScheme;
     private final SecretKey hmacKey;
 
+    private final List<Integer> paddingOfResponses = new LinkedList<>();
+
     public BasicEMM(final int securityParameter) throws GeneralSecurityException {
         final var keys = this.setup(securityParameter);
         this.hmacKey = keys.get(0);
@@ -80,6 +82,7 @@ public class BasicEMM implements EMM {
                     encryptedIndexMap.keySet().stream().filter(encryptedLabel::equals).toList();
             if (matchingLabels.size() == 1) {
                 encryptedValues.add(encryptedIndexMap.get(matchingLabels.get(0)));
+                paddingOfResponses.add(0);
             } else {
                 break;
             }
@@ -112,5 +115,9 @@ public class BasicEMM implements EMM {
 
     public int getNumberOfDummyValues() {
         return 0;
+    }
+
+    public List<Integer> getPaddingOfResponses() {
+        return paddingOfResponses;
     }
 }

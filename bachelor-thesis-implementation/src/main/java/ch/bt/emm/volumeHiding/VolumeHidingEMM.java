@@ -29,6 +29,7 @@ public class VolumeHidingEMM implements EMM {
     private int maxNumberOfValuesPerLabel = 0;
 
     private int numberOfDummyValues;
+    private List<Integer> paddingOfResponses = new LinkedList<>();
 
     public VolumeHidingEMM(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
@@ -98,8 +99,20 @@ public class VolumeHidingEMM implements EMM {
         final var token = ((SearchTokenListInts) searchToken).getSearchTokenList();
         token.forEach(
                 t -> {
-                    ciphertexts.add(encryptedIndexTable1[t.getToken(1)]);
-                    ciphertexts.add(encryptedIndexTable2[t.getToken(2)]);
+                    final var ciphertext1 = encryptedIndexTable1[t.getToken(1)];
+                    final var ciphertext2 = encryptedIndexTable2[t.getToken(2)];
+                    ciphertexts.add(ciphertext1);
+                    ciphertexts.add(ciphertext2);
+                    try {
+                        final var plaintext1 = seScheme.decryptLabel(ciphertext1.label());
+                        final var plaintext2 = seScheme.decryptLabel(ciphertext2.label());
+                        int dummy = 0;
+                        dummy += Arrays.equals(plaintext1.label(), new byte[0]) ? 1 : 0;
+                        dummy += Arrays.equals(plaintext2.label(), new byte[0]) ? 1 : 0;
+                        paddingOfResponses.add(dummy);
+                    } catch (GeneralSecurityException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
         return ciphertexts;
     }
@@ -128,5 +141,9 @@ public class VolumeHidingEMM implements EMM {
 
     public int getNumberOfDummyValues() {
         return numberOfDummyValues;
+    }
+
+    public List<Integer> getPaddingOfResponses() {
+        return paddingOfResponses;
     }
 }

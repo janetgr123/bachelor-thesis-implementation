@@ -40,6 +40,10 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
 
     private int numberOfDummyCT;
 
+    private List<Integer> paddingOfResponses = new LinkedList<>();
+
+    private List<Integer> paddingOfResponses2 = new LinkedList<>();
+
     public DifferentiallyPrivateVolumeHidingEMM(
             final int securityParameter, final double epsilon, final double alpha)
             throws GeneralSecurityException {
@@ -151,8 +155,20 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
             final var expand2 =
                     CastingHelpers.fromByteArrayToHashModN(
                             DPRF.evaluateDPRF(token, i, 1), tableSize);
-            ciphertexts.add(encryptedCounterTable[expand1]);
-            ciphertexts.add(encryptedCounterTable2[expand2]);
+            final var ciphertext1 = encryptedCounterTable[expand1];
+            final var ciphertext2 = encryptedCounterTable2[expand2];
+            ciphertexts.add(ciphertext1);
+            ciphertexts.add(ciphertext2);
+            try {
+                final var plaintext1 = seScheme.decryptLabel(ciphertext1.label());
+                final var plaintext2 = seScheme.decryptLabel(ciphertext2.label());
+                int dummy = 0;
+                dummy += Arrays.equals(plaintext1.label(), new byte[0]) ? 1 : 0;
+                dummy += Arrays.equals(plaintext2.label(), new byte[0]) ? 1 : 0;
+                paddingOfResponses.add(dummy);
+            } catch (GeneralSecurityException e) {
+                throw new RuntimeException(e);
+            }
         }
         return ciphertexts;
     }
@@ -187,8 +203,20 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
             final var expand2 =
                     CastingHelpers.fromByteArrayToHashModN(
                             DPRF.evaluateDPRF(token.token2(), i, 1), tableSize);
-            ciphertexts.add(encryptedIndexTable1[expand1]);
-            ciphertexts.add(encryptedIndexTable2[expand2]);
+            final var ciphertext1 = encryptedIndexTable1[expand1];
+            final var ciphertext2 = encryptedIndexTable2[expand2];
+            ciphertexts.add(ciphertext1);
+            ciphertexts.add(ciphertext2);
+            try {
+                final var plaintext1 = seScheme.decryptLabel(ciphertext1.label());
+                final var plaintext2 = seScheme.decryptLabel(ciphertext2.label());
+                int dummy = 0;
+                dummy += Arrays.equals(plaintext1.label(), new byte[0]) ? 1 : 0;
+                dummy += Arrays.equals(plaintext2.label(), new byte[0]) ? 1 : 0;
+                paddingOfResponses2.add(dummy);
+            } catch (GeneralSecurityException e) {
+                throw new RuntimeException(e);
+            }
             i++;
         }
         return ciphertexts;
@@ -204,5 +232,13 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
 
     public int getNumberOfDummyCT() {
         return numberOfDummyCT;
+    }
+
+    public List<Integer> getPaddingOfResponses() {
+        return paddingOfResponses;
+    }
+
+    public List<Integer> getPaddingOfResponses2() {
+        return paddingOfResponses2;
     }
 }

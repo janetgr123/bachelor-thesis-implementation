@@ -27,8 +27,8 @@ public class ResultPrinter {
         printer = new CSVPrinter(fileWriter, csvFormat);
     }
 
-    public void printToCsv(final int rangeSize, final Double queryTime)
+    public void printToCsv(final int dataSize, final Double queryTime)
             throws IOException, SQLException, GeneralSecurityException {
-        printer.printRecord(rangeSize, queryTime);
+        printer.printRecord(dataSize, queryTime);
     }
 }
