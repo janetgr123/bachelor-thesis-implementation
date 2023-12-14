@@ -34,7 +34,7 @@ public class TestUtils {
 
     public static void init(Connection connection) {
         try {
-            multimap = getDataFromDB(connection);
+            multimap = getDataFromDB(connection, TEST_DATA_SET_SIZE);
             root = RangeCoverUtils.getRoot(multimap);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -45,14 +45,14 @@ public class TestUtils {
         generateTwoSmallMultimaps();
     }
 
-    public static Map<Label, Set<Plaintext>> getDataFromDB(Connection connection)
+    public static Map<Label, Set<Plaintext>> getDataFromDB(Connection connection, final int size)
             throws SQLException {
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery("select pk_node_id, longitude from t_network_nodes");
         final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
         // Reduce test data
         int i = 0;
-        while (rs.next() && i < TEST_DATA_SET_SIZE) {
+        while (rs.next() && i < size) {
             final var set = new HashSet<Plaintext>();
             set.add(
                     new Plaintext(

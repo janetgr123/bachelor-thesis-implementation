@@ -2,6 +2,7 @@ package ch.bt.benchmark;
 
 import ch.bt.model.db.NetworkNode;
 
+import ch.bt.model.rc.CustomRange;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 
@@ -60,5 +61,3 @@ public class BenchmarkUtils {
 
 
 }
-
-

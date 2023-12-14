@@ -88,6 +88,9 @@ public class BaselineSearch {
 
     @State(Scope.Benchmark)
     public static class Parameters {
+        @Param("0")
+        int numberOfDataSamples;
+
         Map<Label, Set<Plaintext>> multimap;
         RangeBRCScheme rangeBRCScheme;
         Vertex root;
@@ -108,7 +111,7 @@ public class BaselineSearch {
             Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
             BenchmarkUtils.addData(connection);
 
-            multimap = TestUtils.getDataFromDB(connection);
+            multimap = TestUtils.getDataFromDB(connection, numberOfDataSamples);
             root = RangeCoverUtils.getRoot(multimap);
 
             final int securityParameter = 256;
@@ -121,6 +124,12 @@ public class BaselineSearch {
 
     @State(Scope.Thread)
     public static class RangeSchemeState {
+        @Param("0")
+        int from;
+
+        @Param("0")
+        int to;
+
         List<SearchToken> searchToken;
         CustomRange range;
 
@@ -130,11 +139,7 @@ public class BaselineSearch {
                 @NotNull Constants constants,
                 @NotNull Parameters parameters)
                 throws IOException, SQLException, GeneralSecurityException {
-            final var rootRange = parameters.root.range();
-            final int max = rootRange.getMaximum();
-            int size = (int) (Math.random() * rootRange.size());
-            int from = (int) (Math.random() * max) + rootRange.getMinimum();
-            range = new CustomRange(from, Math.min(from + size - 1, max));
+            range = new CustomRange(from, to);
             searchToken = parameters.rangeBRCScheme.trapdoor(range);
             final var ciphertexts =
                     parameters.rangeBRCScheme.search(searchToken, parameters.encryptedIndex);

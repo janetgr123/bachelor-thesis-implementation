@@ -86,10 +86,20 @@ public class BaselineTrapdoor {
 
     @State(Scope.Benchmark)
     public static class Parameters {
+        @Param("0")
+        int numberOfDataSamples;
+
+        @Param("0")
+        int from;
+
+        @Param("0")
+        int to;
+
         Map<Label, Set<Plaintext>> multimap;
         RangeBRCScheme rangeBRCScheme;
         Vertex root;
         EncryptedIndex encryptedIndex;
+        CustomRange range;
 
         @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
@@ -106,45 +116,19 @@ public class BaselineTrapdoor {
             Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
             BenchmarkUtils.addData(connection);
 
-            multimap = TestUtils.getDataFromDB(connection);
+            multimap = TestUtils.getDataFromDB(connection, numberOfDataSamples);
             root = RangeCoverUtils.getRoot(multimap);
+            range = new CustomRange(from, to);
 
             final int securityParameter = 256;
-
             final var emm = new BasicEMM(securityParameter);
             rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
     }
 
-    @State(Scope.Benchmark)
-    public static class RangeSchemeState {
-        CustomRange range;
-
-        @Setup(Level.Trial)
-        public void sampleRange(
-                @NotNull ResultPrinter printer,
-                @NotNull Constants constants,
-                @NotNull Parameters parameters)
-                throws IOException, SQLException, GeneralSecurityException {
-            final var rootRange = parameters.root.range();
-            final int max = rootRange.getMaximum();
-            int size = (int) (Math.random() * rootRange.size());
-            int from = (int) (Math.random() * max) + rootRange.getMinimum();
-            range = new CustomRange(from, Math.min(from + size - 1, max));
-            printer.printToCsv(
-                    "range",
-                    range.getMinimum(),
-                    range.getMaximum(),
-                    "token",
-                    parameters.rangeBRCScheme.trapdoor(range).size(),
-                    constants);
-        }
-    }
-
     @Benchmark
-    public List<SearchToken> trapdoor(
-            @NotNull Parameters rangeSchemeParameters, @NotNull RangeSchemeState state) {
-        return rangeSchemeParameters.rangeBRCScheme.trapdoor(state.range);
+    public List<SearchToken> trapdoor(@NotNull Parameters parameters) {
+        return parameters.rangeBRCScheme.trapdoor(parameters.range);
     }
 }

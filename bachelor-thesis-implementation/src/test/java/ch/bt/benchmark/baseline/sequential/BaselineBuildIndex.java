@@ -45,12 +45,13 @@ public class BaselineBuildIndex {
         CSVFormat csvFormat;
         CSVPrinter printer;
 
-        public void printToCsv(final String col1, final int col2, @NotNull Constants constants)
+        public void printToCsv(
+                final String col1, final int col2, final int col3, @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
             if (printer == null) {
                 init(constants);
             }
-            printer.printRecord(col1, col2);
+            printer.printRecord(col1, col2, col3);
         }
 
         @Setup(Level.Trial)
@@ -71,6 +72,9 @@ public class BaselineBuildIndex {
 
     @State(Scope.Benchmark)
     public static class Parameters {
+        @Param("0")
+        int numberOfDataSamples;
+
         Map<Label, Set<Plaintext>> multimap;
         RangeBRCScheme rangeBRCScheme;
         EncryptedIndex encryptedIndex;
@@ -91,7 +95,7 @@ public class BaselineBuildIndex {
             Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
             BenchmarkUtils.addData(connection);
 
-            multimap = TestUtils.getDataFromDB(connection);
+            multimap = TestUtils.getDataFromDB(connection, numberOfDataSamples);
             final Vertex root = RangeCoverUtils.getRoot(multimap);
 
             final int securityParameter = 256;
@@ -104,9 +108,11 @@ public class BaselineBuildIndex {
         @TearDown(Level.Trial)
         public void tearDown(@NotNull ResultPrinter printer, @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
-            printer.printToCsv("multimap", multimap.size(), constants);
-            printer.printToCsv("encrypted index", encryptedIndex.size(), constants);
-            printer.printToCsv("dummy values", emm.getNumberOfDummyValues(), constants);
+            printer.printToCsv("multimap", numberOfDataSamples, multimap.size(), constants);
+            printer.printToCsv(
+                    "encrypted index", numberOfDataSamples, encryptedIndex.size(), constants);
+            printer.printToCsv(
+                    "dummy values", numberOfDataSamples, emm.getNumberOfDummyValues(), constants);
         }
     }
 
