@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class VolumeHidingParTrapdoor {
+public class DpVolumeHidingParTrapdoor {
 
     @State(Scope.Benchmark)
     public static class Parameters {

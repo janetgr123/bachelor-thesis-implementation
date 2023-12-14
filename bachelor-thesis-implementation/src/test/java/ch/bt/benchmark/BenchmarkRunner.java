@@ -54,6 +54,9 @@ public class BenchmarkRunner {
                 String.join("", "benchmark-logs-", methodLower, String.valueOf(data), ".txt");
         final String results =
                 String.join("", "benchmark-results-", methodLower, String.valueOf(data), ".csv");
+
+        System.out.println(clazz + method);
+
         return new OptionsBuilder()
                 .jvmArgsPrepend("-server")
                 .include(clazz + method + "[0-9]?")

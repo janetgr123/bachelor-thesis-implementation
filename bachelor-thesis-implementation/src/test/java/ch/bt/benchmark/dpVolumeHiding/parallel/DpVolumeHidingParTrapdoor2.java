@@ -1,10 +1,11 @@
-package ch.bt.benchmark.dpVolumeHiding.sequential;
+package ch.bt.benchmark.dpVolumeHiding.parallel;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
 import ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM;
-import ch.bt.genericRs.DPRangeBRCScheme;
+import ch.bt.genericRs.ParallelDPRangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
+import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.CustomRange;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class VolumeHidingTrapdoor {
+public class DpVolumeHidingParTrapdoor2 {
 
     @State(Scope.Benchmark)
     public static class Parameters {
@@ -43,10 +44,12 @@ public class VolumeHidingTrapdoor {
         int size;
 
         Map<Label, Set<Plaintext>> multimap;
-        DPRangeBRCScheme rangeBRCScheme;
+        ParallelDPRangeBRCScheme rangeBRCScheme;
         Vertex root;
         EncryptedIndex encryptedIndex;
         CustomRange range;
+
+        Set<Ciphertext> ciphertexts;
 
         @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
@@ -72,13 +75,17 @@ public class VolumeHidingTrapdoor {
                     new DifferentiallyPrivateVolumeHidingEMM(
                             securityParameter, 0.2, TestUtils.ALPHA);
             rangeBRCScheme =
-                    new DPRangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
+                    new ParallelDPRangeBRCScheme(
+                            securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
+            final var searchToken = rangeBRCScheme.trapdoor(range);
+            ciphertexts = rangeBRCScheme.search(searchToken, encryptedIndex);
         }
     }
 
     @Benchmark
-    public List<SearchToken> trapdoor(@NotNull Parameters parameters) {
-        return parameters.rangeBRCScheme.trapdoor(parameters.range);
+    public List<SearchToken> trapdoor(@NotNull Parameters parameters)
+            throws GeneralSecurityException, IOException {
+        return parameters.rangeBRCScheme.trapdoor(parameters.range, parameters.ciphertexts);
     }
 }

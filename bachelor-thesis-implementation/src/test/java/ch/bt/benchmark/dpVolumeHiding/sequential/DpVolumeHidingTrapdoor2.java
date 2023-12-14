@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class VolumeHidingTrapdoor2 {
+public class DpVolumeHidingTrapdoor2 {
 
     @State(Scope.Benchmark)
     public static class Parameters {

@@ -1,10 +1,10 @@
-package ch.bt.benchmark.dpVolumeHiding.parallel;
+package ch.bt.benchmark.dpVolumeHiding.sequential;
 
 import ch.bt.TestUtils;
 import ch.bt.benchmark.BenchmarkUtils;
 import ch.bt.emm.TwoRoundEMM;
 import ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM;
-import ch.bt.genericRs.ParallelDPRangeBRCScheme;
+import ch.bt.genericRs.DPRangeBRCScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
@@ -37,11 +37,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class VolumeHidingParSearch2 {
+public class DpVolumeHidingSearch2 {
 
     @State(Scope.Benchmark)
     public static class Constants {
-        final String folder = "src/test/resources/benchmark/dpVolumeHiding/parallel/data";
+        final String folder = "src/test/resources/benchmark/dpVolumeHiding/sequential/data";
         final String method = "search2";
     }
 
@@ -104,7 +104,7 @@ public class VolumeHidingParSearch2 {
         int numberOfDataSamples;
 
         Map<Label, Set<Plaintext>> multimap;
-        ParallelDPRangeBRCScheme rangeBRCScheme;
+        DPRangeBRCScheme rangeBRCScheme;
         Vertex root;
         EncryptedIndex encryptedIndex;
         TwoRoundEMM emm;
@@ -131,8 +131,7 @@ public class VolumeHidingParSearch2 {
 
             emm = new DifferentiallyPrivateVolumeHidingEMM(securityParameter, 0.2, TestUtils.ALPHA);
             rangeBRCScheme =
-                    new ParallelDPRangeBRCScheme(
-                            securityParameter, emm, new BestRangeCover(), root);
+                    new DPRangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
             encryptedIndex = rangeBRCScheme.buildIndex(multimap);
         }
     }

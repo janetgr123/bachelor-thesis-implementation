@@ -37,12 +37,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class VolumeHidingSearch2 {
+public class DpVolumeHidingSearch {
 
     @State(Scope.Benchmark)
     public static class Constants {
         final String folder = "src/test/resources/benchmark/dpVolumeHiding/sequential/data";
-        final String method = "search2";
+        final String method = "search";
     }
 
     @State(Scope.Benchmark)
@@ -144,7 +144,7 @@ public class VolumeHidingSearch2 {
         @Param("0")
         int size;
 
-        List<SearchToken> searchToken2;
+        List<SearchToken> searchToken;
         CustomRange range;
 
         @Setup(Level.Trial)
@@ -154,19 +154,15 @@ public class VolumeHidingSearch2 {
                 @NotNull Parameters parameters)
                 throws IOException, SQLException, GeneralSecurityException {
             range = new CustomRange(from, from + size - 1);
-            final var searchToken = parameters.rangeBRCScheme.trapdoor(range);
+            searchToken = parameters.rangeBRCScheme.trapdoor(range);
             final var ciphertexts =
                     parameters.rangeBRCScheme.search(searchToken, parameters.encryptedIndex);
-            searchToken2 = parameters.rangeBRCScheme.trapdoor(range, ciphertexts);
-            final var ciphertexts2 =
-                    parameters.rangeBRCScheme.search2(searchToken2, parameters.encryptedIndex);
-
             printer.printToCsv(
                     range.getMinimum(),
                     range.getMaximum(),
-                    searchToken2.size(),
-                    ciphertexts2.size(),
-                    parameters.emm.getPaddingOfResponses2().stream().reduce(Integer::sum).orElse(0),
+                    searchToken.size(),
+                    ciphertexts.size(),
+                    parameters.emm.getPaddingOfResponses().stream().reduce(Integer::sum).orElse(0),
                     constants);
         }
     }
@@ -174,7 +170,7 @@ public class VolumeHidingSearch2 {
     @Benchmark
     public Set<Ciphertext> search(
             @NotNull Parameters rangeSchemeParameters, @NotNull RangeSchemeState state) {
-        return rangeSchemeParameters.rangeBRCScheme.search2(
-                state.searchToken2, rangeSchemeParameters.encryptedIndex);
+        return rangeSchemeParameters.rangeBRCScheme.search(
+                state.searchToken, rangeSchemeParameters.encryptedIndex);
     }
 }
