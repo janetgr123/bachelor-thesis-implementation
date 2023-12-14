@@ -55,7 +55,7 @@ public class BenchmarkRunner {
         final String results =
                 String.join("", "benchmark-results-", methodLower, String.valueOf(data), ".csv");
 
-        System.out.println(clazz + method);
+        System.out.println("Preparing " + clazz + method);
 
         return new OptionsBuilder()
                 .jvmArgsPrepend("-server")
@@ -129,15 +129,21 @@ public class BenchmarkRunner {
         final var modes = List.of("sequential", "parallel");
 
         for (final var mode : modes) {
+            System.out.println("Running " + mode + " range schemes.");
             for (final var folder : folders) {
+                System.out.println("Folder " + folder);
                 for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i *= 10) {
+                    System.out.println("Number of data samples " + i);
 
+                    System.out.println("Running build index");
                     new Runner(createOptions(folder, "BuildIndex", TimeUnit.MILLISECONDS, i, mode))
                             .run();
 
+                    System.out.println("Running trapdoor");
                     new Runner(createOptions(folder, "Trapdoor", TimeUnit.NANOSECONDS, i, mode))
                             .run();
 
+                    System.out.println("Running search");
                     new Runner(createOptions(folder, "Search", TimeUnit.MILLISECONDS, i, mode))
                             .run();
                 }
