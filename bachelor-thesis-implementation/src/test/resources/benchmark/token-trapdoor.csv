@@ -1,0 +1,79 @@
+baseline,10,2,3,
+baseline,10,2,3,
+baseline,10,2,7,
+type,data size,range size,from,token
+baseline,10,4,6,
+baseline,10,4,3,
+baseline,10,4,4,
+type,data size,range size,from,token
+baseline,10,6,3,
+baseline,10,6,5,
+baseline,10,6,4,
+type,data size,range size,from,token
+baseline,10,8,3,
+baseline,10,8,1,
+baseline,10,8,3,
+type,data size,range size,from,token
+baseline,10,10,1,
+baseline,10,10,1,
+baseline,10,10,1,
+type,data size,range size,from,token
+baseline,100,20,2,
+baseline,100,20,70,
+baseline,100,20,50,
+type,data size,range size,from,token
+baseline,100,40,45,
+baseline,100,40,53,
+baseline,100,40,32,
+type,data size,range size,from,token
+baseline,100,60,45,
+baseline,100,60,6,
+baseline,100,60,12,
+type,data size,range size,from,token
+baseline,100,80,5,
+baseline,100,80,14,
+baseline,100,80,19,
+type,data size,range size,from,token
+baseline,100,100,8,
+baseline,100,100,1,
+baseline,100,100,8,
+type,data size,range size,from,token
+volumeHiding,10,2,6,
+volumeHiding,10,2,7,
+volumeHiding,10,2,2,
+type,data size,range size,from,token
+volumeHiding,10,4,2,
+volumeHiding,10,4,3,
+volumeHiding,10,4,2,
+type,data size,range size,from,token
+volumeHiding,10,6,1,
+volumeHiding,10,6,3,
+volumeHiding,10,6,4,
+type,data size,range size,from,token
+volumeHiding,10,8,1,
+volumeHiding,10,8,3,
+volumeHiding,10,8,3,
+type,data size,range size,from,token
+volumeHiding,10,10,1,
+volumeHiding,10,10,1,
+volumeHiding,10,10,1,
+type,data size,range size,from,token
+volumeHiding,100,20,43,
+volumeHiding,100,20,62,
+volumeHiding,100,20,14,
+type,data size,range size,from,token
+volumeHiding,100,40,6,
+volumeHiding,100,40,30,
+volumeHiding,100,40,7,
+type,data size,range size,from,token
+volumeHiding,100,60,10,
+volumeHiding,100,60,22,
+volumeHiding,100,60,27,
+type,data size,range size,from,token
+volumeHiding,100,80,8,
+volumeHiding,100,80,30,
+volumeHiding,100,80,2,
+type,data size,range size,from,token
+volumeHiding,100,100,9,
+volumeHiding,100,100,4,
+volumeHiding,100,100,8,

@@ -1,6 +1,6 @@
 "Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: numberOfDataSamples","Param: rangeSize","Param: type"
-"ch.bt.benchmark.Trapdoor.trapdoor","avgt",1,2,577.686717,NaN,"ns/op",100,20,volumeHiding
-"ch.bt.benchmark.Trapdoor.trapdoor","avgt",1,2,639.318996,NaN,"ns/op",100,40,volumeHiding
-"ch.bt.benchmark.Trapdoor.trapdoor","avgt",1,2,671.782664,NaN,"ns/op",100,60,volumeHiding
-"ch.bt.benchmark.Trapdoor.trapdoor","avgt",1,2,540.896580,NaN,"ns/op",100,80,volumeHiding
-"ch.bt.benchmark.Trapdoor.trapdoor","avgt",1,2,634.339954,NaN,"ns/op",100,100,volumeHiding
+"ch.bt.benchmark.Trapdoor.trapdoor","avgt",1,2,539.082480,NaN,"ns/op",100,20,volumeHiding
+"ch.bt.benchmark.Trapdoor.trapdoor","avgt",1,2,480.472306,NaN,"ns/op",100,40,volumeHiding
+"ch.bt.benchmark.Trapdoor.trapdoor","avgt",1,2,536.968714,NaN,"ns/op",100,60,volumeHiding
+"ch.bt.benchmark.Trapdoor.trapdoor","avgt",1,2,621.990874,NaN,"ns/op",100,80,volumeHiding
+"ch.bt.benchmark.Trapdoor.trapdoor","avgt",1,2,624.428457,NaN,"ns/op",100,100,volumeHiding
