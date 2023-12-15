@@ -1,0 +1,5 @@
+type,data size,multimap size,encrypted index size,dummy entries in encrypted index
+baseline,10,10,45,0
+baseline,100,100,783,0
+volumeHiding,10,10,118,73
+volumeHiding,100,100,2036,1253

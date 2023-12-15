@@ -1,2 +1,2 @@
-"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: numberOfDataSamples"
-"ch.bt.benchmark.baseline.sequential.BaselineBuildIndex.buildIndex","avgt",1,2,45.679307,NaN,"ms/op",100
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: numberOfDataSamples","Param: type"
+"ch.bt.benchmark.BuildIndex.buildIndex","avgt",1,2,46.303273,NaN,"ms/op",100,baseline

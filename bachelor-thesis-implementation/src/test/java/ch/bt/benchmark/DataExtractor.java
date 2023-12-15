@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class DataExtractor {
     private static final int MAX_NUMBER_OF_DATA_SAMPLES =
-            BenchmarkRunner.MAX_NUMBER_OF_DATA_SAMPLES;
+            BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES;
     private static final String PATH = "src/test/resources/benchmark";
 
     private static final List<String> FOLDERS =
