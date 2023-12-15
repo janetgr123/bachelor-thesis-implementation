@@ -34,7 +34,7 @@ public class BenchmarkRunner {
 
     public static final int THREADS = 1;
 
-    private static final int MAX_NUMBER_OF_DATA_SAMPLES = 100;
+    public static final int MAX_NUMBER_OF_DATA_SAMPLES = 100;
     private static final String FOLDER = "src/test/resources/benchmark";
     private static final Map<Integer, List<CustomRange>> ranges = new HashMap<>();
 

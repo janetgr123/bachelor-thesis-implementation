@@ -16,19 +16,21 @@ public class ResultPrinter {
     CSVFormat csvFormat;
     CSVPrinter printer;
 
-    public ResultPrinter(final String method, final String folder) throws IOException {
-        final String file = String.join(".", String.join("-", "data", method), "csv");
+    public ResultPrinter(final String method, final String folder, final String mode, final String name) throws IOException {
+        final String file = String.join(".", String.join("-", "data", method, name), "csv");
         fileWriter =
                 Files.newBufferedWriter(
-                        Paths.get(String.join("/", folder, file)),
+                        Paths.get(
+                                String.join(
+                                        "/", "src/test/resources/benchmark", folder, mode, file)),
                         StandardOpenOption.APPEND,
                         StandardOpenOption.CREATE);
         csvFormat = CSVFormat.DEFAULT.builder().build();
         printer = new CSVPrinter(fileWriter, csvFormat);
     }
 
-    public void printToCsv(final int dataSize, final Double queryTime)
+    public void printToCsv(final String col1, final String col2)
             throws IOException, SQLException, GeneralSecurityException {
-        printer.printRecord(dataSize, queryTime);
+        printer.printRecord(col1, col2);
     }
 }
