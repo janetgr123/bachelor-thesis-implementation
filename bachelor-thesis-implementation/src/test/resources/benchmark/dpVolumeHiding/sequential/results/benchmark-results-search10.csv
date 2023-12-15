@@ -1,0 +1,19 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: from","Param: numberOfDataSamples","Param: size"
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch.search","avgt",1,2,4.927168,NaN,"ms/op",11,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch.search","avgt",1,2,4.922162,NaN,"ms/op",11,10,2
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch.search","avgt",1,2,4.852610,NaN,"ms/op",11,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch.search","avgt",1,2,4.896098,NaN,"ms/op",10,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch.search","avgt",1,2,4.969267,NaN,"ms/op",10,10,2
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch.search","avgt",1,2,4.908391,NaN,"ms/op",10,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch.search","avgt",1,2,4.839457,NaN,"ms/op",10,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch.search","avgt",1,2,4.783278,NaN,"ms/op",10,10,2
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch.search","avgt",1,2,4.839879,NaN,"ms/op",10,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch2.search","avgt",1,2,3982.057631,NaN,"ms/op",11,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch2.search","avgt",1,2,3977.051069,NaN,"ms/op",11,10,2
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch2.search","avgt",1,2,3928.960363,NaN,"ms/op",11,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch2.search","avgt",1,2,3890.205215,NaN,"ms/op",10,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch2.search","avgt",1,2,3946.335001,NaN,"ms/op",10,10,2
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch2.search","avgt",1,2,4021.717370,NaN,"ms/op",10,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch2.search","avgt",1,2,3914.435500,NaN,"ms/op",10,10,1
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch2.search","avgt",1,2,4007.178677,NaN,"ms/op",10,10,2
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingSearch2.search","avgt",1,2,4012.890428,NaN,"ms/op",10,10,1

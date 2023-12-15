@@ -1,0 +1,3 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: numberOfDataSamples"
+"ch.bt.benchmark.dpVolumeHiding.sequential.DpVolumeHidingBuildIndex.buildIndex","avgt",1,2,760.090597,NaN,"ms/op",100
+"ch.bt.benchmark.volumeHiding.sequential.VolumeHidingBuildIndex.buildIndex","avgt",1,2,567.200342,NaN,"ms/op",100

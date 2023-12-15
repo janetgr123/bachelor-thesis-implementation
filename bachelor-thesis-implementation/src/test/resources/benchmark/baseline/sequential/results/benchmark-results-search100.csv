@@ -1,0 +1,10 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: from","Param: numberOfDataSamples","Param: size"
+"ch.bt.benchmark.baseline.sequential.BaselineSearch.search","avgt",1,2,3.043706,NaN,"ms/op",23,100,47
+"ch.bt.benchmark.baseline.sequential.BaselineSearch.search","avgt",1,2,3.646966,NaN,"ms/op",23,100,53
+"ch.bt.benchmark.baseline.sequential.BaselineSearch.search","avgt",1,2,0.131883,NaN,"ms/op",23,100,1
+"ch.bt.benchmark.baseline.sequential.BaselineSearch.search","avgt",1,2,3.108906,NaN,"ms/op",59,100,47
+"ch.bt.benchmark.baseline.sequential.BaselineSearch.search","avgt",1,2,3.435276,NaN,"ms/op",59,100,53
+"ch.bt.benchmark.baseline.sequential.BaselineSearch.search","avgt",1,2,0.134160,NaN,"ms/op",59,100,1
+"ch.bt.benchmark.baseline.sequential.BaselineSearch.search","avgt",1,2,0.132821,NaN,"ms/op",111,100,47
+"ch.bt.benchmark.baseline.sequential.BaselineSearch.search","avgt",1,2,0.125783,NaN,"ms/op",111,100,53
+"ch.bt.benchmark.baseline.sequential.BaselineSearch.search","avgt",1,2,0.129903,NaN,"ms/op",111,100,1

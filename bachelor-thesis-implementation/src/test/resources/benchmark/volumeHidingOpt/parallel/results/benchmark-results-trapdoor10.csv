@@ -1,0 +1,10 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: from","Param: numberOfDataSamples","Param: size"
+"ch.bt.benchmark.volumeHidingOpt.parallel.VolumeHidingOptParTrapdoor.trapdoor","avgt",1,2,8364.452011,NaN,"ns/op",11,10,1
+"ch.bt.benchmark.volumeHidingOpt.parallel.VolumeHidingOptParTrapdoor.trapdoor","avgt",1,2,8288.179071,NaN,"ns/op",11,10,2
+"ch.bt.benchmark.volumeHidingOpt.parallel.VolumeHidingOptParTrapdoor.trapdoor","avgt",1,2,8158.280869,NaN,"ns/op",11,10,1
+"ch.bt.benchmark.volumeHidingOpt.parallel.VolumeHidingOptParTrapdoor.trapdoor","avgt",1,2,8193.096630,NaN,"ns/op",10,10,1
+"ch.bt.benchmark.volumeHidingOpt.parallel.VolumeHidingOptParTrapdoor.trapdoor","avgt",1,2,8280.778710,NaN,"ns/op",10,10,2
+"ch.bt.benchmark.volumeHidingOpt.parallel.VolumeHidingOptParTrapdoor.trapdoor","avgt",1,2,8313.950043,NaN,"ns/op",10,10,1
+"ch.bt.benchmark.volumeHidingOpt.parallel.VolumeHidingOptParTrapdoor.trapdoor","avgt",1,2,8235.019359,NaN,"ns/op",10,10,1
+"ch.bt.benchmark.volumeHidingOpt.parallel.VolumeHidingOptParTrapdoor.trapdoor","avgt",1,2,8168.328164,NaN,"ns/op",10,10,2
+"ch.bt.benchmark.volumeHidingOpt.parallel.VolumeHidingOptParTrapdoor.trapdoor","avgt",1,2,8299.891102,NaN,"ns/op",10,10,1

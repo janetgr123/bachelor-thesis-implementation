@@ -1,0 +1,10 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: from","Param: numberOfDataSamples","Param: size"
+"ch.bt.benchmark.baseline.sequential.BaselineTrapdoor.trapdoor","avgt",1,2,612.970681,NaN,"ns/op",23,100,47
+"ch.bt.benchmark.baseline.sequential.BaselineTrapdoor.trapdoor","avgt",1,2,614.741634,NaN,"ns/op",23,100,53
+"ch.bt.benchmark.baseline.sequential.BaselineTrapdoor.trapdoor","avgt",1,2,628.085309,NaN,"ns/op",23,100,1
+"ch.bt.benchmark.baseline.sequential.BaselineTrapdoor.trapdoor","avgt",1,2,501.088285,NaN,"ns/op",59,100,47
+"ch.bt.benchmark.baseline.sequential.BaselineTrapdoor.trapdoor","avgt",1,2,521.475915,NaN,"ns/op",59,100,53
+"ch.bt.benchmark.baseline.sequential.BaselineTrapdoor.trapdoor","avgt",1,2,496.884211,NaN,"ns/op",59,100,1
+"ch.bt.benchmark.baseline.sequential.BaselineTrapdoor.trapdoor","avgt",1,2,493.119724,NaN,"ns/op",111,100,47
+"ch.bt.benchmark.baseline.sequential.BaselineTrapdoor.trapdoor","avgt",1,2,624.741712,NaN,"ns/op",111,100,53
+"ch.bt.benchmark.baseline.sequential.BaselineTrapdoor.trapdoor","avgt",1,2,511.072655,NaN,"ns/op",111,100,1
