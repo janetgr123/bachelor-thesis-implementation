@@ -244,7 +244,7 @@ public class BuildIndex {
             String username = postgreSQLContainer.getUsername();
             String password = postgreSQLContainer.getPassword();
             Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
-            BenchmarkUtils.addData(connection);
+            DatabaseUtils.addData(connection);
 
             multimap = TestUtils.getDataFromDB(connection, numberOfDataSamples);
             root = RangeCoverUtils.getRoot(multimap);

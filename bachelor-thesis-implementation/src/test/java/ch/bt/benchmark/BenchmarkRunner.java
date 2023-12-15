@@ -13,7 +13,7 @@ public class BenchmarkRunner {
 
     private static final boolean RUN_BUILD_INDEX_BENCHMARKS = false;
     private static final boolean RUN_TRAPDOOR_BENCHMARKS = true;
-    private static final boolean RUN_SEARCH_BENCHMARKS = true;
+    private static final boolean RUN_SEARCH_BENCHMARKS = false;
 
     /*
     Running a Runner starts a parametrized benchmark run.
@@ -45,7 +45,7 @@ public class BenchmarkRunner {
 
                     System.out.println();
                     System.out.println("Running build index for " + folder + " " + mode);
-                    new Runner(BenchmarkUtils.createOptionsForBuildIndex(folder, mode)).run();
+                    new Runner(RunnerUtils.createOptionsForBuildIndex(folder, mode)).run();
                 }
             }
         } else {
@@ -75,7 +75,7 @@ public class BenchmarkRunner {
                                                 "Run trapdoor for data size " + dataSize);
                                         try {
                                             new Runner(
-                                                            BenchmarkUtils.createOptionsForTrapdoor(
+                                                            RunnerUtils.createOptionsForTrapdoor(
                                                                     folder, mode, dataSize))
                                                     .run();
                                         } catch (RunnerException e) {
@@ -91,7 +91,7 @@ public class BenchmarkRunner {
             System.out.println();
         }
 
-         /*
+        /*
         TRAPDOOR
          */
         if (RUN_SEARCH_BENCHMARKS) {
@@ -108,12 +108,11 @@ public class BenchmarkRunner {
                             .forEach(
                                     dataSize -> {
                                         System.out.println();
-                                        System.out.println(
-                                                "Run search for data size " + dataSize);
+                                        System.out.println("Run search for data size " + dataSize);
                                         try {
                                             new Runner(
-                                                    BenchmarkUtils.createOptionsForSearch(
-                                                            folder, mode, dataSize))
+                                                            RunnerUtils.createOptionsForSearch(
+                                                                    folder, mode, dataSize))
                                                     .run();
                                         } catch (RunnerException e) {
                                             throw new RuntimeException(e);

@@ -44,6 +44,7 @@ public class Trapdoor {
                 final String type,
                 final int dataSize,
                 final int rangeSize,
+                final int from,
                 final List<String> token,
                 @NotNull Trapdoor.Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
@@ -54,28 +55,22 @@ public class Trapdoor {
                     type,
                     dataSize,
                     rangeSize,
+                    from,
                     token.stream().reduce((el1, el2) -> String.join(",", el1, el2)).orElse(""));
         }
 
         @Setup(Level.Trial)
-        public void init(@NotNull Trapdoor.Constants constants)
+        public void init(@NotNull Constants constants)
                 throws GeneralSecurityException, IOException, SQLException {
             final String file =
-                    String.join(".", String.join("-", "encryptedIndex", constants.method), "csv");
+                    String.join(".", String.join("-", "token", constants.method), "csv");
             final var path = Paths.get(String.join("/", constants.folder, file));
             final var newFile = path.toFile();
             if (newFile.exists()) {
                 csvFormat =
                         CSVFormat.DEFAULT
                                 .builder()
-                                .setHeader(
-                                        "type",
-                                        "table number",
-                                        "data size",
-                                        "label data",
-                                        "label iv",
-                                        "value1 data",
-                                        "value1 iv")
+                                .setHeader("type", "data size", "range size", "from", "token")
                                 .build();
             } else {
                 csvFormat = CSVFormat.DEFAULT.builder().build();
@@ -166,11 +161,17 @@ public class Trapdoor {
                                 .map(
                                         el ->
                                                 el.stream()
-                                                        .map(String::valueOf)
+                                                        .map(
+                                                                i ->
+                                                                        "("
+                                                                                + i.getToken(1)
+                                                                                + ","
+                                                                                + i.getToken(2)
+                                                                                + ")")
                                                         .reduce(
                                                                 (el1, el2) ->
                                                                         String.join(",", el1, el2)))
-                                .map(s -> "<" + s + ">")
+                                .map(s -> "|" + s)
                                 .toList();
                         default -> token.stream()
                                 .map(SearchTokenBytes.class::cast)
@@ -182,6 +183,7 @@ public class Trapdoor {
                     parameters.type,
                     parameters.numberOfDataSamples,
                     parameters.rangeSize,
+                    range.getMinimum(),
                     stringToken,
                     constants);
         }

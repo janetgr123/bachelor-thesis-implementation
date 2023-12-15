@@ -18,6 +18,7 @@ import java.security.GeneralSecurityException;
 import java.security.Security;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Search {
@@ -41,7 +42,7 @@ public class Search {
         @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
             System.out.println();
-            System.out.println("INITIALIZE BENCHMARK: EXTRACT ENCRYPTED INDEX AND SEARCH TOKENS");
+            System.out.println("INITIALIZE BENCHMARK: EXTRACT ENCRYPTED INDEX");
             System.out.println("------------------------------------------------------");
 
             Security.addProvider(new BouncyCastleFipsProvider());
@@ -61,24 +62,16 @@ public class Search {
     @State(Scope.Benchmark)
     public static class SampleFrom {
 
+        Map<Integer, List<SearchToken>> fromToToken;
         CustomRange range;
 
         @Setup(Level.Iteration)
-        public void init(@NotNull Parameters parameters) {
-            final int from =
-                    (int)
-                                    (Math.random()
-                                            * (parameters.root.range().getMaximum()
-                                                    - parameters.rangeSize))
-                            + parameters.root.range().getMinimum();
-            range = new CustomRange(from, from + parameters.rangeSize - 1);
+        public void init(@NotNull Parameters parameters) throws IOException {
             System.out.println();
-            System.out.println(
-                    "Running trapdoor for range ["
-                            + from
-                            + ", "
-                            + (from + parameters.rangeSize - 1)
-                            + "].");
+            System.out.println("EXTRACTING SEARCH TOKEN");
+            fromToToken =
+                    BenchmarkUtils.extractToken(
+                            parameters.numberOfDataSamples, parameters.type, parameters.rangeSize);
         }
     }
 
