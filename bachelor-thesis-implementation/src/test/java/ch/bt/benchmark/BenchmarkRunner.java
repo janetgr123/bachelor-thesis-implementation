@@ -25,9 +25,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class BenchmarkRunner {
-    public static int NUMBER_OF_SAMPLES = 3;
-    public static final int ITERATIONS = 2;
-
+    public static int NUMBER_OF_RANGE_SIZES = 3; // different range sizes
+    public static final int ITERATIONS = 2; // number of queries for fixed data size and range size
     public static final int WARM_UPS = 1;
 
     public static final int FORKS = 1;
@@ -104,7 +103,7 @@ public class BenchmarkRunner {
         for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i *= 10) {
             root = RangeCoverUtils.getRoot(TestUtils.getDataFromDB(connection, i));
             final var rangesForData = new LinkedList<CustomRange>();
-            for (int j = 0; j < NUMBER_OF_SAMPLES; j++) {
+            for (int j = 0; j < NUMBER_OF_RANGE_SIZES; j++) {
                 rangesForData.add(generateRange(root));
             }
             ranges.put(i, rangesForData);
@@ -115,8 +114,8 @@ public class BenchmarkRunner {
         final var rootRange = root.range();
         final int max = rootRange.getMaximum();
         int size = (int) (Math.random() * rootRange.size()) + 1;
-        int from = (int) (Math.random() * max) + rootRange.getMinimum();
-        return new CustomRange(from, Math.min(from + size - 1, max));
+        int from = (int) (Math.random() * (max - size)) + rootRange.getMinimum();
+        return new CustomRange(from, from + size - 1);
     }
 
     public static void main(String[] args) throws RunnerException, SQLException {
