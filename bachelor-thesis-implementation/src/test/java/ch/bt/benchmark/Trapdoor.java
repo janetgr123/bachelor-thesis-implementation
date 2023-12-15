@@ -45,7 +45,7 @@ public class Trapdoor {
                 final int dataSize,
                 final int rangeSize,
                 final List<String> token,
-                @NotNull Constants constants)
+                @NotNull Trapdoor.Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
             if (printer == null) {
                 init(constants);
@@ -58,7 +58,7 @@ public class Trapdoor {
         }
 
         @Setup(Level.Trial)
-        public void init(@NotNull Constants constants)
+        public void init(@NotNull Trapdoor.Constants constants)
                 throws GeneralSecurityException, IOException, SQLException {
             final String file =
                     String.join(".", String.join("-", "encryptedIndex", constants.method), "csv");
@@ -153,8 +153,9 @@ public class Trapdoor {
         @TearDown(Level.Iteration)
         public void tearDown(
                 @NotNull TokenPrinter printer,
-                @NotNull Constants constants,
-                @NotNull Parameters parameters) {
+                @NotNull Trapdoor.Constants constants,
+                @NotNull Parameters parameters)
+                throws SQLException, GeneralSecurityException, IOException {
             System.out.println();
             System.out.println("End of iteration...");
             final var stringToken =
