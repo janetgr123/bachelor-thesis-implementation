@@ -28,4 +28,6 @@ public interface EMM {
 
     int getNumberOfDummyValues();
     List<Integer> getPaddingOfResponses();
+    SecretKey getPrfKey();
+    SecretKey getAesKey();
 }

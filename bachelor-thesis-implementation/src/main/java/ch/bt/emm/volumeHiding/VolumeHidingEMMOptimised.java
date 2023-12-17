@@ -13,12 +13,24 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
+import javax.crypto.SecretKey;
+
 /** SSE scheme from Patel et al. (2019) With improved communication using delegatable PRFs */
 public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
 
     public VolumeHidingEMMOptimised(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
         super(securityParameter, alpha);
+    }
+
+    // for benchmarking only
+    public VolumeHidingEMMOptimised(
+            final double alpha,
+            final int maxNumberOfValuesPerLabel,
+            final int numberOfValues,
+            final SecretKey prfKey,
+            final SecretKey seSchemeKey) {
+        super(alpha, maxNumberOfValuesPerLabel, numberOfValues, prfKey, seSchemeKey);
     }
 
     @Override

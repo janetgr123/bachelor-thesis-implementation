@@ -11,10 +11,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 public class RunnerUtils {
+
     public static Options createOptionsForSearch(
             final String folder, final String mode, final int dataSize) {
+        final var potenitalStep = dataSize / 20;
+        final var step = potenitalStep == 0 ? 1 : potenitalStep;
         final var ranges =
-                IntStream.iterate(dataSize / 5, i -> i <= dataSize, i -> i + dataSize / 5)
+                IntStream.iterate(step, i -> i <= dataSize, i -> i + step)
                         .mapToObj(String::valueOf)
                         .toArray(String[]::new);
         String clazz = String.valueOf(folder.charAt(0)).toUpperCase() + folder.substring(1);
@@ -39,18 +42,18 @@ public class RunnerUtils {
                 .measurementIterations(BenchmarkSettings.NUMBER_OF_QUERIES)
                 .forks(BenchmarkSettings.FORKS)
                 .resultFormat(ResultFormatType.CSV)
-                .result(
-                        String.join(
-                                "/", BenchmarkSettings.FOLDER, folder, mode, "results", results))
+                .result(String.join("/", BenchmarkSettings.FOLDER, results))
                 .verbosity(VerboseMode.EXTRA)
-                .output(String.join("/", BenchmarkSettings.FOLDER, folder, mode, "logs", logs))
+                .output(String.join("/", BenchmarkSettings.FOLDER, logs))
                 .build();
     }
 
     public static Options createOptionsForTrapdoor(
             final String folder, final String mode, final int dataSize) {
+        final var potenitalStep = dataSize / 20;
+        final var step = potenitalStep == 0 ? 1 : potenitalStep;
         final var ranges =
-                IntStream.iterate(dataSize / 5, i -> i <= dataSize, i -> i + dataSize / 5)
+                IntStream.iterate(step, i -> i <= dataSize, i -> i + step)
                         .mapToObj(String::valueOf)
                         .toArray(String[]::new);
         String clazz = String.valueOf(folder.charAt(0)).toUpperCase() + folder.substring(1);
@@ -69,17 +72,15 @@ public class RunnerUtils {
                 .param("rangeSize", ranges)
                 .param("type", folder)
                 .mode(Mode.AverageTime)
-                .timeUnit(TimeUnit.NANOSECONDS)
+                .timeUnit(TimeUnit.MILLISECONDS)
                 .warmupMode(WarmupMode.INDI)
                 .warmupIterations(BenchmarkSettings.WARM_UPS)
                 .measurementIterations(BenchmarkSettings.NUMBER_OF_QUERIES)
                 .forks(BenchmarkSettings.FORKS)
                 .resultFormat(ResultFormatType.CSV)
-                .result(
-                        String.join(
-                                "/", BenchmarkSettings.FOLDER, folder, mode, "results", results))
+                .result(String.join("/", BenchmarkSettings.FOLDER, results))
                 .verbosity(VerboseMode.EXTRA)
-                .output(String.join("/", BenchmarkSettings.FOLDER, folder, mode, "logs", logs))
+                .output(String.join("/", BenchmarkSettings.FOLDER, logs))
                 .build();
     }
 
@@ -112,11 +113,9 @@ public class RunnerUtils {
                 .measurementIterations(BenchmarkSettings.NUMBER_OF_ITERATIONS_BUILD_INDEX)
                 .forks(BenchmarkSettings.FORKS)
                 .resultFormat(ResultFormatType.CSV)
-                .result(
-                        String.join(
-                                "/", BenchmarkSettings.FOLDER, folder, mode, "results", results))
+                .result(String.join("/", BenchmarkSettings.FOLDER, results))
                 .verbosity(VerboseMode.EXTRA)
-                .output(String.join("/", BenchmarkSettings.FOLDER, folder, mode, "logs", logs))
+                .output(String.join("/", BenchmarkSettings.FOLDER, logs))
                 .build();
     }
 }

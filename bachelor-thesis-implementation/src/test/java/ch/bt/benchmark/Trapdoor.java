@@ -1,6 +1,10 @@
 package ch.bt.benchmark;
 
+import ch.bt.TestUtils;
+import ch.bt.emm.EMM;
 import ch.bt.emm.basic.BasicEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMM;
+import ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised;
 import ch.bt.genericRs.RangeBRCScheme;
 import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
@@ -51,12 +55,9 @@ public class Trapdoor {
             if (printer == null) {
                 init(constants);
             }
-            printer.printRecord(
-                    type,
-                    dataSize,
-                    rangeSize,
-                    from,
-                    token.stream().reduce((el1, el2) -> String.join(",", el1, el2)).orElse(""));
+            final var tokenString =
+                    token.stream().reduce((el1, el2) -> String.join(",", el1, el2)).orElse("");
+            printer.printRecord(type, dataSize, rangeSize, from, tokenString);
         }
 
         @Setup(Level.Trial)
@@ -92,27 +93,60 @@ public class Trapdoor {
         @Param("0")
         int numberOfDataSamples;
 
-        @Param("0")
-        int rangeSize;
+        Vertex root;
+        RangeBRCScheme rangeBRCScheme;
+        EMM emm;
 
         @Param("baseline")
         String type;
 
-        RangeBRCScheme rangeBRCScheme;
-        Vertex root;
+        int securityParameter;
 
         @Setup(Level.Trial)
         public void init() throws GeneralSecurityException, IOException, SQLException {
             System.out.println();
-            System.out.println("INITIALIZE BENCHMARK: EXTRACT ROOT");
+            System.out.println("INITIALIZE BENCHMARK: EXTRACT ROOT, MULTIMAP AND SCHEME PARAMS");
             System.out.println("------------------------------------------------------");
 
             Security.addProvider(new BouncyCastleFipsProvider());
 
+            securityParameter = 256;
+
             root = BenchmarkUtils.readRoot(numberOfDataSamples, type);
 
-            final int securityParameter = 256;
-            final var emm = new BasicEMM(securityParameter);
+            final var paramsOfMultimap = BenchmarkUtils.readSizes(numberOfDataSamples, type);
+            final var keys = BenchmarkUtils.getKeys(numberOfDataSamples, type);
+            final var numberOfValues = paramsOfMultimap.get(1);
+            final var maxNumberOfValues = paramsOfMultimap.get(0);
+            final var prfKey = keys.get(0);
+            final var aesKey = keys.get(1);
+
+            System.out.println(
+                    "params: "
+                            + numberOfValues
+                            + ", "
+                            + maxNumberOfValues
+                            + ", "
+                            + Arrays.toString(prfKey.getEncoded())
+                            + ", "
+                            + Arrays.toString(aesKey.getEncoded()));
+
+            emm =
+                    switch (type) {
+                        case "volumeHiding" -> new VolumeHidingEMM(
+                                TestUtils.ALPHA, maxNumberOfValues, numberOfValues, prfKey, aesKey);
+                        case "volumeHidingOpt" -> new VolumeHidingEMMOptimised(
+                                TestUtils.ALPHA, maxNumberOfValues, numberOfValues, prfKey, aesKey);
+                        default -> new BasicEMM(prfKey, aesKey);
+                    };
+
+            System.out.println();
+            System.out.println(
+                    "Trial with Dataset Size "
+                            + numberOfDataSamples
+                            + " and Range Scheme Type "
+                            + emm.getClass());
+
             rangeBRCScheme = new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
 
             System.out.println();
@@ -122,37 +156,40 @@ public class Trapdoor {
 
     @State(Scope.Benchmark)
     public static class SampleFrom {
-
         CustomRange range;
-
         List<SearchToken> token;
 
+        @Param("0")
+        int rangeSize;
+
         @Setup(Level.Iteration)
-        public void init(@NotNull Parameters parameters) {
+        public void init(@NotNull Parameters parameters)
+                throws GeneralSecurityException, IOException {
+
             final int from =
-                    (int)
-                                    (Math.random()
-                                            * (parameters.root.range().getMaximum()
-                                                    - parameters.rangeSize))
+                    (int) (Math.random() * (parameters.root.range().getMaximum() - rangeSize))
                             + parameters.root.range().getMinimum();
-            range = new CustomRange(from, from + parameters.rangeSize - 1);
+            range = new CustomRange(from, from + rangeSize - 1);
+
             System.out.println();
             System.out.println(
                     "Running trapdoor for range ["
-                            + from
+                            + range.getMinimum()
                             + ", "
-                            + (from + parameters.rangeSize - 1)
+                            + range.getMaximum()
                             + "].");
         }
 
         @TearDown(Level.Iteration)
         public void tearDown(
                 @NotNull TokenPrinter printer,
-                @NotNull Trapdoor.Constants constants,
+                @NotNull Constants constants,
                 @NotNull Parameters parameters)
                 throws SQLException, GeneralSecurityException, IOException {
             System.out.println();
             System.out.println("End of iteration...");
+            System.out.println("Token before saving: " + token.toString());
+
             final var stringToken =
                     switch (parameters.type) {
                         case "volumeHiding" -> token.stream()
@@ -171,7 +208,7 @@ public class Trapdoor {
                                                         .reduce(
                                                                 (el1, el2) ->
                                                                         String.join(",", el1, el2)))
-                                .map(s -> "|" + s)
+                                .map(pair -> pair.orElse(null))
                                 .toList();
                         default -> token.stream()
                                 .map(SearchTokenBytes.class::cast)
@@ -179,10 +216,12 @@ public class Trapdoor {
                                 .map(Arrays::toString)
                                 .toList();
                     };
+
+            System.out.println("String token: " + stringToken);
             printer.printToCsv(
                     parameters.type,
                     parameters.numberOfDataSamples,
-                    parameters.rangeSize,
+                    rangeSize,
                     range.getMinimum(),
                     stringToken,
                     constants);

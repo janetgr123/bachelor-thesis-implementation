@@ -25,18 +25,35 @@ public class VolumeHidingEMM implements EMM {
     private final double alpha;
 
     private final SecretKey prfKey;
+    private final SecretKey aesKey;
 
     private int maxNumberOfValuesPerLabel = 0;
 
     private int numberOfDummyValues;
-    private List<Integer> paddingOfResponses = new LinkedList<>();
+    private final List<Integer> paddingOfResponses = new LinkedList<>();
 
     public VolumeHidingEMM(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
         final var keys = this.setup(securityParameter);
         this.prfKey = keys.get(0);
-        this.seScheme = new AESSEScheme(keys.get(1));
+        this.aesKey = keys.get(1);
+        this.seScheme = new AESSEScheme(aesKey);
         this.alpha = alpha;
+    }
+
+    // for benchmarking only
+    public VolumeHidingEMM(
+            final double alpha,
+            final int maxNumberOfValuesPerLabel,
+            final int numberOfValues,
+            final SecretKey prfKey,
+            final SecretKey seSchemeKey) {
+        this.prfKey = prfKey;
+        this.aesKey = seSchemeKey;
+        this.seScheme = new AESSEScheme(seSchemeKey);
+        this.alpha = alpha;
+        this.maxNumberOfValuesPerLabel = maxNumberOfValuesPerLabel;
+        this.tableSize = (int) Math.round((1 + alpha) * numberOfValues);
     }
 
     private void setMaxNumberOfValuesPerLabel(final Map<Label, Set<Plaintext>> multiMap) {
@@ -133,6 +150,11 @@ public class VolumeHidingEMM implements EMM {
 
     public SecretKey getPrfKey() {
         return prfKey;
+    }
+
+    @Override
+    public SecretKey getAesKey() {
+        return aesKey;
     }
 
     public int getMaxNumberOfValuesPerLabel() {

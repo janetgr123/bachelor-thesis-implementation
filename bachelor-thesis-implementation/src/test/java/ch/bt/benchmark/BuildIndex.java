@@ -56,12 +56,16 @@ public class BuildIndex {
                 final int col3,
                 final int col4,
                 final int col5,
+                final int col6,
+                final int col7,
+                final String key1,
+                final String key2,
                 @NotNull Constants constants)
                 throws IOException, SQLException, GeneralSecurityException {
             if (printer == null) {
                 init(constants);
             }
-            printer.printRecord(col1, col2, col3, col4, col5);
+            printer.printRecord(col1, col2, col3, col4, col5, col6, col7, key1, key2);
         }
 
         @Setup(Level.Trial)
@@ -82,7 +86,11 @@ public class BuildIndex {
                                         "data size",
                                         "multimap size",
                                         "encrypted index size",
-                                        "dummy entries in encrypted index")
+                                        "dummy entries in encrypted index",
+                                        "max number of values per label multimap",
+                                        "number of values multimap",
+                                        "prf key",
+                                        "aes key")
                                 .build();
             }
             fileWriter =
@@ -316,12 +324,32 @@ public class BuildIndex {
             System.out.println("End of Iteration...");
 
             if (!multimap.printed.containsKey(type) || !multimap.printed.get(type)) {
+                final var maxNumberOfValuesPerLabel =
+                        switch (type) {
+                            case "volumeHiding" -> ((VolumeHidingEMM) emm)
+                                    .getMaxNumberOfValuesPerLabel();
+                            case "volumeHidingOpt" -> ((VolumeHidingEMMOptimised) emm)
+                                    .getMaxNumberOfValuesPerLabel();
+                            default -> 0;
+                        };
+                final var numberOfValues =
+                        switch (type) {
+                            case "volumeHiding" -> ((VolumeHidingEMM) emm).getTableSize();
+                            case "volumeHidingOpt" -> ((VolumeHidingEMMOptimised) emm)
+                                    .getTableSize();
+                            default -> 0;
+                        };
+
                 printer.printToCsv(
                         type,
                         multimap.numberOfDataSamples,
                         multimap.multimap.size(),
                         encryptedIndex.size(),
                         emm.getNumberOfDummyValues(),
+                        maxNumberOfValuesPerLabel,
+                        numberOfValues,
+                        Arrays.toString(emm.getPrfKey().getEncoded()),
+                        Arrays.toString(emm.getAesKey().getEncoded()),
                         constants);
                 multimap.printed.put(type, true);
 

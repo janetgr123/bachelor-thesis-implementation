@@ -2,11 +2,14 @@ package ch.bt.crypto;
 
 import ch.bt.model.multimap.Label;
 import ch.bt.model.rc.CustomRange;
+
 import org.apache.commons.compress.utils.BitInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.nio.ByteOrder;
+import java.util.Arrays;
+import java.util.function.Predicate;
 
 public class CastingHelpers {
 
@@ -23,7 +26,20 @@ public class CastingHelpers {
     }
 
     public static byte[] fromStringToByteArray(final String s) {
-        return s.getBytes();
+        final var n = s.length();
+        final var bytes =
+                Arrays.stream(s.substring(1, n - 1).split(","))
+                        .map(el -> el.replaceAll(" ", ""))
+                        .filter(Predicate.not(String::isEmpty))
+                        .map(Byte::parseByte)
+                        .toArray(Byte[]::new);
+        final var result = new byte[bytes.length];
+        int i = 0;
+        for (final var b : bytes) {
+            result[i] = b;
+            i++;
+        }
+        return result;
     }
 
     public static BitInputStream fromByteArrayToBitInputStream(final byte[] array) {
