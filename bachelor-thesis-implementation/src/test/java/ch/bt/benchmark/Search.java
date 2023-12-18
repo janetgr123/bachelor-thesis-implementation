@@ -185,6 +185,7 @@ public class Search {
             range = new CustomRange(from, from + rangeSize - 1);
             System.out.println(
                     "Token for range [" + range.getMinimum() + ", " + range.getMaximum() + "].");
+            System.out.println("TOKEN: " + token.toString());
         }
 
         @TearDown(Level.Iteration)

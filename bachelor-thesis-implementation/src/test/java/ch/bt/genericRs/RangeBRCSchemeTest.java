@@ -37,7 +37,7 @@ public class RangeBRCSchemeTest {
 
     private static Vertex root;
 
-    private static final CustomRange range = new CustomRange(2,2);
+    private static final CustomRange range = new CustomRange(2,11);
 
     @BeforeAll
     public static void init() {

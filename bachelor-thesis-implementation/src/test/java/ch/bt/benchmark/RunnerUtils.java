@@ -17,7 +17,7 @@ public class RunnerUtils {
         final var potenitalStep = dataSize / 20;
         final var step = potenitalStep == 0 ? 1 : potenitalStep;
         final var ranges =
-                IntStream.iterate(step, i -> i <= dataSize, i -> i + step)
+                IntStream.iterate(step, i -> i <= 2 * step, i -> i + step)
                         .mapToObj(String::valueOf)
                         .toArray(String[]::new);
         String clazz = String.valueOf(folder.charAt(0)).toUpperCase() + folder.substring(1);
@@ -53,7 +53,7 @@ public class RunnerUtils {
         final var potenitalStep = dataSize / 20;
         final var step = potenitalStep == 0 ? 1 : potenitalStep;
         final var ranges =
-                IntStream.iterate(step, i -> i <= dataSize, i -> i + step)
+                IntStream.iterate(step, i -> i <= 2 * step, i -> i + step)
                         .mapToObj(String::valueOf)
                         .toArray(String[]::new);
         String clazz = String.valueOf(folder.charAt(0)).toUpperCase() + folder.substring(1);

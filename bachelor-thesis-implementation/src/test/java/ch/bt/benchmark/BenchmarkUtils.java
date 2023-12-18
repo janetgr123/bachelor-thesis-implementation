@@ -36,8 +36,7 @@ public class BenchmarkUtils {
         }
     }
 
-    private static List<CSVRecord> readMultimapParams(final String type)
-            throws IOException {
+    private static List<CSVRecord> readMultimapParams(final String type) throws IOException {
         if (type.equals("baseline")) {
             return List.of();
         }
@@ -178,7 +177,7 @@ public class BenchmarkUtils {
                                     (SearchToken) new SearchTokenListInts(extractList(tokenList)));
 
                             default -> Arrays.stream(tokenList.split(","))
-                                    .map(BenchmarkUtils::parseByteArrayFromString)
+                                    .map(CastingHelpers::fromStringToByteArray)
                                     .map(SearchTokenBytes::new)
                                     .map(SearchToken.class::cast)
                                     .toList();
@@ -248,14 +247,15 @@ public class BenchmarkUtils {
                 final var label =
                         switch (type) {
                             case "volumeHiding", "volumeHidingOpt" -> new CiphertextWithIV(
-                                    parseByteArrayFromString(entry.get("label iv")),
-                                    parseByteArrayFromString(entry.get("label data")));
-                            default -> new Label(parseByteArrayFromString(entry.get("label data")));
+                                    CastingHelpers.fromStringToByteArray(entry.get("label iv")),
+                                    CastingHelpers.fromStringToByteArray(entry.get("label data")));
+                            default -> new Label(
+                                    CastingHelpers.fromStringToByteArray(entry.get("label data")));
                         };
                 final var value =
                         new CiphertextWithIV(
-                                parseByteArrayFromString(entry.get("value1 iv")),
-                                parseByteArrayFromString(entry.get("value1 data")));
+                                CastingHelpers.fromStringToByteArray(entry.get("value1 iv")),
+                                CastingHelpers.fromStringToByteArray(entry.get("value1 data")));
                 switch (type) {
                     case "volumeHiding", "volumeHidingOpt":
                         boolean tableNumber =
@@ -278,23 +278,6 @@ public class BenchmarkUtils {
                             default -> new EncryptedIndexMap(map);
                         };
             }
-        }
-        return result;
-    }
-
-    private static byte[] parseByteArrayFromString(final String s) {
-        final var withoutBrackets = s.substring(1, s.length() - 1);
-        final var byteList =
-                Arrays.stream(withoutBrackets.split(","))
-                        .map(el -> el.replaceAll(" ", ""))
-                        .map(Byte::parseByte)
-                        .toList();
-        final int n = byteList.size();
-        final var result = new byte[n];
-        int i = 0;
-        for (final var b : byteList) {
-            result[i] = b;
-            i++;
         }
         return result;
     }

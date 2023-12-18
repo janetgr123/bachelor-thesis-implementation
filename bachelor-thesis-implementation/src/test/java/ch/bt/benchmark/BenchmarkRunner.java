@@ -4,10 +4,7 @@ import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 import java.security.Security;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -27,8 +24,11 @@ public class BenchmarkRunner {
     are run in the setup methods of the benchmarks and therefore do not dilute the measurements.
      */
     public static void main(String[] args) throws RunnerException, FileNotFoundException {
-        final var file = new File(String.join("/", BenchmarkSettings.FOLDER, "console-logs.txt"));
-        System.setOut(new PrintStream(new FileOutputStream(file)));
+        //final var file = new File(String.join("/", BenchmarkSettings.FOLDER, "console-logs.txt"));
+        //System.setOut(new PrintStream(new FileOutputStream(file)));
+
+        BenchmarkUtils.deleteHelperFile("results-build-index.csv");
+        BenchmarkUtils.deleteHelperFile("results-search.csv");
 
         System.out.println("STARTING BENCHMARKS");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
