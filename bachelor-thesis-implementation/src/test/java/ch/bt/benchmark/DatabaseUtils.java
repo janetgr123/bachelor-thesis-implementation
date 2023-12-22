@@ -13,7 +13,7 @@ import java.sql.Statement;
 
 public class DatabaseUtils {
     public static void addData(Connection connection) {
-        try (final var input = BenchmarkUtils.class.getResourceAsStream("/data/data.csv")) {
+        try (final var input = DatabaseUtils.class.getResourceAsStream("/data/data.csv")) {
             CSVParser parser = new CSVParser(new InputStreamReader(input), CSVFormat.DEFAULT);
             final var records =
                     parser.stream()

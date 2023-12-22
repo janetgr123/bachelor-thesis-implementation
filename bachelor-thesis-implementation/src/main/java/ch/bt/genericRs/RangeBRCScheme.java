@@ -83,17 +83,19 @@ public class RangeBRCScheme implements GenericRSScheme {
 
     @Override
     public Set<Ciphertext> search(List<SearchToken> searchToken, EncryptedIndex encryptedIndex) {
-        return searchToken.stream()
-                .map(
-                        t -> {
-                            try {
-                                return emmScheme.search(t, encryptedIndex);
-                            } catch (GeneralSecurityException | IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+        final var ciphertexts =
+                searchToken.stream()
+                        .map(
+                                t -> {
+                                    try {
+                                        return emmScheme.search(t, encryptedIndex);
+                                    } catch (GeneralSecurityException | IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                })
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toSet());
+        return ciphertexts;
     }
 
     @Override
@@ -112,5 +114,18 @@ public class RangeBRCScheme implements GenericRSScheme {
                         })
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
+    }
+
+    public int getIndexDummies() {
+        return emmScheme.getNumberOfDummyValues();
+    }
+
+    @Override
+    public EMM getEMM() {
+        return emmScheme;
+    }
+
+    public String getClassOfEMM() {
+        return emmScheme.getClass().getName();
     }
 }

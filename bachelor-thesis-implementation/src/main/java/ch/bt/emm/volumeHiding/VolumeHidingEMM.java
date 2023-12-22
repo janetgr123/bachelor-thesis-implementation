@@ -30,7 +30,6 @@ public class VolumeHidingEMM implements EMM {
     private int maxNumberOfValuesPerLabel = 0;
 
     private int numberOfDummyValues;
-    private final List<Integer> paddingOfResponses = new LinkedList<>();
 
     public VolumeHidingEMM(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
@@ -45,7 +44,7 @@ public class VolumeHidingEMM implements EMM {
     public VolumeHidingEMM(
             final double alpha,
             final int maxNumberOfValuesPerLabel,
-            final int numberOfValues,
+            final int tableSize,
             final SecretKey prfKey,
             final SecretKey seSchemeKey) {
         this.prfKey = prfKey;
@@ -53,7 +52,7 @@ public class VolumeHidingEMM implements EMM {
         this.seScheme = new AESSEScheme(seSchemeKey);
         this.alpha = alpha;
         this.maxNumberOfValuesPerLabel = maxNumberOfValuesPerLabel;
-        this.tableSize = (int) Math.round((1 + alpha) * numberOfValues);
+        this.tableSize = tableSize;
     }
 
     private void setMaxNumberOfValuesPerLabel(final Map<Label, Set<Plaintext>> multiMap) {
@@ -114,23 +113,12 @@ public class VolumeHidingEMM implements EMM {
         final var encryptedIndexTable1 = ((EncryptedIndexTables) encryptedIndex).getTable(0);
         final var encryptedIndexTable2 = ((EncryptedIndexTables) encryptedIndex).getTable(1);
         final var token = ((SearchTokenListInts) searchToken).getSearchTokenList();
-        token.forEach(
-                t -> {
-                    final var ciphertext1 = encryptedIndexTable1[t.getToken(1)];
-                    final var ciphertext2 = encryptedIndexTable2[t.getToken(2)];
-                    ciphertexts.add(ciphertext1);
-                    ciphertexts.add(ciphertext2);
-                    try {
-                        final var plaintext1 = seScheme.decryptLabel(ciphertext1.label());
-                        final var plaintext2 = seScheme.decryptLabel(ciphertext2.label());
-                        int dummy = 0;
-                        dummy += Arrays.equals(plaintext1.label(), new byte[0]) ? 1 : 0;
-                        dummy += Arrays.equals(plaintext2.label(), new byte[0]) ? 1 : 0;
-                        paddingOfResponses.add(dummy);
-                    } catch (GeneralSecurityException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        for (final var t : token) {
+            final var ciphertext1 = encryptedIndexTable1[t.getToken(1)];
+            final var ciphertext2 = encryptedIndexTable2[t.getToken(2)];
+            ciphertexts.add(ciphertext1);
+            ciphertexts.add(ciphertext2);
+        }
         return ciphertexts;
     }
 
@@ -163,9 +151,5 @@ public class VolumeHidingEMM implements EMM {
 
     public int getNumberOfDummyValues() {
         return numberOfDummyValues;
-    }
-
-    public List<Integer> getPaddingOfResponses() {
-        return paddingOfResponses;
     }
 }

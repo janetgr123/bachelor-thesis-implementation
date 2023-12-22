@@ -130,4 +130,19 @@ public class ParallelRangeBRCScheme implements GenericRSScheme {
                                         .collect(Collectors.toSet()))
                 .join();
     }
+
+    @Override
+    public String getClassOfEMM() {
+        return emmScheme.getClass().getName();
+    }
+
+    @Override
+    public int getIndexDummies() {
+        return emmScheme.getNumberOfDummyValues();
+    }
+
+    @Override
+    public EMM getEMM() {
+        return emmScheme;
+    }
 }

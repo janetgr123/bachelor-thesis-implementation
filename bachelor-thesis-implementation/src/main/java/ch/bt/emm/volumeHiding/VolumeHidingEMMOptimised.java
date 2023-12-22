@@ -65,16 +65,6 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
             final var ciphertext2 = encryptedIndexTable2[expand2];
             ciphertexts.add(ciphertext1);
             ciphertexts.add(ciphertext2);
-            try {
-                final var plaintext1 = getSeScheme().decryptLabel(ciphertext1.label());
-                final var plaintext2 = getSeScheme().decryptLabel(ciphertext2.label());
-                int dummy = 0;
-                dummy += Arrays.equals(plaintext1.label(), new byte[0]) ? 1 : 0;
-                dummy += Arrays.equals(plaintext2.label(), new byte[0]) ? 1 : 0;
-                getPaddingOfResponses().add(dummy);
-            } catch (GeneralSecurityException e) {
-                throw new RuntimeException(e);
-            }
         }
         return ciphertexts;
     }

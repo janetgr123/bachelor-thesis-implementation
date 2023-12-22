@@ -173,4 +173,23 @@ public class ParallelDPRangeBRCScheme implements TwoRoundGenericRSScheme {
                                         .collect(Collectors.toSet()))
                 .join();
     }
+
+    @Override
+    public String getClassOfEMM() {
+        return "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM";
+    }
+
+    @Override
+    public int getIndexDummies() {
+        return emmScheme.getNumberOfDummyValues();
+    }
+    @Override
+    public int getIndexDummiesCT() {
+        return emmScheme.getNumberOfDummyCT();
+    }
+
+    @Override
+    public TwoRoundEMM getEMM() {
+        return emmScheme;
+    }
 }

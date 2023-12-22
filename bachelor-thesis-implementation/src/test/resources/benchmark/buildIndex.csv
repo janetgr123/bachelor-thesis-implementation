@@ -1,0 +1,14 @@
+ch.bt.emm.basic.BasicEMM,seq,10,-1,-1,18427078
+ch.bt.emm.basic.BasicEMM,seq,10,-1,-1,11033860
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,10,-1,-1,63179196
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,10,-1,-1,40571656
+ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,10,-1,-1,44283167
+ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,10,-1,-1,50384181
+ch.bt.emm.basic.BasicEMM,par,10,-1,-1,3636432
+ch.bt.emm.basic.BasicEMM,par,10,-1,-1,4194337
+ch.bt.emm.volumeHiding.VolumeHidingEMM,par,10,-1,-1,39583919
+ch.bt.emm.volumeHiding.VolumeHidingEMM,par,10,-1,-1,36173210
+ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,par,10,-1,-1,39549423
+ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,par,10,-1,-1,41491222
+ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM,seq,10,-1,-1,48204344
+ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM,seq,10,-1,-1,60508762
