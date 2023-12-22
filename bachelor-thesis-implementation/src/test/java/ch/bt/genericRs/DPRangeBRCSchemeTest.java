@@ -64,6 +64,30 @@ public class DPRangeBRCSchemeTest {
         testRangeSchemeWithEMM(rangeScheme);
     }
 
+    @ParameterizedTest
+    @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
+    public void testCorrectnessParallelWithDifferentiallyPrivateVolumeHidingEMM(
+            final int securityParameter) throws GeneralSecurityException, IOException {
+        final var dpVHEMM = differentiallyPrivateVolumeHidingEMMs.get(securityParameter);
+        final var rangeScheme =
+                new ParallelDPRangeBRCScheme(
+                        securityParameter, dpVHEMM, new BestRangeCover(), root);
+        testRangeSchemeWithEMM(rangeScheme);
+    }
+
+    @ParameterizedTest
+    @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
+    public void testDeterminismParallelWithDifferentiallyPrivateVolumeHidingEMM(
+            final int securityParameter) throws GeneralSecurityException, IOException {
+        final var dpVHEMM = differentiallyPrivateVolumeHidingEMMs.get(securityParameter);
+        final var rangeScheme =
+                new DPRangeBRCScheme(securityParameter, dpVHEMM, new BestRangeCover(), root);
+        final var rangeSchemePar =
+                new ParallelDPRangeBRCScheme(
+                        securityParameter, dpVHEMM, new BestRangeCover(), root);
+        testRangeSchemeWithEMM(rangeScheme, rangeSchemePar);
+    }
+
     private void testRangeSchemeWithEMM(final TwoRoundGenericRSScheme rangeScheme)
             throws GeneralSecurityException, IOException {
         final var encryptedIndex = rangeScheme.buildIndex(multimap);
@@ -88,5 +112,27 @@ public class DPRangeBRCSchemeTest {
         // PROPERTY:    Result(Search(Trapdoor(range), BuildIndex(multiMap))) =
         //              union(multiMap[label] : label in range)
         assertEquals(expectedValues, values);
+    }
+
+    private void testRangeSchemeWithEMM(
+            final TwoRoundGenericRSScheme rangeScheme, final TwoRoundGenericRSScheme rangeSchemePar)
+            throws GeneralSecurityException, IOException {
+        final var encryptedIndex = rangeScheme.buildIndex(multimap);
+        final var searchToken = rangeScheme.trapdoor(range);
+        final var ciphertexts = rangeScheme.search(searchToken, encryptedIndex);
+        final var searchToken2 = rangeScheme.trapdoor(range, ciphertexts);
+        final var ciphertexts2 = rangeScheme.search2(searchToken2, encryptedIndex);
+        final var values =
+                rangeScheme.result(ciphertexts2, range).stream().distinct().sorted().toList();
+        final var encryptedIndexPar = rangeSchemePar.buildIndex(multimap);
+        final var searchTokenPar = rangeSchemePar.trapdoor(range);
+        final var ciphertextsPar = rangeSchemePar.search(searchTokenPar, encryptedIndexPar);
+        final var searchToken2Par = rangeSchemePar.trapdoor(range, ciphertextsPar);
+        final var ciphertexts2Par = rangeSchemePar.search2(searchToken2Par, encryptedIndexPar);
+        final var valuesPar =
+                rangeSchemePar.result(ciphertexts2Par, range).stream().distinct().sorted().toList();
+
+        // PROPERTY:    parallel scheme is deterministic
+        assertEquals(values, valuesPar);
     }
 }

@@ -2,10 +2,10 @@ package ch.bt.emm.volumeHiding;
 
 import ch.bt.crypto.CastingHelpers;
 import ch.bt.crypto.DPRF;
-import ch.bt.model.multimap.Ciphertext;
-import ch.bt.model.multimap.Label;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.encryptedindex.EncryptedIndexTables;
+import ch.bt.model.multimap.Ciphertext;
+import ch.bt.model.multimap.Label;
 import ch.bt.model.searchtoken.SearchToken;
 import ch.bt.model.searchtoken.SearchTokenBytes;
 
@@ -13,12 +13,24 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
+import javax.crypto.SecretKey;
+
 /** SSE scheme from Patel et al. (2019) With improved communication using delegatable PRFs */
 public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
 
     public VolumeHidingEMMOptimised(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
         super(securityParameter, alpha);
+    }
+
+    // for benchmarking only
+    public VolumeHidingEMMOptimised(
+            final double alpha,
+            final int maxNumberOfValuesPerLabel,
+            final int numberOfValues,
+            final SecretKey prfKey,
+            final SecretKey seSchemeKey) {
+        super(alpha, maxNumberOfValuesPerLabel, numberOfValues, prfKey, seSchemeKey);
     }
 
     @Override
@@ -49,8 +61,10 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
             final var expand2 =
                     CastingHelpers.fromByteArrayToHashModN(
                             DPRF.evaluateDPRF(token, i, 1), tableSize);
-            ciphertexts.add(encryptedIndexTable1[expand1]);
-            ciphertexts.add(encryptedIndexTable2[expand2]);
+            final var ciphertext1 = encryptedIndexTable1[expand1];
+            final var ciphertext2 = encryptedIndexTable2[expand2];
+            ciphertexts.add(ciphertext1);
+            ciphertexts.add(ciphertext2);
         }
         return ciphertexts;
     }

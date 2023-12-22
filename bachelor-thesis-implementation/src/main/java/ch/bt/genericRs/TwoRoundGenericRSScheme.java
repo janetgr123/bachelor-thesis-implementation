@@ -1,5 +1,6 @@
 package ch.bt.genericRs;
 
+import ch.bt.emm.TwoRoundEMM;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
@@ -35,4 +36,11 @@ public interface TwoRoundGenericRSScheme {
 
     Set<Plaintext> result(final Set<Ciphertext> values, final CustomRange q)
             throws GeneralSecurityException;
+
+    String getClassOfEMM();
+
+    int getIndexDummies();
+    int getIndexDummiesCT();
+
+    TwoRoundEMM getEMM();
 }

@@ -116,8 +116,7 @@ public class DPRangeBRCScheme implements TwoRoundGenericRSScheme {
     }
 
     @Override
-    public Set<Ciphertext> search2(List<SearchToken> searchToken, EncryptedIndex encryptedIndex)
-             {
+    public Set<Ciphertext> search2(List<SearchToken> searchToken, EncryptedIndex encryptedIndex) {
         return searchToken.stream()
                 .map(
                         t -> {
@@ -147,5 +146,23 @@ public class DPRangeBRCScheme implements TwoRoundGenericRSScheme {
                         })
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public String getClassOfEMM() {
+        return "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM";
+    }
+
+    @Override
+    public int getIndexDummies() {
+        return emmScheme.getNumberOfDummyValues();
+    }@Override
+    public int getIndexDummiesCT() {
+        return emmScheme.getNumberOfDummyCT();
+    }
+
+    @Override
+    public TwoRoundEMM getEMM() {
+        return emmScheme;
     }
 }

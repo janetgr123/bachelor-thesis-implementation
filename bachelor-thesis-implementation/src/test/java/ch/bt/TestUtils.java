@@ -6,6 +6,7 @@ import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.Vertex;
 import ch.bt.rc.RangeCoverUtils;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,6 +14,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class TestUtils {
+
+    public static final int TEST_DATA_SET_SIZE = 100;
     public static final double ALPHA = 0.3;
 
     public static final List<Integer> VALID_SECURITY_PARAMETERS_FOR_AES = List.of(128, 256);
@@ -29,9 +32,9 @@ public class TestUtils {
 
     public static Vertex root;
 
-    public static void init() {
+    public static void init(Connection connection) {
         try {
-            multimap = getDataFromDB();
+            multimap = getDataFromDB(connection, TEST_DATA_SET_SIZE);
             root = RangeCoverUtils.getRoot(multimap);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -42,13 +45,14 @@ public class TestUtils {
         generateTwoSmallMultimaps();
     }
 
-    public static Map<Label, Set<Plaintext>> getDataFromDB() throws SQLException {
-        Statement stmt = TestConfigurationsWithDB.connection.createStatement();
+    public static Map<Label, Set<Plaintext>> getDataFromDB(Connection connection, final int size)
+            throws SQLException {
+        Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery("select pk_node_id, longitude from t_network_nodes");
         final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
         // Reduce test data
         int i = 0;
-        while (rs.next() && i < 1000) {
+        while (rs.next() && i < size) {
             final var set = new HashSet<Plaintext>();
             set.add(
                     new Plaintext(

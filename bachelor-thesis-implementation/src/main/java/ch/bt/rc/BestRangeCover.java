@@ -7,11 +7,17 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class BestRangeCover implements RangeCoveringAlgorithm {
-    final List<Vertex> explored = new ArrayList<>();
+    List<Vertex> explored;
+
+    public BestRangeCover() {
+        explored = new ArrayList<>();
+    }
 
     @Override
     public Set<Vertex> getRangeCover(final CustomRange q, final Vertex v) {
-        return getRangeCover(q, v, new HashSet<>());
+        final var cover = getRangeCover(q, v, new HashSet<>());
+        explored = new ArrayList<>();
+        return cover;
     }
 
     public Set<Vertex> getRangeCover(

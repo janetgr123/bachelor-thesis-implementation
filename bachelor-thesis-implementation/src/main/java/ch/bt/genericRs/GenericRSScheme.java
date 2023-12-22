@@ -1,5 +1,6 @@
 package ch.bt.genericRs;
 
+import ch.bt.emm.EMM;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
@@ -23,7 +24,15 @@ public interface GenericRSScheme {
 
     List<SearchToken> trapdoor(final CustomRange q);
 
-    Set<Ciphertext> search(final List<SearchToken> searchToken, final EncryptedIndex encryptedIndex);
+    Set<Ciphertext> search(
+            final List<SearchToken> searchToken, final EncryptedIndex encryptedIndex);
 
-    Set<Plaintext> result(final Set<Ciphertext> values, final CustomRange q) throws GeneralSecurityException;
+    Set<Plaintext> result(final Set<Ciphertext> values, final CustomRange q)
+            throws GeneralSecurityException;
+
+    String getClassOfEMM();
+
+    int getIndexDummies();
+
+    EMM getEMM();
 }

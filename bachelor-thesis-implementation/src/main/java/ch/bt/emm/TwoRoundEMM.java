@@ -1,9 +1,10 @@
 package ch.bt.emm;
 
+import ch.bt.crypto.SEScheme;
+import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
-import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.searchtoken.SearchToken;
 
 import java.io.IOException;
@@ -28,9 +29,15 @@ public interface TwoRoundEMM {
     Set<Ciphertext> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex)
             throws GeneralSecurityException, IOException;
 
+    int getNumberOfDummyValues();
+
+    int getNumberOfDummyCT();
+
     Set<Ciphertext> search2(final SearchToken searchToken, final EncryptedIndex encryptedIndex)
             throws IOException;
 
     Set<Plaintext> result(final Set<Ciphertext> ciphertexts, final Label searchLabel)
             throws GeneralSecurityException;
+
+    SEScheme getSeScheme();
 }

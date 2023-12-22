@@ -2,12 +2,12 @@ package ch.bt.emm.basic;
 
 import ch.bt.crypto.*;
 import ch.bt.emm.EMM;
+import ch.bt.model.encryptedindex.EncryptedIndex;
+import ch.bt.model.encryptedindex.EncryptedIndexMap;
 import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.CiphertextWithIV;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.Plaintext;
-import ch.bt.model.encryptedindex.EncryptedIndex;
-import ch.bt.model.encryptedindex.EncryptedIndexMap;
 import ch.bt.model.searchtoken.SearchToken;
 import ch.bt.model.searchtoken.SearchTokenBytes;
 
@@ -21,10 +21,20 @@ public class BasicEMM implements EMM {
     private final SEScheme seScheme;
     private final SecretKey hmacKey;
 
+    private final SecretKey aesKey;
+
     public BasicEMM(final int securityParameter) throws GeneralSecurityException {
         final var keys = this.setup(securityParameter);
         this.hmacKey = keys.get(0);
-        seScheme = new AESSEScheme(keys.get(1));
+        this.aesKey = keys.get(1);
+        seScheme = new AESSEScheme(aesKey);
+    }
+
+    // for benchmarking only
+    public BasicEMM(final SecretKey prfKey, final SecretKey aesKey) {
+        this.hmacKey = prfKey;
+        this.aesKey = aesKey;
+        seScheme = new AESSEScheme(aesKey);
     }
 
     @Override
@@ -79,7 +89,8 @@ public class BasicEMM implements EMM {
             final var matchingLabels =
                     encryptedIndexMap.keySet().stream().filter(encryptedLabel::equals).toList();
             if (matchingLabels.size() == 1) {
-                encryptedValues.add(encryptedIndexMap.get(matchingLabels.get(0)));
+                final var matchingValue = encryptedIndexMap.get(matchingLabels.get(0));
+                encryptedValues.add(matchingValue);
             } else {
                 break;
             }
@@ -108,5 +119,19 @@ public class BasicEMM implements EMM {
 
     public SEScheme getSeScheme() {
         return this.seScheme;
+    }
+
+    public int getNumberOfDummyValues() {
+        return 0;
+    }
+
+    @Override
+    public SecretKey getPrfKey() {
+        return hmacKey;
+    }
+
+    @Override
+    public SecretKey getAesKey() {
+        return aesKey;
     }
 }

@@ -38,8 +38,8 @@ public class VolumeHidingEMMUtils {
         final Stack<Ciphertext> stash = new Stack<>();
         CuckooHashing.doCuckooHashingWithStash(
                 maxNumberOfEvictions, table1, table2, multiMap, stash, tableSize, prfKey);
-        VolumeHidingEMMUtils.fillEmptyValues(table1);
-        VolumeHidingEMMUtils.fillEmptyValues(table2);
+        int numberOfDummyValues = VolumeHidingEMMUtils.fillEmptyValues(table1);
+        numberOfDummyValues += VolumeHidingEMMUtils.fillEmptyValues(table2);
 
         final PairLabelCiphertext[] encryptedTable1 = new PairLabelCiphertext[tableSize];
         final PairLabelCiphertext[] encryptedTable2 = new PairLabelCiphertext[tableSize];
@@ -47,7 +47,9 @@ public class VolumeHidingEMMUtils {
                 table1, table2, encryptedTable1, encryptedTable2, seScheme);
 
         return new EncryptedIndexWithStash(
-                new EncryptedIndexTables(encryptedTable1, encryptedTable2), stash);
+                new EncryptedIndexTables(encryptedTable1, encryptedTable2),
+                stash,
+                numberOfDummyValues);
     }
 
     public static Set<Plaintext> getPlaintexts(
@@ -128,15 +130,18 @@ public class VolumeHidingEMMUtils {
                 seScheme.encryptLabel(entry.label()), seScheme.encrypt(entry.value()));
     }
 
-    public static void fillEmptyValues(final PairLabelPlaintext[] table) {
+    public static int fillEmptyValues(final PairLabelPlaintext[] table) {
+        int numberOfDummyValues = 0;
         int i = 0;
         for (final var pair : table) {
             if (pair == null) {
                 table[i] =
                         new PairLabelPlaintext(new Label(new byte[0]), new Plaintext(new byte[0]));
+                numberOfDummyValues++;
             }
             i++;
         }
+        return numberOfDummyValues;
     }
 
     public static List<Label> getDecryptedLabels(

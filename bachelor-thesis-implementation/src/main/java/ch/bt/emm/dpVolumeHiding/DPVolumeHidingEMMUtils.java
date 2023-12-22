@@ -34,8 +34,8 @@ public class DPVolumeHidingEMMUtils {
                 counterStash,
                 tableSize,
                 prfKey);
-        DPVolumeHidingEMMUtils.fillEmptyValues(counterTable1);
-        DPVolumeHidingEMMUtils.fillEmptyValues(counterTable2);
+        int numberOfDummyCT = DPVolumeHidingEMMUtils.fillEmptyValues(counterTable1);
+        numberOfDummyCT += DPVolumeHidingEMMUtils.fillEmptyValues(counterTable2);
 
         final PairLabelCiphertext[] encryptedCounterTable1 = new PairLabelCiphertext[tableSize];
         final PairLabelCiphertext[] encryptedCounterTable2 = new PairLabelCiphertext[tableSize];
@@ -47,7 +47,8 @@ public class DPVolumeHidingEMMUtils {
                 seScheme);
         return new EncryptedIndexWithStash(
                 new EncryptedIndexTables(encryptedCounterTable1, encryptedCounterTable2),
-                counterStash);
+                counterStash,
+                numberOfDummyCT);
     }
 
     private static PairLabelCiphertext encryptEntry(
@@ -98,14 +99,17 @@ public class DPVolumeHidingEMMUtils {
         }
     }
 
-    public static void fillEmptyValues(final PairLabelNumberValues[] table) {
+    public static int fillEmptyValues(final PairLabelNumberValues[] table) {
+        int numberOfDummyCT = 0;
         int i = 0;
         for (final var pair : table) {
             if (pair == null) {
                 table[i] = new PairLabelNumberValues(new Label(new byte[0]), 0);
+                numberOfDummyCT++;
             }
             i++;
         }
+        return numberOfDummyCT;
     }
 
     public static List<Label> getDecryptedLabels(

@@ -25,15 +25,34 @@ public class VolumeHidingEMM implements EMM {
     private final double alpha;
 
     private final SecretKey prfKey;
+    private final SecretKey aesKey;
 
     private int maxNumberOfValuesPerLabel = 0;
+
+    private int numberOfDummyValues;
 
     public VolumeHidingEMM(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
         final var keys = this.setup(securityParameter);
         this.prfKey = keys.get(0);
-        this.seScheme = new AESSEScheme(keys.get(1));
+        this.aesKey = keys.get(1);
+        this.seScheme = new AESSEScheme(aesKey);
         this.alpha = alpha;
+    }
+
+    // for benchmarking only
+    public VolumeHidingEMM(
+            final double alpha,
+            final int maxNumberOfValuesPerLabel,
+            final int tableSize,
+            final SecretKey prfKey,
+            final SecretKey seSchemeKey) {
+        this.prfKey = prfKey;
+        this.aesKey = seSchemeKey;
+        this.seScheme = new AESSEScheme(seSchemeKey);
+        this.alpha = alpha;
+        this.maxNumberOfValuesPerLabel = maxNumberOfValuesPerLabel;
+        this.tableSize = tableSize;
     }
 
     private void setMaxNumberOfValuesPerLabel(final Map<Label, Set<Plaintext>> multiMap) {
@@ -63,6 +82,7 @@ public class VolumeHidingEMM implements EMM {
                 VolumeHidingEMMUtils.calculateEncryptedIndexAndStash(
                         tableSize, numberOfValues, multiMap, prfKey, seScheme);
         this.stash = encryptedIndexWithStash.stash();
+        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues();
         return encryptedIndexWithStash.encryptedIndex();
     }
 
@@ -93,11 +113,12 @@ public class VolumeHidingEMM implements EMM {
         final var encryptedIndexTable1 = ((EncryptedIndexTables) encryptedIndex).getTable(0);
         final var encryptedIndexTable2 = ((EncryptedIndexTables) encryptedIndex).getTable(1);
         final var token = ((SearchTokenListInts) searchToken).getSearchTokenList();
-        token.forEach(
-                t -> {
-                    ciphertexts.add(encryptedIndexTable1[t.getToken(1)]);
-                    ciphertexts.add(encryptedIndexTable2[t.getToken(2)]);
-                });
+        for (final var t : token) {
+            final var ciphertext1 = encryptedIndexTable1[t.getToken(1)];
+            final var ciphertext2 = encryptedIndexTable2[t.getToken(2)];
+            ciphertexts.add(ciphertext1);
+            ciphertexts.add(ciphertext2);
+        }
         return ciphertexts;
     }
 
@@ -119,7 +140,16 @@ public class VolumeHidingEMM implements EMM {
         return prfKey;
     }
 
+    @Override
+    public SecretKey getAesKey() {
+        return aesKey;
+    }
+
     public int getMaxNumberOfValuesPerLabel() {
         return maxNumberOfValuesPerLabel;
+    }
+
+    public int getNumberOfDummyValues() {
+        return numberOfDummyValues;
     }
 }

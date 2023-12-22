@@ -36,6 +36,10 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
 
     private int maxNumberOfValuesPerLabel = 0;
 
+    private int numberOfDummyValues;
+
+    private int numberOfDummyCT;
+
     public DifferentiallyPrivateVolumeHidingEMM(
             final int securityParameter, final double epsilon, final double alpha)
             throws GeneralSecurityException {
@@ -76,12 +80,14 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
 
         final var encryptedIndex = encryptedIndexWithStash.encryptedIndex();
         this.stash = encryptedIndexWithStash.stash();
+        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues();
 
         final var encryptedCTIndexWithStash =
                 DPVolumeHidingEMMUtils.calculateEncryptedCTIndex(
                         tableSize, numberOfValues, multiMap, prfKey, seScheme);
         final var encryptedCTIndex = encryptedCTIndexWithStash.encryptedIndex();
         this.counterStash = encryptedCTIndexWithStash.stash();
+        this.numberOfDummyCT = encryptedCTIndexWithStash.numberOfDummyValues();
 
         return new DifferentiallyPrivateEncryptedIndexTables(encryptedIndex, encryptedCTIndex);
     }
@@ -145,8 +151,10 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
             final var expand2 =
                     CastingHelpers.fromByteArrayToHashModN(
                             DPRF.evaluateDPRF(token, i, 1), tableSize);
-            ciphertexts.add(encryptedCounterTable[expand1]);
-            ciphertexts.add(encryptedCounterTable2[expand2]);
+            final var ciphertext1 = encryptedCounterTable[expand1];
+            final var ciphertext2 = encryptedCounterTable2[expand2];
+            ciphertexts.add(ciphertext1);
+            ciphertexts.add(ciphertext2);
         }
         return ciphertexts;
     }
@@ -181,14 +189,27 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
             final var expand2 =
                     CastingHelpers.fromByteArrayToHashModN(
                             DPRF.evaluateDPRF(token.token2(), i, 1), tableSize);
-            ciphertexts.add(encryptedIndexTable1[expand1]);
-            ciphertexts.add(encryptedIndexTable2[expand2]);
+            final var ciphertext1 = encryptedIndexTable1[expand1];
+            final var ciphertext2 = encryptedIndexTable2[expand2];
+            ciphertexts.add(ciphertext1);
+            ciphertexts.add(ciphertext2);
             i++;
         }
         return ciphertexts;
     }
 
+    @Override
     public SEScheme getSeScheme() {
         return seScheme;
+    }
+
+    @Override
+    public int getNumberOfDummyValues() {
+        return numberOfDummyValues;
+    }
+
+    @Override
+    public int getNumberOfDummyCT() {
+        return numberOfDummyCT;
     }
 }
