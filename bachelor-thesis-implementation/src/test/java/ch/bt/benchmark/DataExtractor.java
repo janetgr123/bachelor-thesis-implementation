@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
+import java.text.NumberFormat;
 import java.util.*;
 
 public class DataExtractor {
@@ -20,6 +21,7 @@ public class DataExtractor {
 
     private static final List<String> MODES = List.of("seq", "par");
     private static final Map<String, List<String>> HEADERS = new HashMap<>();
+    private static final NumberFormat nf = NumberFormat.getPercentInstance(new Locale("en", "US"));
 
     public static void main(String[] args) throws IOException {
         initializeHeaders();
@@ -39,7 +41,7 @@ public class DataExtractor {
     private static void printPercentagePaddingVersusDataSize(final String method)
             throws IOException {
         final var writer =
-                new MethodVsTime(String.join("-", method, "method-vs-percentage-padding"));
+                new MethodVsPadding(String.join("-", method, "method-vs-percentage-padding"));
         for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i *= 10) {
             final var current = String.join("/", PATH, String.join(".", method, "csv"));
             final var file = new File(current);
@@ -49,7 +51,6 @@ public class DataExtractor {
                         CSVFormat.DEFAULT
                                 .builder()
                                 .setHeader(HEADERS.get(method).toArray(String[]::new))
-                                .setSkipHeaderRecord(true)
                                 .build();
                 Iterable<CSVRecord> records = csvFormat.parse(in);
                 final var recordList = new ArrayList<CSVRecord>();
@@ -57,68 +58,63 @@ public class DataExtractor {
                 final Map<String, Double> averagePercentagePadding = new HashMap<>();
                 final int dataSize = i;
                 classes.forEach(
-                        clazz ->
-                                MODES.forEach(
-                                        mode -> {
-                                            final var recordsForDataSizeAndClass =
-                                                    recordList.stream()
-                                                            .filter(
-                                                                    el ->
-                                                                            el.get("data size")
-                                                                                            .equals(
-                                                                                                    String
-                                                                                                            .valueOf(
-                                                                                                                    dataSize))
-                                                                                    && el.get("emm")
-                                                                                            .equals(
-                                                                                                    clazz)
-                                                                                    && el.get(
-                                                                                                    "mode")
-                                                                                            .equals(
-                                                                                                    mode))
-                                                            .toList();
-                                            final var averageSize =
-                                                    ((double)
-                                                                    recordsForDataSizeAndClass
-                                                                            .stream()
-                                                                            .map(
-                                                                                    r ->
-                                                                                            r.get(
-                                                                                                    "size encrypted index"))
-                                                                            .map(Integer::parseInt)
-                                                                            .reduce(Integer::sum)
-                                                                            .orElse(0))
-                                                            / recordsForDataSizeAndClass.size();
-                                            final var averagePadding =
-                                                    ((double)
-                                                                    recordsForDataSizeAndClass
-                                                                            .stream()
-                                                                            .map(
-                                                                                    r ->
-                                                                                            r.get(
-                                                                                                    "number of dummy values"))
-                                                                            .map(Integer::parseInt)
-                                                                            .reduce(Integer::sum)
-                                                                            .orElse(0))
-                                                            / recordsForDataSizeAndClass.size();
-                                            averagePercentagePadding.put(
-                                                    String.join("-", clazz, mode),
-                                                    averagePadding / averageSize * 100);
-                                        }));
+                        clazz -> {
+                            final var recordsForDataSizeAndClass =
+                                    recordList.stream()
+                                            .filter(
+                                                    el ->
+                                                            el.get("data size")
+                                                                            .equals(
+                                                                                    String.valueOf(
+                                                                                            dataSize))
+                                                                    && el.get("emm").equals(clazz)
+                                                                    && el.get("mode").equals("seq"))
+                                            .toList();
+                            final var averageSize =
+                                    ((double)
+                                                    recordsForDataSizeAndClass.stream()
+                                                            .map(r -> r.get("size encrypted index"))
+                                                            .map(Integer::parseInt)
+                                                            .reduce(Integer::sum)
+                                                            .orElse(0))
+                                            / recordsForDataSizeAndClass.size();
+                            final var averagePadding =
+                                    ((double)
+                                                    recordsForDataSizeAndClass.stream()
+                                                            .map(
+                                                                    r ->
+                                                                            r.get(
+                                                                                    "number of dummy values"))
+                                                            .map(Integer::parseInt)
+                                                            .reduce(Integer::sum)
+                                                            .orElse(0))
+                                            / recordsForDataSizeAndClass.size();
+                            averagePercentagePadding.put(clazz, averagePadding / averageSize);
+                        });
                 writer.printToCsv(
                         dataSize,
-                        averagePercentagePadding.get("ch.bt.emm.basic.BasicEMM-seq"),
-                        averagePercentagePadding.get("ch.bt.emm.basic.BasicEMM-par"),
-                        averagePercentagePadding.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-seq"),
-                        averagePercentagePadding.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-par"),
-                        averagePercentagePadding.get(
-                                "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-seq"),
-                        averagePercentagePadding.get(
-                                "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"),
-                        averagePercentagePadding.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-seq"),
-                        averagePercentagePadding.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par"));
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get("ch.bt.emm.basic.BasicEMM")
+                                                .doubleValue())
+                                .replace("%", "\\%"),
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get("ch.bt.emm.volumeHiding.VolumeHidingEMM")
+                                                .doubleValue())
+                                .replace("%", "\\%"),
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get(
+                                                        "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
+                                                .doubleValue())
+                                .replace("%", "\\%"),
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get(
+                                                        "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
+                                                .doubleValue())
+                                .replace("%", "\\%"));
             }
         }
         writer.printer.close();
@@ -127,11 +123,18 @@ public class DataExtractor {
     private static void printPercentagePaddingVersusRangeSizeForFixedDataSize(
             final String method, final int dataSize) throws IOException {
         final var writer =
-                new MethodVsTime(
+                new MethodVsPadding2(
                         String.join(
                                 "-",
                                 method,
                                 "method-vs-percentage-padding",
+                                String.valueOf(dataSize)));
+        final var writer2 =
+                new MethodVsPadding2(
+                        String.join(
+                                "-",
+                                method,
+                                "method-vs-percentage-padding-no-percent",
                                 String.valueOf(dataSize)));
         final var potenitalStep = dataSize / 20;
         final var step = potenitalStep == 0 ? 1 : potenitalStep;
@@ -144,7 +147,6 @@ public class DataExtractor {
                         CSVFormat.DEFAULT
                                 .builder()
                                 .setHeader(HEADERS.get(method).toArray(String[]::new))
-                                .setSkipHeaderRecord(true)
                                 .build();
                 Iterable<CSVRecord> records = csvFormat.parse(in);
                 final var recordList = new ArrayList<CSVRecord>();
@@ -152,77 +154,96 @@ public class DataExtractor {
                 final Map<String, Double> averagePercentagePadding = new HashMap<>();
                 final int rangeSize = i;
                 classes.forEach(
-                        clazz ->
-                                MODES.forEach(
-                                        mode -> {
-                                            final var recordsForDataSizeAndClass =
-                                                    recordList.stream()
-                                                            .filter(
-                                                                    el ->
-                                                                            el.get("data size")
-                                                                                            .equals(
-                                                                                                    String
-                                                                                                            .valueOf(
-                                                                                                                    dataSize))
-                                                                                    && el.get("emm")
-                                                                                            .equals(
-                                                                                                    clazz)
-                                                                                    && el.get(
-                                                                                                    "mode")
-                                                                                            .equals(
-                                                                                                    mode)
-                                                                                    && el.get(
-                                                                                                    "range size")
-                                                                                            .equals(
-                                                                                                    String
-                                                                                                            .valueOf(
-                                                                                                                    rangeSize)))
-                                                            .toList();
-                                            final var averageResponseSize =
-                                                    ((double)
-                                                                    recordsForDataSizeAndClass
-                                                                            .stream()
-                                                                            .map(
-                                                                                    r ->
-                                                                                            r.get(
-                                                                                                    "size of response"))
-                                                                            .map(Integer::parseInt)
-                                                                            .reduce(Integer::sum)
-                                                                            .orElse(0))
-                                                            / recordsForDataSizeAndClass.size();
-                                            final var averagePadding =
-                                                    ((double)
-                                                                    recordsForDataSizeAndClass
-                                                                            .stream()
-                                                                            .map(
-                                                                                    r ->
-                                                                                            r.get(
-                                                                                                    "number of dummy values"))
-                                                                            .map(Integer::parseInt)
-                                                                            .reduce(Integer::sum)
-                                                                            .orElse(0))
-                                                            / recordsForDataSizeAndClass.size();
-                                            averagePercentagePadding.put(
-                                                    String.join("-", clazz, mode),
-                                                    averagePadding / averageResponseSize * 100);
-                                        }));
+                        clazz -> {
+                            final var recordsForDataSizeAndClass =
+                                    recordList.stream()
+                                            .filter(
+                                                    el ->
+                                                            el.get("data size")
+                                                                            .equals(
+                                                                                    String.valueOf(
+                                                                                            dataSize))
+                                                                    && el.get("emm").equals(clazz)
+                                                                    && el.get("mode").equals("seq")
+                                                                    && el.get("range size")
+                                                                            .equals(
+                                                                                    String.valueOf(
+                                                                                            rangeSize)))
+                                            .toList();
+                            final var averageResponseSize =
+                                    ((double)
+                                                    recordsForDataSizeAndClass.stream()
+                                                            .map(r -> r.get("size of response"))
+                                                            .map(Integer::parseInt)
+                                                            .reduce(Integer::sum)
+                                                            .orElse(0))
+                                            / recordsForDataSizeAndClass.size();
+                            final var averagePadding =
+                                    ((double)
+                                                    recordsForDataSizeAndClass.stream()
+                                                            .map(
+                                                                    r ->
+                                                                            r.get(
+                                                                                    "number of dummy values"))
+                                                            .map(Integer::parseInt)
+                                                            .reduce(Integer::sum)
+                                                            .orElse(0))
+                                            / recordsForDataSizeAndClass.size();
+                            averagePercentagePadding.put(
+                                    clazz, averagePadding / averageResponseSize);
+                        });
                 writer.printToCsv(
-                        dataSize,
-                        averagePercentagePadding.get("ch.bt.emm.basic.BasicEMM-seq"),
-                        averagePercentagePadding.get("ch.bt.emm.basic.BasicEMM-par"),
-                        averagePercentagePadding.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-seq"),
-                        averagePercentagePadding.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-par"),
-                        averagePercentagePadding.get(
-                                "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-seq"),
-                        averagePercentagePadding.get(
-                                "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"),
-                        averagePercentagePadding.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-seq"),
-                        averagePercentagePadding.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par"));
+                        rangeSize,
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get("ch.bt.emm.basic.BasicEMM")
+                                                .doubleValue())
+                                .replace("%", "\\%"),
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get("ch.bt.emm.volumeHiding.VolumeHidingEMM")
+                                                .doubleValue())
+                                .replace("%", "\\%"),
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get(
+                                                        "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
+                                                .doubleValue())
+                                .replace("%", "\\%"),
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get(
+                                                        "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
+                                                .doubleValue())
+                                .replace("%", "\\%"));
+                writer2.printToCsv(
+                        rangeSize,
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get("ch.bt.emm.basic.BasicEMM")
+                                                .doubleValue())
+                                .replace("%", ""),
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get("ch.bt.emm.volumeHiding.VolumeHidingEMM")
+                                                .doubleValue())
+                                .replace("%", ""),
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get(
+                                                        "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
+                                                .doubleValue())
+                                .replace("%", ""),
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get(
+                                                        "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
+                                                .doubleValue())
+                                .replace("%", ""));
             }
         }
         writer.printer.close();
+        writer2.printer.close();
     }
 
     private static void printTimeVersusRangeSizeForFixedDataSize(
@@ -241,7 +262,6 @@ public class DataExtractor {
                         CSVFormat.DEFAULT
                                 .builder()
                                 .setHeader(HEADERS.get(method).toArray(String[]::new))
-                                .setSkipHeaderRecord(true)
                                 .build();
                 Iterable<CSVRecord> records = csvFormat.parse(in);
                 final var recordList = new ArrayList<CSVRecord>();
@@ -287,7 +307,7 @@ public class DataExtractor {
                                                             / recordsForDataSizeAndClass.size());
                                         }));
                 writer.printToCsv(
-                        dataSize,
+                        rangeSize,
                         averageTimes.get("ch.bt.emm.basic.BasicEMM-seq"),
                         averageTimes.get("ch.bt.emm.basic.BasicEMM-par"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-seq"),
@@ -314,7 +334,6 @@ public class DataExtractor {
                         CSVFormat.DEFAULT
                                 .builder()
                                 .setHeader(HEADERS.get(method).toArray(String[]::new))
-                                .setSkipHeaderRecord(true)
                                 .build();
                 Iterable<CSVRecord> records = csvFormat.parse(in);
                 final var recordList = new ArrayList<CSVRecord>();
@@ -383,7 +402,6 @@ public class DataExtractor {
                         CSVFormat.DEFAULT
                                 .builder()
                                 .setHeader(HEADERS.get(method).toArray(String[]::new))
-                                .setSkipHeaderRecord(true)
                                 .build();
                 Iterable<CSVRecord> records = csvFormat.parse(in);
                 final var recordList = new ArrayList<CSVRecord>();

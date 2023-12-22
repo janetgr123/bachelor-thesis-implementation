@@ -21,7 +21,20 @@ public class MethodVsTime {
                         Paths.get(String.join("/", "src/test/resources/benchmark", file)),
                         StandardOpenOption.APPEND,
                         StandardOpenOption.CREATE);
-        csvFormat = CSVFormat.DEFAULT.builder().build();
+        csvFormat =
+                CSVFormat.DEFAULT
+                        .builder()
+                        .setHeader(
+                                "data size",
+                                "baseline",
+                                "baseline parallel",
+                                "volume hiding",
+                                "volume hiding parallel",
+                                "volume hiding opt",
+                                "volume hiding opt parallel",
+                                "dp volume hiding",
+                                "dp volume hiding parallel")
+                        .build();
         printer = new CSVPrinter(fileWriter, csvFormat);
     }
 

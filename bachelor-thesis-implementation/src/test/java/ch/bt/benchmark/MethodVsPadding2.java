@@ -9,12 +9,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-public class MethodVsSize {
+public class MethodVsPadding2 {
     BufferedWriter fileWriter;
     CSVFormat csvFormat;
     CSVPrinter printer;
 
-    public MethodVsSize(final String filename) throws IOException {
+    public MethodVsPadding2(final String filename) throws IOException {
         final String file = String.join(".", filename, "csv");
         fileWriter =
                 Files.newBufferedWriter(
@@ -25,39 +25,22 @@ public class MethodVsSize {
                 CSVFormat.DEFAULT
                         .builder()
                         .setHeader(
-                                "data size",
+                                "range size",
                                 "baseline",
-                                "baseline parallel",
                                 "volume hiding",
-                                "volume hiding parallel",
                                 "volume hiding opt",
-                                "volume hiding opt parallel",
-                                "dp volume hiding",
-                                "dp volume hiding parallel")
+                                "dp volume hiding")
                         .build();
         printer = new CSVPrinter(fileWriter, csvFormat);
     }
 
     public void printToCsv(
             final int dataSize,
-            final int sizeBasic,
-            final int sizeBasicPar,
-            final int sizeVH,
-            final int sizeVHPar,
-            final int sizeVHO,
-            final int sizeVHOPar,
-            final int sizeDP,
-            final int sizeDPPar)
+            final String timeBasic,
+            final String timeVH,
+            final String timeVHO,
+            final String timeDP)
             throws IOException {
-        printer.printRecord(
-                dataSize,
-                sizeBasic,
-                sizeBasicPar,
-                sizeVH,
-                sizeVHPar,
-                sizeVHO,
-                sizeVHOPar,
-                sizeDP,
-                sizeDPPar);
+        printer.printRecord(dataSize, timeBasic, timeVH, timeVHO, timeDP);
     }
 }
