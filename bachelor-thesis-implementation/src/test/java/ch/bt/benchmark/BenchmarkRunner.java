@@ -332,7 +332,7 @@ public class BenchmarkRunner {
         final var endSearch2 = System.nanoTime();
         try {
             if (!isWarmUp) {
-                printSearch.printToCsv(
+                printSearch2.printToCsv(
                         emm, mode, endSearch2 - startSearch2, dataSize, rangeSize, from);
             }
         } catch (IOException e) {

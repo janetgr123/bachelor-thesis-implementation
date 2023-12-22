@@ -446,9 +446,23 @@ public class DataExtractor {
         HEADERS.put(
                 "trapdoor", List.of("emm", "mode", "data size", "from", "range size", "time [ns]"));
         HEADERS.put(
+                "trapdoor2",
+                List.of("emm", "mode", "data size", "from", "range size", "time [ns]"));
+        HEADERS.put(
                 "search", List.of("emm", "mode", "data size", "from", "range size", "time [ns]"));
         HEADERS.put(
                 "searchPadding",
+                List.of(
+                        "emm",
+                        "mode",
+                        "data size",
+                        "range size",
+                        "size of response",
+                        "number of dummy values"));
+        HEADERS.put(
+                "search2", List.of("emm", "mode", "data size", "from", "range size", "time [ns]"));
+        HEADERS.put(
+                "searchPadding2",
                 List.of(
                         "emm",
                         "mode",
