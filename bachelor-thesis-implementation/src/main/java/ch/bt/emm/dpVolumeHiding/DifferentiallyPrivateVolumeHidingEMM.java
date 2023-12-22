@@ -198,14 +198,17 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
         return ciphertexts;
     }
 
+    @Override
     public SEScheme getSeScheme() {
         return seScheme;
     }
 
+    @Override
     public int getNumberOfDummyValues() {
         return numberOfDummyValues;
     }
 
+    @Override
     public int getNumberOfDummyCT() {
         return numberOfDummyCT;
     }

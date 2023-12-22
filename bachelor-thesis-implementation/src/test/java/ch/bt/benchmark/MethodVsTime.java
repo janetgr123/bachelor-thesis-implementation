@@ -8,14 +8,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 
 public class MethodVsTime {
     BufferedWriter fileWriter;
     CSVFormat csvFormat;
     CSVPrinter printer;
 
-    public MethodVsTime(final String method, final String filename) throws IOException {
+    public MethodVsTime(final String filename) throws IOException {
         final String file = String.join(".", filename, "csv");
         fileWriter =
                 Files.newBufferedWriter(
@@ -33,9 +32,19 @@ public class MethodVsTime {
             final double timeVH,
             final double timeVHPar,
             final double timeVHO,
-            final double timeVHOPar)
+            final double timeVHOPar,
+            final double timeDP,
+            final double timeDPPar)
             throws IOException {
         printer.printRecord(
-                dataSize, timeBasic, timeBasicPar, timeVH, timeVHPar, timeVHO, timeVHOPar);
+                dataSize,
+                timeBasic,
+                timeBasicPar,
+                timeVH,
+                timeVHPar,
+                timeVHO,
+                timeVHOPar,
+                timeDP,
+                timeDPPar);
     }
 }

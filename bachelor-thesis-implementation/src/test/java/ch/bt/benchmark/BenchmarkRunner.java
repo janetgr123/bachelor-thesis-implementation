@@ -289,7 +289,20 @@ public class BenchmarkRunner {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        final long dummies = -1; // TODO!!!
+        final long dummies =
+                cipherTexts.stream()
+                        .map(PairLabelCiphertext.class::cast)
+                        .map(PairLabelCiphertext::label)
+                        .map(
+                                el -> {
+                                    try {
+                                        return scheme.getEMM().getSeScheme().decryptLabel(el);
+                                    } catch (GeneralSecurityException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                })
+                        .filter(p -> Arrays.equals(p.label(), new byte[0]))
+                        .count();
         printPadding.printToCsv(emm, mode, dataSize, rangeSize, cipherTexts.size(), dummies);
 
         /*
@@ -325,7 +338,20 @@ public class BenchmarkRunner {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        final long dummies2 = -1; // TODO!!!
+        final long dummies2 =
+                cipherTexts.stream()
+                        .map(PairLabelCiphertext.class::cast)
+                        .map(PairLabelCiphertext::label)
+                        .map(
+                                el -> {
+                                    try {
+                                        return scheme.getEMM().getSeScheme().decryptLabel(el);
+                                    } catch (GeneralSecurityException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                })
+                        .filter(p -> Arrays.equals(p.label(), new byte[0]))
+                        .count();
         printPadding2.printToCsv(emm, mode, dataSize, rangeSize, cipherTexts2.size(), dummies2);
         printTrapdoor.printer.close();
         printSearch.printer.close();

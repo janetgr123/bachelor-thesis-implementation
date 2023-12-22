@@ -8,14 +8,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 
 public class MethodVsSize {
     BufferedWriter fileWriter;
     CSVFormat csvFormat;
     CSVPrinter printer;
 
-    public MethodVsSize(final String method, final String filename) throws IOException {
+    public MethodVsSize(final String filename) throws IOException {
         final String file = String.join(".", filename, "csv");
         fileWriter =
                 Files.newBufferedWriter(
@@ -33,9 +32,9 @@ public class MethodVsSize {
             final int sizeVH,
             final int sizeVHPar,
             final int sizeVHO,
-            final int sizeVHOPar)
+            final int sizeVHOPar, final int sizeDP, final int sizeDPPar)
             throws IOException {
         printer.printRecord(
-                dataSize, sizeBasic, sizeBasicPar, sizeVH, sizeVHPar, sizeVHO, sizeVHOPar);
+                dataSize, sizeBasic, sizeBasicPar, sizeVH, sizeVHPar, sizeVHO, sizeVHOPar, sizeDP, sizeDPPar);
     }
 }

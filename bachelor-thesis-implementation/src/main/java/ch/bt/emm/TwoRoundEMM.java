@@ -1,5 +1,6 @@
 package ch.bt.emm;
 
+import ch.bt.crypto.SEScheme;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
@@ -32,13 +33,11 @@ public interface TwoRoundEMM {
 
     int getNumberOfDummyCT();
 
-    List<Integer> getPaddingOfResponses();
-
-    List<Integer> getPaddingOfResponses2();
-
     Set<Ciphertext> search2(final SearchToken searchToken, final EncryptedIndex encryptedIndex)
             throws IOException;
 
     Set<Plaintext> result(final Set<Ciphertext> ciphertexts, final Label searchLabel)
             throws GeneralSecurityException;
+
+    SEScheme getSeScheme();
 }
