@@ -477,12 +477,12 @@ public class BenchmarkRunner {
     private static void runBenchmarkForSchemeAndDataSize(
             final TwoRoundGenericRSScheme scheme, final int dataSize, final String mode)
             throws IOException {
+        for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
+            runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true);
+        }
         for (int iteration = 0; iteration < BenchmarkSettings.NUMBER_OF_QUERIES; iteration++) {
             EncryptedIndex encryptedIndex;
             try {
-                for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
-                    runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true);
-                }
                 System.out.println(
                         "Running build index for data size "
                                 + dataSize
