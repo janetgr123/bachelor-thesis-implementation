@@ -16,8 +16,8 @@ public class DataExtractor {
             List.of(
                     "ch.bt.emm.basic.BasicEMM",
                     "ch.bt.emm.volumeHiding.VolumeHidingEMM",
-                    "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised",
-                    "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM");
+                    "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised");
+    // "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM");
 
     private static final List<String> MODES = List.of("seq", "par");
     private static final Map<String, List<String>> HEADERS = new HashMap<>();
@@ -28,7 +28,7 @@ public class DataExtractor {
         printTimeVersusDataSize("buildIndex");
         printOverheadVersusDataSize("overheadEncryptedIndex");
         printPercentagePaddingVersusDataSize("overheadEncryptedIndex");
-        for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i *= 10) {
+        for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i += 10) {
             printTimeVersusRangeSizeForFixedDataSize("trapdoor", i);
             printTimeVersusRangeSizeForFixedDataSize("search", i);
             printPercentagePaddingVersusRangeSizeForFixedDataSize("searchPadding", i);
@@ -42,7 +42,7 @@ public class DataExtractor {
             throws IOException {
         final var writer =
                 new MethodVsPadding(String.join("-", method, "method-vs-percentage-padding"));
-        for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i *= 10) {
+        for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i += 10) {
             final var current = String.join("/", PATH, String.join(".", method, "csv"));
             final var file = new File(current);
             if (file.exists()) {
@@ -109,12 +109,13 @@ public class DataExtractor {
                                                         "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
                                                 .doubleValue())
                                 .replace("%", "\\%"),
-                        nf.format(
-                                        averagePercentagePadding
-                                                .get(
-                                                        "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
-                                                .doubleValue())
-                                .replace("%", "\\%"));
+                        "-1"
+                        /*nf.format(
+                                averagePercentagePadding
+                                        .get(
+                                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
+                                        .doubleValue())
+                        .replace("%", "\\%")*/ );
             }
         }
         writer.printer.close();
@@ -209,13 +210,13 @@ public class DataExtractor {
                                                 .get(
                                                         "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
                                                 .doubleValue())
-                                .replace("%", "\\%"),
-                        nf.format(
+                                .replace("%", "\\%"), "-1"
+                        /*nf.format(
                                         averagePercentagePadding
                                                 .get(
                                                         "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
                                                 .doubleValue())
-                                .replace("%", "\\%"));
+                                .replace("%", "\\%")*/);
                 writer2.printToCsv(
                         rangeSize,
                         nf.format(
@@ -233,13 +234,13 @@ public class DataExtractor {
                                                 .get(
                                                         "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
                                                 .doubleValue())
-                                .replace("%", ""),
-                        nf.format(
+                                .replace("%", ""), "-1"
+                        /*nf.format(
                                         averagePercentagePadding
                                                 .get(
                                                         "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
                                                 .doubleValue())
-                                .replace("%", ""));
+                                .replace("%", "")*/);
             }
         }
         writer.printer.close();
@@ -313,11 +314,11 @@ public class DataExtractor {
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-seq"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-par"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-seq"),
-                        averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"),
-                        averageTimes.get(
+                        averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"), -1, -1
+                        /*averageTimes.get(
                                 "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-seq"),
                         averageTimes.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par"));
+                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par")*/);
             }
         }
         writer.printer.close();
@@ -325,7 +326,7 @@ public class DataExtractor {
 
     private static void printOverheadVersusDataSize(final String method) throws IOException {
         final var writer = new MethodVsSize(String.join("-", method, "method-vs-overhead"));
-        for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i *= 10) {
+        for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i += 10) {
             final var current = String.join("/", PATH, String.join(".", method, "csv"));
             final var file = new File(current);
             if (file.exists()) {
@@ -382,10 +383,12 @@ public class DataExtractor {
                         averageSizes.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-par"),
                         averageSizes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-seq"),
                         averageSizes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"),
-                        averageSizes.get(
+                        -1,
+                        -1
+                        /*averageSizes.get(
                                 "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-seq"),
                         averageSizes.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par"));
+                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par")*/ );
             }
         }
         writer.printer.close();
@@ -393,7 +396,7 @@ public class DataExtractor {
 
     private static void printTimeVersusDataSize(final String method) throws IOException {
         final var writer = new MethodVsTime(String.join("-", method, "method-vs-time"));
-        for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i *= 10) {
+        for (int i = 10; i <= MAX_NUMBER_OF_DATA_SAMPLES; i += 10) {
             final var current = String.join("/", PATH, String.join(".", method, "csv"));
             final var file = new File(current);
             if (file.exists()) {
@@ -448,10 +451,12 @@ public class DataExtractor {
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-par"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-seq"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"),
-                        averageTimes.get(
+                        -1,
+                        -1
+                        /*averageTimes.get(
                                 "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-seq"),
                         averageTimes.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par"));
+                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par")*/ );
             }
         }
         writer.printer.close();

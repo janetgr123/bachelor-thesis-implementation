@@ -75,7 +75,7 @@ public class BenchmarkRunner {
 
         System.out.println("STARTING BENCHMARKS");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        IntStream.iterate(10, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> 10 * i)
+        IntStream.iterate(10, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i + 10)
                 .forEach(
                         dataSize -> {
                             setMultimapAndRootForDataSize(dataSize);
@@ -106,6 +106,7 @@ public class BenchmarkRunner {
                                     throw new RuntimeException(e);
                                 }
                             }
+                            /*
                             List<TwoRoundGenericRSScheme> dpRangeSchemes = new ArrayList<>();
                             for (final var emm : twoRoundEMMS) {
                                 try {
@@ -132,6 +133,8 @@ public class BenchmarkRunner {
                                     throw new RuntimeException(e);
                                 }
                             }
+
+                             */
                             rangeSchemes.forEach(
                                     el -> {
                                         try {
@@ -148,6 +151,7 @@ public class BenchmarkRunner {
                                             throw new RuntimeException(e);
                                         }
                                     });
+                            /*
                             dpRangeSchemes.forEach(
                                     el -> {
                                         try {
@@ -164,6 +168,8 @@ public class BenchmarkRunner {
                                             throw new RuntimeException(e);
                                         }
                                     });
+
+                             */
                         });
 
         System.out.println();
@@ -533,6 +539,7 @@ public class BenchmarkRunner {
                 for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
                     runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true);
                 }
+                System.out.println("Iteration: " + iteration);
                 System.out.println(
                         "Running build index for data size "
                                 + dataSize
