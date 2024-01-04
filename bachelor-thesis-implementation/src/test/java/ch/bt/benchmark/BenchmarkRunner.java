@@ -38,7 +38,9 @@ public class BenchmarkRunner {
 
     private static Map<Label, Set<Plaintext>> multimap;
     private static Vertex root;
-    private static final List<EMM> emms;
+    private static final List<EMM> basicEmms;
+    private static final List<EMM> vhEmms;
+    private static final List<EMM> vhOEmms;
 
     static {
         Security.addProvider(new BouncyCastleFipsProvider());
@@ -46,11 +48,23 @@ public class BenchmarkRunner {
 
     static {
         try {
-            emms =
-                    List.of(
-                            new BasicEMM(SECURITY_PARAMETER),
-                            new VolumeHidingEMM(SECURITY_PARAMETER, ALPHA),
-                            new VolumeHidingEMMOptimised(SECURITY_PARAMETER, ALPHA));
+            basicEmms = List.of(new BasicEMM(SECURITY_PARAMETER));
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static {
+        try {
+            vhEmms = List.of(new VolumeHidingEMM(SECURITY_PARAMETER, ALPHA));
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static {
+        try {
+            vhOEmms = List.of(new VolumeHidingEMMOptimised(SECURITY_PARAMETER, ALPHA));
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
@@ -73,103 +87,116 @@ public class BenchmarkRunner {
         final long start = System.currentTimeMillis();
         initializeData();
 
+        // command line args
+        final var emmType = Integer.parseInt(args[0]);
+        final var twoRoundEMMs = Integer.parseInt(args[1]);
+
+        final var emms =
+                switch (emmType) {
+                    case 1 -> vhEmms;
+                    case 2 -> vhOEmms;
+                    default -> basicEmms;
+                };
+
         System.out.println("STARTING BENCHMARKS");
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         IntStream.iterate(10, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i + 10)
                 .forEach(
                         dataSize -> {
                             setMultimapAndRootForDataSize(dataSize);
-                            List<GenericRSScheme> rangeSchemes = new ArrayList<>();
-                            for (final var emm : emms) {
-                                try {
-                                    rangeSchemes.add(
-                                            new RangeBRCScheme(
-                                                    SECURITY_PARAMETER,
-                                                    emm,
-                                                    new BestRangeCover(),
-                                                    root));
-                                } catch (GeneralSecurityException | IOException e) {
-                                    throw new RuntimeException(e);
+                            if (twoRoundEMMs == 0) {
+                                List<GenericRSScheme> rangeSchemes = new ArrayList<>();
+                                for (final var emm : emms) {
+                                    try {
+                                        rangeSchemes.add(
+                                                new RangeBRCScheme(
+                                                        SECURITY_PARAMETER,
+                                                        emm,
+                                                        new BestRangeCover(),
+                                                        root));
+                                    } catch (GeneralSecurityException | IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
-                            }
 
-                            List<GenericRSScheme> rangeSchemesPar = new ArrayList<>();
-                            for (final var emm : emms) {
-                                try {
-                                    rangeSchemesPar.add(
-                                            new ParallelRangeBRCScheme(
-                                                    SECURITY_PARAMETER,
-                                                    emm,
-                                                    new BestRangeCover(),
-                                                    root));
-                                } catch (GeneralSecurityException | IOException e) {
-                                    throw new RuntimeException(e);
+                                List<GenericRSScheme> rangeSchemesPar = new ArrayList<>();
+                                for (final var emm : emms) {
+                                    try {
+                                        rangeSchemesPar.add(
+                                                new ParallelRangeBRCScheme(
+                                                        SECURITY_PARAMETER,
+                                                        emm,
+                                                        new BestRangeCover(),
+                                                        root));
+                                    } catch (GeneralSecurityException | IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
-                            }
-                            /*
-                            List<TwoRoundGenericRSScheme> dpRangeSchemes = new ArrayList<>();
-                            for (final var emm : twoRoundEMMS) {
-                                try {
-                                    dpRangeSchemes.add(
-                                            new DPRangeBRCScheme(
-                                                    SECURITY_PARAMETER,
-                                                    emm,
-                                                    new BestRangeCover(),
-                                                    root));
-                                } catch (GeneralSecurityException | IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                            List<TwoRoundGenericRSScheme> dpRangeSchemesPar = new ArrayList<>();
-                            for (final var emm : twoRoundEMMS) {
-                                try {
-                                    dpRangeSchemesPar.add(
-                                            new ParallelDPRangeBRCScheme(
-                                                    SECURITY_PARAMETER,
-                                                    emm,
-                                                    new BestRangeCover(),
-                                                    root));
-                                } catch (GeneralSecurityException | IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
+                                rangeSchemes.forEach(
+                                        el -> {
+                                            try {
+                                                runBenchmarkForSchemeAndDataSize(
+                                                        el, dataSize, "seq");
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        });
+                                rangeSchemesPar.forEach(
+                                        el -> {
+                                            try {
+                                                runBenchmarkForSchemeAndDataSize(
+                                                        el, dataSize, "par");
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        });
+                            } else {
 
-                             */
-                            rangeSchemes.forEach(
-                                    el -> {
-                                        try {
-                                            runBenchmarkForSchemeAndDataSize(el, dataSize, "seq");
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    });
-                            rangeSchemesPar.forEach(
-                                    el -> {
-                                        try {
-                                            runBenchmarkForSchemeAndDataSize(el, dataSize, "par");
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    });
-                            /*
-                            dpRangeSchemes.forEach(
-                                    el -> {
-                                        try {
-                                            runBenchmarkForSchemeAndDataSize(el, dataSize, "seq");
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    });
-                            dpRangeSchemesPar.forEach(
-                                    el -> {
-                                        try {
-                                            runBenchmarkForSchemeAndDataSize(el, dataSize, "par");
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    });
-
-                             */
+                                List<TwoRoundGenericRSScheme> dpRangeSchemes = new ArrayList<>();
+                                for (final var emm : twoRoundEMMS) {
+                                    try {
+                                        dpRangeSchemes.add(
+                                                new DPRangeBRCScheme(
+                                                        SECURITY_PARAMETER,
+                                                        emm,
+                                                        new BestRangeCover(),
+                                                        root));
+                                    } catch (GeneralSecurityException | IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                                List<TwoRoundGenericRSScheme> dpRangeSchemesPar = new ArrayList<>();
+                                for (final var emm : twoRoundEMMS) {
+                                    try {
+                                        dpRangeSchemesPar.add(
+                                                new ParallelDPRangeBRCScheme(
+                                                        SECURITY_PARAMETER,
+                                                        emm,
+                                                        new BestRangeCover(),
+                                                        root));
+                                    } catch (GeneralSecurityException | IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                                dpRangeSchemes.forEach(
+                                        el -> {
+                                            try {
+                                                runBenchmarkForSchemeAndDataSize(
+                                                        el, dataSize, "seq");
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        });
+                                dpRangeSchemesPar.forEach(
+                                        el -> {
+                                            try {
+                                                runBenchmarkForSchemeAndDataSize(
+                                                        el, dataSize, "par");
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        });
+                            }
                         });
 
         System.out.println();
@@ -188,6 +215,7 @@ public class BenchmarkRunner {
                 new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
                         .withReuse(true)
                         .withInitScript("init.sql");
+        System.out.println(postgreSQLContainer);
         postgreSQLContainer.start();
         String jdbcUrl = postgreSQLContainer.getJdbcUrl();
         String username = postgreSQLContainer.getUsername();

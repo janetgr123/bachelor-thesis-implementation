@@ -1,0 +1,3 @@
+# number of emm (0 = basic, 1 = vh, 2 = vho), isTwoRound
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0
+
