@@ -10,7 +10,7 @@ import java.util.*;
 public class DataExtractor {
     private static final int MAX_NUMBER_OF_DATA_SAMPLES =
             BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES;
-    private static final String PATH = "src/test/resources/benchmark";
+    private static final String PATH = "src/test/resources/data";
 
     private static final List<String> classes =
             List.of(
@@ -210,13 +210,14 @@ public class DataExtractor {
                                                 .get(
                                                         "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
                                                 .doubleValue())
-                                .replace("%", "\\%"), "-1"
+                                .replace("%", "\\%"),
+                        "-1"
                         /*nf.format(
-                                        averagePercentagePadding
-                                                .get(
-                                                        "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
-                                                .doubleValue())
-                                .replace("%", "\\%")*/);
+                                averagePercentagePadding
+                                        .get(
+                                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
+                                        .doubleValue())
+                        .replace("%", "\\%")*/ );
                 writer2.printToCsv(
                         rangeSize,
                         nf.format(
@@ -234,13 +235,14 @@ public class DataExtractor {
                                                 .get(
                                                         "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
                                                 .doubleValue())
-                                .replace("%", ""), "-1"
+                                .replace("%", ""),
+                        "-1"
                         /*nf.format(
-                                        averagePercentagePadding
-                                                .get(
-                                                        "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
-                                                .doubleValue())
-                                .replace("%", "")*/);
+                                averagePercentagePadding
+                                        .get(
+                                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
+                                        .doubleValue())
+                        .replace("%", "")*/ );
             }
         }
         writer.printer.close();
@@ -314,11 +316,13 @@ public class DataExtractor {
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-seq"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-par"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-seq"),
-                        averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"), -1, -1
+                        averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"),
+                        -1,
+                        -1
                         /*averageTimes.get(
                                 "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-seq"),
                         averageTimes.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par")*/);
+                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par")*/ );
             }
         }
         writer.printer.close();

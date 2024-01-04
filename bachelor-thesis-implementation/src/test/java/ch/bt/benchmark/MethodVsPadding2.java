@@ -18,7 +18,7 @@ public class MethodVsPadding2 {
         final String file = String.join(".", filename, "csv");
         fileWriter =
                 Files.newBufferedWriter(
-                        Paths.get(String.join("/", "src/test/resources/benchmark", file)),
+                        Paths.get(String.join("/", "src/test/resources/data", file)),
                         StandardOpenOption.APPEND,
                         StandardOpenOption.CREATE);
         csvFormat =
