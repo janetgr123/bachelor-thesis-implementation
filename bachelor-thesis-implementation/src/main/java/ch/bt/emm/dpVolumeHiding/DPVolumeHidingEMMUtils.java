@@ -13,8 +13,25 @@ import java.util.*;
 
 import javax.crypto.SecretKey;
 
+/**
+ * This class is a collection of static helper methods for {@link ch.bt.emm.dpVolumeHiding}
+ *
+ * @author Janet Greutmann
+ */
 public class DPVolumeHidingEMMUtils {
+    /** Dummy entry */
+    public static final byte[] DUMMY = new byte[0];
 
+    /**
+     * @param tableSize the size of the tables
+     * @param numberOfValues the number of values stored in the multimap
+     * @param multiMap the multimap containing the plaintext data
+     * @param prfKey the secret key used for the PRF
+     * @param seScheme the symmetric encryption scheme
+     * @return the encrypted index of the counter tables calculated with Cuckoo Hashing, the tables
+     *     are encrypted, the stash is not.
+     * @throws IOException
+     */
     public static EncryptedIndexWithStash calculateEncryptedCTIndex(
             final int tableSize,
             final int numberOfValues,
@@ -51,6 +68,12 @@ public class DPVolumeHidingEMMUtils {
                 numberOfDummyCT);
     }
 
+    /**
+     * @param entry the (label, |multimap[label]|) pair that should be encrypted
+     * @param seScheme the symmetric encryption scheme
+     * @return the encrypted (label, |multimap[label]|) pair
+     * @throws GeneralSecurityException
+     */
     private static PairLabelCiphertext encryptEntry(
             final PairLabelNumberValues entry, final SEScheme seScheme)
             throws GeneralSecurityException {
@@ -60,6 +83,15 @@ public class DPVolumeHidingEMMUtils {
                         new Plaintext(CastingHelpers.fromIntToByteArray(entry.numberOfValues()))));
     }
 
+    /**
+     * Encrypts the Cuckoo Hashing counter tables
+     *
+     * @param table1 the first counter table of the Cuckoo Hashing
+     * @param table2 the second counter table of the Cuckoo Hashing
+     * @param encryptedTable1 the reference to the resulting encrypted table 1
+     * @param encryptedTable2 the reference to the resulting encrypted table 2
+     * @param seScheme the symmetric encryption scheme
+     */
     public static void encryptCounterTables(
             final PairLabelNumberValues[] table1,
             final PairLabelNumberValues[] table2,
@@ -99,12 +131,18 @@ public class DPVolumeHidingEMMUtils {
         }
     }
 
+    /**
+     * Fills empty entries of the counter table with dummy values
+     *
+     * @param table one of the two counter tables used for Cuckoo Hashing
+     * @return the number of dummy entries in the counter table
+     */
     public static int fillEmptyValues(final PairLabelNumberValues[] table) {
         int numberOfDummyCT = 0;
         int i = 0;
         for (final var pair : table) {
             if (pair == null) {
-                table[i] = new PairLabelNumberValues(new Label(new byte[0]), 0);
+                table[i] = new PairLabelNumberValues(new Label(DUMMY), 0);
                 numberOfDummyCT++;
             }
             i++;
@@ -112,6 +150,12 @@ public class DPVolumeHidingEMMUtils {
         return numberOfDummyCT;
     }
 
+    /**
+     * @param volumeHidingEMM the differentially private volume hiding emm
+     * @param table1 the first encrypted table of the Cuckoo Hashing
+     * @param table2 the second encrypted table of the Cuckoo Hashing
+     * @return a list of all decrypted labels that are contained in the two tables
+     */
     public static List<Label> getDecryptedLabels(
             final DifferentiallyPrivateVolumeHidingEMM volumeHidingEMM,
             final PairLabelCiphertext[] table1,
@@ -134,6 +178,12 @@ public class DPVolumeHidingEMMUtils {
                 .toList();
     }
 
+    /**
+     * @param volumeHidingEMM the differentially private volume hiding emm
+     * @param table1 the first encrypted table of the Cuckoo Hashing
+     * @param table2 the second encrypted table of the Cuckoo Hashing
+     * @return a list of all decrypted values that are contained in the two tables
+     */
     public static List<Plaintext> getDecryptedValues(
             final DifferentiallyPrivateVolumeHidingEMM volumeHidingEMM,
             final PairLabelCiphertext[] table1,

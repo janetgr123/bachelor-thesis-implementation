@@ -8,6 +8,11 @@ import java.security.GeneralSecurityException;
 
 import javax.crypto.SecretKey;
 
+/**
+ * This interface specifies a symmetric encryption scheme.
+ *
+ * @author Janet Greutmann
+ */
 public interface SEScheme {
 
     SecretKey generateKey(final int securityParameter) throws GeneralSecurityException;

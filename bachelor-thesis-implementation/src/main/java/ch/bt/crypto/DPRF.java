@@ -14,9 +14,12 @@ import java.util.Arrays;
 import javax.crypto.SecretKey;
 
 /**
+ * This class is a collection implements delegatable pseudo-random functions from <a
+ * href="https://doi.org/10.1145/2508859.2516668">Kiayias et al.</a> using crypto primitives of the
  * <a
- * href="https://github.com/indrabasak/bouncycastle-fips-examples/blob/master/doc/BCFipsIn100.pdf">...</a>
- * date accessed: 21.11.2023
+ * href="https://github.com/indrabasak/bouncycastle-fips-examples/blob/master/doc/BCFipsIn100.pdf">Bouncy
+ * Castle FIPS API</a> date accessed: 21.11.2023
+ * @author Janet Greutmann
  */
 public class DPRF {
 
@@ -29,8 +32,7 @@ public class DPRF {
      */
     public static byte[] expandData(final byte[] data, final long left) throws IOException {
         final int length = data.length * 2;
-        FipsXOFOperatorFactory<FipsSHS.Parameters> factory =
-                new FipsSHS.XOFOperatorFactory<>();
+        FipsXOFOperatorFactory<FipsSHS.Parameters> factory = new FipsSHS.XOFOperatorFactory<>();
         OutputXOFCalculator<FipsSHS.Parameters> calculator =
                 factory.createOutputXOFCalculator(FipsSHS.SHAKE256);
         OutputStream digestStream = calculator.getFunctionStream();

@@ -13,9 +13,12 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
-import javax.crypto.SecretKey;
-
-/** SSE scheme from Patel et al. (2019) With improved communication using delegatable PRFs */
+/**
+ * This class implements the Optimised Volume Hiding SSE scheme from <a
+ * href="https://doi.org/10.1145/3319535.3354213">Patel et al.</a>
+ *
+ * @author Janet Greutmann
+ */
 public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
 
     public VolumeHidingEMMOptimised(final int securityParameter, final double alpha)
@@ -23,22 +26,25 @@ public class VolumeHidingEMMOptimised extends VolumeHidingEMM {
         super(securityParameter, alpha);
     }
 
-    // for benchmarking only
-    public VolumeHidingEMMOptimised(
-            final double alpha,
-            final int maxNumberOfValuesPerLabel,
-            final int numberOfValues,
-            final SecretKey prfKey,
-            final SecretKey seSchemeKey) {
-        super(alpha, maxNumberOfValuesPerLabel, numberOfValues, prfKey, seSchemeKey);
-    }
-
+    /**
+     * @param searchLabel the search label in plaintext
+     * @return a search token that enables access to the entries in the encrypted index that
+     *     correspond to the search label. The search token is generated using DPRFs and thus can be
+     *     extended which reduces the communication overhead.
+     * @throws GeneralSecurityException
+     */
     @Override
     public SearchToken trapdoor(final Label searchLabel)
             throws GeneralSecurityException, IOException {
         return new SearchTokenBytes(DPRF.generateToken(getPrfKey(), searchLabel));
     }
 
+    /**
+     * @param searchToken the search token prefix that has been generated with trapdoor
+     * @param encryptedIndex the encrypted index
+     * @return the set of ciphertexts that correspond to the labels encrypted in the extended token
+     * @throws GeneralSecurityException
+     */
     @Override
     public Set<Ciphertext> search(
             final SearchToken searchToken, final EncryptedIndex encryptedIndex)
