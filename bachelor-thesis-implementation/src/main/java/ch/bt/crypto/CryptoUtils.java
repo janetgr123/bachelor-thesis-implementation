@@ -38,6 +38,7 @@ public class CryptoUtils {
      * @param key symmetric AES encryption key
      * @param plaintext input plaintext to encrypt with the AES scheme
      * @return Enc(key, plaintext) ciphertext and used iv, wrapped into a class
+     * @throws GeneralSecurityException
      */
     public static CiphertextWithIV cbcEncrypt(final SecretKey key, final byte[] plaintext)
             throws GeneralSecurityException {
@@ -64,6 +65,7 @@ public class CryptoUtils {
      *
      * @param data the byte array to hash
      * @return SHA3-512 hash of the data
+     * @throws GeneralSecurityException
      */
     public static byte[] calculateSha3Digest(final byte[] data) throws GeneralSecurityException {
         MessageDigest hash = MessageDigest.getInstance("SHA3-512", "BCFIPS");
@@ -75,6 +77,7 @@ public class CryptoUtils {
      *
      * @param data the string to hash
      * @return hash of the data
+     * @throws GeneralSecurityException
      */
     public static byte[] calculateSha3Digest(final String data) throws GeneralSecurityException {
         MessageDigest hash = MessageDigest.getInstance("SHA3-512", "BCFIPS");

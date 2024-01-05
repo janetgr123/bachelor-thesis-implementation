@@ -9,6 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * This class collects the sizes of the encrypted indices for data sizes
+ *
+ * @author Janet Greutmann
+ */
 public class MethodVsSize {
     BufferedWriter fileWriter;
     CSVFormat csvFormat;

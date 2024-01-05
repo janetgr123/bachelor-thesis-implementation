@@ -9,6 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * This class writes the response size benchmark results
+ *
+ * @author Janet Greutmann
+ */
 public class ResultPrinter4 {
     BufferedWriter fileWriter;
     CSVFormat csvFormat;

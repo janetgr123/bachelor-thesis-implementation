@@ -9,6 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * This class collects the padding a method needed in average for data sizes
+ *
+ * @author Janet Greutmann
+ */
 public class MethodVsPadding {
     BufferedWriter fileWriter;
     CSVFormat csvFormat;

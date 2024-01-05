@@ -9,6 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * This class writes the time benchmark results
+ *
+ * @author Janet Greutmann
+ */
 public class ResultPrinter2 {
     BufferedWriter fileWriter;
     CSVFormat csvFormat;
@@ -24,7 +29,7 @@ public class ResultPrinter2 {
         csvFormat =
                 CSVFormat.DEFAULT
                         .builder()
-                        //.setHeader("emm", "mode", "data size", "from", "range size", "time [ns]")
+                        // .setHeader("emm", "mode", "data size", "from", "range size", "time [ns]")
                         .build();
         printer = new CSVPrinter(fileWriter, csvFormat);
     }

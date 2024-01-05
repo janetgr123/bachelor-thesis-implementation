@@ -9,6 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * This class collects the time a method needed in average for data sizes in average
+ *
+ * @author Janet Greutmann
+ */
 public class MethodVsTime {
     BufferedWriter fileWriter;
     CSVFormat csvFormat;

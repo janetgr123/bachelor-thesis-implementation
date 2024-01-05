@@ -1,5 +1,10 @@
 package ch.bt.benchmark;
 
+/**
+ * This class encapsulates the benchmark settings.
+ *
+ * @author Janet Greutmann
+ */
 public class BenchmarkSettings {
     public static final int NUMBER_OF_QUERIES =
             100; // number of queries for fixed parameters (e.g. data size, range size)

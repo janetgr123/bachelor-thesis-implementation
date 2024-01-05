@@ -9,6 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * This class writes the encrypted index size benchmark results
+ *
+ * @author Janet Greutmann
+ */
 public class ResultPrinter3 {
     BufferedWriter fileWriter;
     CSVFormat csvFormat;

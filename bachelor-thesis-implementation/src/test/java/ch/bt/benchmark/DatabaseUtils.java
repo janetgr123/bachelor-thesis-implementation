@@ -11,6 +11,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * This class is collection of static helper methods to read the dataset.
+ * @author Janet Greutmann
+ */
 public class DatabaseUtils {
     public static void addData(Connection connection) {
         try (final var input = DatabaseUtils.class.getResourceAsStream("/data/data.csv")) {

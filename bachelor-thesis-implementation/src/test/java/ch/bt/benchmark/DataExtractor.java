@@ -7,6 +7,11 @@ import java.io.*;
 import java.text.NumberFormat;
 import java.util.*;
 
+/**
+ * This class extracts the data for the plots from the benchmark results.
+ *
+ * @author Janet Greutmann
+ */
 public class DataExtractor {
     private static final int MAX_NUMBER_OF_DATA_SAMPLES =
             BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES;

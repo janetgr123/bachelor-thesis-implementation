@@ -12,7 +12,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * This class is a collection of static helper methods for {@link ch.bt.genericRs}
+ *
+ * @author Janet Greutmann
+ */
 public class RangeBRCSchemeUtils {
+    /**
+     * The data from the database is converted into a graph which is stored in a new multimap where
+     * the labels are given by the vertices of the graph. This method calculates the graph during
+     * runtime without storing it.
+     *
+     * @param v the vertex v
+     * @param map the new multimap that corresponds to the graph
+     * @param keys a list of the labels contained in the multimap that contains the data from the
+     *     database
+     * @param multiMap the multimap that contains the data from the multimap
+     */
     public static void addVertex(
             final Vertex v,
             final Map<Label, Set<Plaintext>> map,

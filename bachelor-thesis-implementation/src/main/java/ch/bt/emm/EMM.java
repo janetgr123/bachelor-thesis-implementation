@@ -21,6 +21,7 @@ public interface EMM {
      * @param securityParameter the length of the keys in bits
      * @return two secret keys, one for the PRF and one for the symmetric encryption scheme
      * @throws GeneralSecurityException
+     * @throws IOException
      */
     List<SecretKey> setup(final int securityParameter) throws GeneralSecurityException, IOException;
 
@@ -28,6 +29,7 @@ public interface EMM {
      * @param multiMap the plaintext data stored in a multimap
      * @return the encrypted index of the multimap according to the scheme
      * @throws GeneralSecurityException
+     * @throws IOException
      */
     EncryptedIndex buildIndex(final Map<Label, Set<Plaintext>> multiMap)
             throws GeneralSecurityException, IOException;
@@ -37,6 +39,7 @@ public interface EMM {
      * @return a search token that enables access to the entries in the encrypted index that
      *     correspond to the search label.
      * @throws GeneralSecurityException
+     * @throws IOException
      */
     SearchToken trapdoor(final Label searchLabel) throws GeneralSecurityException, IOException;
 
@@ -45,6 +48,7 @@ public interface EMM {
      * @param encryptedIndex the encrypted index
      * @return the set of ciphertexts that correspond to the label encrypted in the token
      * @throws GeneralSecurityException
+     * @throws IOException
      */
     Set<Ciphertext> search(final SearchToken searchToken, final EncryptedIndex encryptedIndex)
             throws GeneralSecurityException, IOException;
@@ -54,6 +58,7 @@ public interface EMM {
      * @param searchLabel the search label in plaintext
      * @return the set of plaintexts that have been encrypted to those ciphertexts using the given
      *     ivs and the schemeKey
+     * @throws GeneralSecurityException
      */
     Set<Plaintext> result(final Set<Ciphertext> ciphertexts, final Label searchLabel)
             throws GeneralSecurityException;
