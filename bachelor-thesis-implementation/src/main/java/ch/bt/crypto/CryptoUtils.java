@@ -61,7 +61,7 @@ public class CryptoUtils {
     }
 
     /**
-     * Hashing with SHA3-512
+     * Hashing with SHA3-512, for testing purposes only
      *
      * @param data the byte array to hash
      * @return SHA3-512 hash of the data
