@@ -2,14 +2,10 @@ package ch.bt.cuckoHashing;
 
 import ch.bt.crypto.CastingHelpers;
 import ch.bt.crypto.DPRF;
-import ch.bt.emm.dpVolumeHiding.DPVolumeHidingEMMUtils;
 import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
 import ch.bt.model.multimap.PairLabelNumberValues;
 import ch.bt.model.multimap.Plaintext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -25,7 +21,6 @@ import javax.crypto.SecretKey;
  * @author Janet Greutmann
  */
 public class CuckooHashingCT {
-    private static final Logger logger = LoggerFactory.getLogger(DPVolumeHidingEMMUtils.class);
 
     /** The maximum stash size should be of asymptotically constant size. */
     private static final int maxStashSize = 3;
@@ -76,15 +71,12 @@ public class CuckooHashingCT {
                 /*
                  * try table 1
                  */
-                logger.debug("Inserting in table 1: {}", toInsert);
                 toInsert = insert(table1, getHashCT(toInsert.label(), 0, tableSize, key), toInsert);
 
                 /*
                  * if an element is evicted, try table 2
                  */
                 if (toInsert != null) {
-                    logger.debug("COLLISION! Evict from table 1: {}", toInsert);
-                    logger.debug("Inserting in table 2: {}", toInsert);
                     evictionCounter++;
                     toInsert =
                             insert(
@@ -96,7 +88,6 @@ public class CuckooHashingCT {
                      * if an element is evicted, try table 1 again in the next loop round
                      */
                     if (toInsert != null) {
-                        logger.debug("COLLISION! Evict from table 2: {}", toInsert);
                         evictionCounter++;
                         firstTime = false;
                     }
@@ -107,7 +98,6 @@ public class CuckooHashingCT {
              * number of evictions is reached, the evicted element is put onto the stash
              */
             if (toInsert != null) {
-                logger.debug("Could not insert element. Putting onto stash: {}", toInsert);
                 stash.add(toInsert);
             }
         }
@@ -139,7 +129,6 @@ public class CuckooHashingCT {
                                 CastingHelpers.fromByteArrayToBitInputStream(toHash),
                                 key.getEncoded()),
                         n);
-        logger.info("Hashing element {}. The hash evaluates to {}.", toHash, result);
         return result;
     }
 
