@@ -17,7 +17,7 @@ import java.util.*;
 import javax.crypto.SecretKey;
 
 /**
- * This class implements the SSE scheme Pi_bas from <a
+ * This class is based on the SSE scheme Pi_bas from <a
  * href="http://dx.doi.org/10.14722/ndss.2014.23264">Cash et al.</a> The implementation of <a
  * href="https://github.com/cloudsecuritygroup/ers-attacks">Falzon et al.</a> in Python has been
  * used as a reference code base.
