@@ -49,8 +49,8 @@ public class TestConfigurationsWithDB implements BeforeAllCallback {
             String password = postgreSQLContainer.getPassword();
             connection = DriverManager.getConnection(jdbcUrl, username, password);
             addData1();
-            addData2();
-            addData3();
+            //addData2();
+            //addData3(); because very slow
             TestUtils.init(connection);
             extensionContext
                     .getRoot()

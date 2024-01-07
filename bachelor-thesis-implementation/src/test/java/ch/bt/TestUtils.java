@@ -82,7 +82,9 @@ public class TestUtils {
         final var query =
                 "select "
                         + primaryKey
-                        + ", longitude from t_network_nodes where "
+                        + ", longitude from "
+                        + table
+                        + " where "
                         + primaryKey
                         + " in ("
                         + outputList(indices.stream().sorted().toList())
