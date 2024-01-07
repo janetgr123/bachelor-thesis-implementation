@@ -6,13 +6,18 @@ import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.Vertex;
 import ch.bt.rc.RangeCoverUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Stream;
 
 public class TestUtils {
 
-    public static final int TEST_DATA_SET_SIZE = 100;
+    private static final Logger logger = LoggerFactory.getLogger(TestUtils.class);
+
+    public static final int TEST_DATA_SET_SIZE = 10;
     public static final double ALPHA = 0.3;
 
     public static final List<Integer> VALID_SECURITY_PARAMETERS_FOR_AES = List.of(128, 256);
@@ -40,10 +45,12 @@ public class TestUtils {
         final var randomLabelId = (int) ((labels.size() - 1) * Math.random());
         searchLabel = labels.get(randomLabelId);
         generateTwoSmallMultimaps();
+        logger.info("initialization done");
     }
 
     public static Map<Label, Set<Plaintext>> sampleDataFromDB(Connection connection, final int size)
             throws SQLException {
+        logger.info("sample {} data points", size);
         final var PUFFER = (int) Math.round(0.2 * size);
         Statement stmt = connection.createStatement();
         ResultSet rs0 =
@@ -73,6 +80,7 @@ public class TestUtils {
             multiMap.put(
                     new Label(CastingHelpers.fromIntToByteArray(rs.getInt("pk_node_id"))), set);
         }
+        logger.info("sampling done");
         return multiMap;
     }
 

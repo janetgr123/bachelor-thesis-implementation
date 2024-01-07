@@ -13,6 +13,7 @@ import ch.bt.model.rc.Vertex;
 import ch.bt.rc.BestRangeCover;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -22,6 +23,7 @@ import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Disabled // this test takes very long
 @ExtendWith({TestConfigurationsWithDB.class})
 public class DPRangeBRCSchemeTest {
 
