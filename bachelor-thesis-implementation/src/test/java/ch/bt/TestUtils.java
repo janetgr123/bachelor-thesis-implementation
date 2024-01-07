@@ -16,8 +16,8 @@ import java.util.stream.Stream;
 public class TestUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(TestUtils.class);
-
     public static final int TEST_DATA_SET_SIZE = 10;
+    public static final int TEST_DATA = 0;
     public static final double ALPHA = 0.3;
 
     public static final List<Integer> VALID_SECURITY_PARAMETERS_FOR_AES = List.of(128, 256);
@@ -36,7 +36,7 @@ public class TestUtils {
 
     public static void init(Connection connection) {
         try {
-            multimap = sampleDataFromDB(connection, TEST_DATA_SET_SIZE);
+            multimap = sampleDataFromDB(connection, TEST_DATA_SET_SIZE, TEST_DATA);
             root = RangeCoverUtils.getRoot(multimap);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -48,14 +48,30 @@ public class TestUtils {
         logger.info("initialization done");
     }
 
-    public static Map<Label, Set<Plaintext>> sampleDataFromDB(Connection connection, final int size)
-            throws SQLException {
+    public static Map<Label, Set<Plaintext>> sampleDataFromDB(
+            Connection connection, final int size, final int dataset) throws SQLException {
+        final String primaryKey =
+                switch (dataset) {
+                    case 0 -> "pk_node_id";
+                    default -> "pk_id";
+                };
+        final String table =
+                switch (dataset) {
+                    case 1 -> "t_spitz";
+                    case 2 -> "t_check_ins";
+                    default -> "t_network_nodes";
+                };
         logger.info("sample {} data points", size);
         final var PUFFER = (int) Math.round(0.2 * size);
         Statement stmt = connection.createStatement();
         ResultSet rs0 =
                 stmt.executeQuery(
-                        "select min(pk_node_id) as min, max(pk_node_id) as max from t_network_nodes");
+                        "select min("
+                                + primaryKey
+                                + ") as min, max("
+                                + primaryKey
+                                + ") as max from "
+                                + table);
         rs0.next();
         final var min = rs0.getInt("min");
         final var max = rs0.getInt("max");
@@ -64,7 +80,11 @@ public class TestUtils {
             indices.add((int) Math.round(Math.random() * max + min));
         }
         final var query =
-                "select pk_node_id, longitude from t_network_nodes where pk_node_id in ("
+                "select "
+                        + primaryKey
+                        + ", longitude from t_network_nodes where "
+                        + primaryKey
+                        + " in ("
                         + outputList(indices.stream().sorted().toList())
                         + ")";
         ResultSet rs = stmt.executeQuery(query);
@@ -77,8 +97,7 @@ public class TestUtils {
                                     (int)
                                             Math.round(
                                                     Math.pow(10, 6) * rs.getDouble("longitude")))));
-            multiMap.put(
-                    new Label(CastingHelpers.fromIntToByteArray(rs.getInt("pk_node_id"))), set);
+            multiMap.put(new Label(CastingHelpers.fromIntToByteArray(rs.getInt(primaryKey))), set);
         }
         logger.info("sampling done");
         return multiMap;

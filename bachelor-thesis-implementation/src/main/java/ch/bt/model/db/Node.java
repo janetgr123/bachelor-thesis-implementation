@@ -8,4 +8,4 @@ package ch.bt.model.db;
  * @param longitude the longitude of the node
  * @author Janet Greutmann
  */
-public record NetworkNode(int id, double latitude, double longitude) {}
+public record Node(int id, double latitude, double longitude) {}

@@ -24,6 +24,7 @@ public class BenchmarkRunner {
         // command line args
         final var emmType = Integer.parseInt(args[0]);
         final var twoRoundEMMs = Integer.parseInt(args[1]);
+        final var dataSet = Integer.parseInt(args[2]);
 
         final var emms =
                 switch (emmType) {
@@ -37,7 +38,7 @@ public class BenchmarkRunner {
         IntStream.iterate(10, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i + 10)
                 .forEach(
                         dataSize -> {
-                            BenchmarkUtils.setMultimapAndRootForDataSize(dataSize);
+                            BenchmarkUtils.setMultimapAndRootForDataSize(dataSize, dataSet);
                             if (twoRoundEMMs == 0) {
                                 BenchmarkUtils.runBenchmarkForRangeScheme(emms, dataSize);
                                 BenchmarkUtils.runBenchmarkForParallelRangeScheme(emms, dataSize);

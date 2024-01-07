@@ -1,6 +1,6 @@
 package ch.bt.benchmark;
 
-import ch.bt.model.db.NetworkNode;
+import ch.bt.model.db.Node;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -25,7 +25,7 @@ public class DatabaseUtils {
                                     el -> {
                                         final var string = el.get(0);
                                         final var split = string.split(" ");
-                                        return new NetworkNode(
+                                        return new Node(
                                                 Integer.parseInt(split[0]),
                                                 Double.parseDouble(split[1]),
                                                 Double.parseDouble(split[2]));
