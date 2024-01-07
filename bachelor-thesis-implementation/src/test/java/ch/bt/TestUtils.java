@@ -6,10 +6,7 @@ import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.Vertex;
 import ch.bt.rc.RangeCoverUtils;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -47,25 +44,46 @@ public class TestUtils {
 
     public static Map<Label, Set<Plaintext>> sampleDataFromDB(Connection connection, final int size)
             throws SQLException {
+        final var PUFFER = (int) Math.round(0.2 * size);
         Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery("select pk_node_id, longitude from t_network_nodes");
-        final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
-        final Map<Integer, Integer> data = new HashMap<>();
-        while (rs.next()) {
-            data.put(
-                    rs.getInt("pk_node_id"),
-                    (int) Math.round(Math.pow(10, 6) * rs.getDouble("longitude")));
+        ResultSet rs0 =
+                stmt.executeQuery(
+                        "select min(pk_node_id) as min, max(pk_node_id) as max from t_network_nodes");
+        rs0.next();
+        final var min = rs0.getInt("min");
+        final var max = rs0.getInt("max");
+        final var indices = new ArrayList<Integer>();
+        while (indices.size() < size + PUFFER) {
+            indices.add((int) Math.round(Math.random() * max + min));
         }
-        final var keys = data.keySet().parallelStream().toList();
-        final var n = keys.size();
-        while (multiMap.size() < size) {
-            final var index = (int) Math.round(Math.random() * n);
-            final var label = keys.get(index);
+        final var query =
+                "select pk_node_id, longitude from t_network_nodes where pk_node_id in ("
+                        + outputList(indices.stream().sorted().toList())
+                        + ")";
+        ResultSet rs = stmt.executeQuery(query);
+        final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
+        while (rs.next() && multiMap.size() < size) {
             final var set = new HashSet<Plaintext>();
-            set.add(new Plaintext(CastingHelpers.fromIntToByteArray(data.get(label))));
-            multiMap.put(new Label(CastingHelpers.fromIntToByteArray(label)), set);
+            set.add(
+                    new Plaintext(
+                            CastingHelpers.fromIntToByteArray(
+                                    (int)
+                                            Math.round(
+                                                    Math.pow(10, 6) * rs.getDouble("longitude")))));
+            multiMap.put(
+                    new Label(CastingHelpers.fromIntToByteArray(rs.getInt("pk_node_id"))), set);
         }
         return multiMap;
+    }
+
+    private static String outputList(final List<Integer> list) {
+        StringBuilder result = new StringBuilder();
+        for (final var l : list) {
+            result.append(l);
+            result.append(",");
+        }
+        result.deleteCharAt(result.length() - 1);
+        return result.toString();
     }
 
     public static Stream<Integer> getValidSecurityParametersForAES() {
