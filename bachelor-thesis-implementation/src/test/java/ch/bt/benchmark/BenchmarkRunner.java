@@ -2,6 +2,7 @@ package ch.bt.benchmark;
 
 import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 
+import java.io.IOException;
 import java.security.Security;
 import java.sql.SQLException;
 import java.util.stream.IntStream;
@@ -17,14 +18,15 @@ public class BenchmarkRunner {
         Security.addProvider(new BouncyCastleFipsProvider());
     }
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, IOException {
         final long start = System.currentTimeMillis();
-        BenchmarkUtils.initializeData();
 
         // command line args
         final var emmType = Integer.parseInt(args[0]);
         final var twoRoundEMMs = Integer.parseInt(args[1]);
         final var dataSet = Integer.parseInt(args[2]);
+
+        BenchmarkUtils.initializeData(dataSet);
 
         final var emms =
                 switch (emmType) {

@@ -120,7 +120,7 @@ public class BenchmarkUtils {
                 });
     }
 
-    public static void initializeData() throws SQLException {
+    public static void initializeData(final int dataSet) throws SQLException, IOException {
         /*
         Initializes a test container with a postgres database.
         The data set is inserted into the database.
@@ -136,7 +136,13 @@ public class BenchmarkUtils {
         String username = postgreSQLContainer.getUsername();
         String password = postgreSQLContainer.getPassword();
         connection = DriverManager.getConnection(jdbcUrl, username, password);
-        DatabaseUtils.addData(connection);
+        if (dataSet == 1) {
+            DatabaseUtils.addData2(connection);
+        } else if (dataSet == 2) {
+            DatabaseUtils.addData3(connection);
+        } else {
+            DatabaseUtils.addData1(connection);
+        }
     }
 
     public static void setMultimapAndRootForDataSize(final int dataSize, final int dataSet) {
