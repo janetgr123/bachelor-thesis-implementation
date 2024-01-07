@@ -34,7 +34,7 @@ public class TestUtils {
 
     public static void init(Connection connection) {
         try {
-            multimap = getDataFromDB(connection, TEST_DATA_SET_SIZE);
+            multimap = sampleDataFromDB(connection, TEST_DATA_SET_SIZE);
             root = RangeCoverUtils.getRoot(multimap);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -45,22 +45,25 @@ public class TestUtils {
         generateTwoSmallMultimaps();
     }
 
-    public static Map<Label, Set<Plaintext>> getDataFromDB(Connection connection, final int size)
+    public static Map<Label, Set<Plaintext>> sampleDataFromDB(Connection connection, final int size)
             throws SQLException {
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery("select pk_node_id, longitude from t_network_nodes");
         final Map<Label, Set<Plaintext>> multiMap = new HashMap<>();
-        // Reduce test data
-        int i = 0;
-        while (rs.next() && i < size) {
+        final Map<Integer, Integer> data = new HashMap<>();
+        while (rs.next()) {
+            data.put(
+                    rs.getInt("pk_node_id"),
+                    (int) Math.round(Math.pow(10, 6) * rs.getDouble("longitude")));
+        }
+        final var keys = data.keySet().parallelStream().toList();
+        final var n = keys.size();
+        while (multiMap.size() < size) {
+            final var index = (int) Math.round(Math.random() * n);
+            final var label = keys.get(index);
             final var set = new HashSet<Plaintext>();
-            set.add(
-                    new Plaintext(
-                            CastingHelpers.fromIntToByteArray(
-                                    (int) (Math.pow(10, 6) * rs.getDouble("longitude")))));
-            multiMap.put(
-                    new Label(CastingHelpers.fromIntToByteArray(rs.getInt("pk_node_id"))), set);
-            i++;
+            set.add(new Plaintext(CastingHelpers.fromIntToByteArray(data.get(label))));
+            multiMap.put(new Label(CastingHelpers.fromIntToByteArray(label)), set);
         }
         return multiMap;
     }

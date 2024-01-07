@@ -141,7 +141,7 @@ public class BenchmarkUtils {
 
     public static void setMultimapAndRootForDataSize(final int dataSize) {
         try {
-            multimap = TestUtils.getDataFromDB(connection, dataSize);
+            multimap = TestUtils.sampleDataFromDB(connection, dataSize);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
