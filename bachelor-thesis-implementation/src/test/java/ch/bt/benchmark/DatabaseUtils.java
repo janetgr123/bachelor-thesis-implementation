@@ -3,7 +3,6 @@ package ch.bt.benchmark;
 import ch.bt.model.db.Node;
 
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
@@ -28,12 +27,17 @@ public class DatabaseUtils {
             final var recordList = new ArrayList<Node>();
             records.forEach(
                     record -> {
-                        if (record.size() > 2 && !record.get(2).isEmpty()) {
-                            recordList.add(
-                                    new Node(
-                                            Integer.parseInt(record.get(0)),
-                                            Double.parseDouble(record.get(2)),
-                                            Double.parseDouble(record.get(1))));
+                        if (recordList.size()
+                                <= 1.5
+                                        * BenchmarkSettings
+                                                .MAX_NUMBER_OF_DATA_SAMPLES) { // change domain size
+                            if (record.size() > 2 && !record.get(2).isEmpty()) {
+                                recordList.add(
+                                        new Node(
+                                                Integer.parseInt(record.get(0)),
+                                                Double.parseDouble(record.get(2)),
+                                                Double.parseDouble(record.get(1))));
+                            }
                         }
                     });
 

@@ -49,8 +49,8 @@ public class TestConfigurationsWithDB implements BeforeAllCallback {
             String password = postgreSQLContainer.getPassword();
             connection = DriverManager.getConnection(jdbcUrl, username, password);
             addData1();
-            //addData2();
-            //addData3(); because very slow
+            // addData2();
+            // addData3(); because very slow
             TestUtils.init(connection);
             extensionContext
                     .getRoot()
@@ -69,7 +69,9 @@ public class TestConfigurationsWithDB implements BeforeAllCallback {
             final var recordList = new ArrayList<Node>();
             records.forEach(
                     record -> {
-                        if (record.size() > 2 && !record.get(2).isEmpty()) {
+                        if (recordList.size() <= 25
+                                && record.size() > 2
+                                && !record.get(2).isEmpty()) {
                             recordList.add(
                                     new Node(
                                             Integer.parseInt(record.get(0)),
