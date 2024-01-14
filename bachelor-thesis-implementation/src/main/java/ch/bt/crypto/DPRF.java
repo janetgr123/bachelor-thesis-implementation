@@ -19,6 +19,7 @@ import javax.crypto.SecretKey;
  * <a
  * href="https://github.com/indrabasak/bouncycastle-fips-examples/blob/master/doc/BCFipsIn100.pdf">Bouncy
  * Castle FIPS API</a> date accessed: 21.11.2023
+ *
  * @author Janet Greutmann
  */
 public class DPRF {
@@ -90,6 +91,11 @@ public class DPRF {
                 org.bouncycastle.util.Arrays.concatenate(
                         CastingHelpers.fromIntToByteArray(i),
                         CastingHelpers.fromIntToByteArray(tableNo));
+        return calculateFk(CastingHelpers.fromByteArrayToBitInputStream(input), token);
+    }
+
+    public static byte[] evaluateDPRF(final byte[] token, final int tableNo) throws IOException {
+        final var input = CastingHelpers.fromIntToByteArray(tableNo);
         return calculateFk(CastingHelpers.fromByteArrayToBitInputStream(input), token);
     }
 }

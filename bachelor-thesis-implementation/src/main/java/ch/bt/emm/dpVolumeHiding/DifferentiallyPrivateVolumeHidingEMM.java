@@ -206,18 +206,14 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
         final var encryptedCounterTable = encryptedCouterIndex.getTable(0);
         final var encryptedCounterTable2 = encryptedCouterIndex.getTable(1);
         final var token = ((SearchTokenBytes) searchToken).token();
-        for (int i = 0; i < maxNumberOfValuesPerLabel; i++) {
-            final var expand1 =
-                    CastingHelpers.fromByteArrayToHashModN(
-                            DPRF.evaluateDPRF(token, i, 0), tableSize);
-            final var expand2 =
-                    CastingHelpers.fromByteArrayToHashModN(
-                            DPRF.evaluateDPRF(token, i, 1), tableSize);
-            final var ciphertext1 = encryptedCounterTable[expand1];
-            final var ciphertext2 = encryptedCounterTable2[expand2];
-            ciphertexts.add(ciphertext1);
-            ciphertexts.add(ciphertext2);
-        }
+        final var expand1 =
+                CastingHelpers.fromByteArrayToHashModN(DPRF.evaluateDPRF(token, 0), tableSize);
+        final var expand2 =
+                CastingHelpers.fromByteArrayToHashModN(DPRF.evaluateDPRF(token, 1), tableSize);
+        final var ciphertext1 = encryptedCounterTable[expand1];
+        final var ciphertext2 = encryptedCounterTable2[expand2];
+        ciphertexts.add(ciphertext1);
+        ciphertexts.add(ciphertext2);
         return ciphertexts;
     }
 
