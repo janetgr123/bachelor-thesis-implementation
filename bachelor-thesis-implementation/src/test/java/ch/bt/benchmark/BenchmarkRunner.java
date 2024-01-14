@@ -1,6 +1,7 @@
 package ch.bt.benchmark;
 
 import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.security.Security;
@@ -22,9 +23,9 @@ public class BenchmarkRunner {
         final long start = System.currentTimeMillis();
 
         // command line args
-        final var emmType = Integer.parseInt(args[0]);
-        final var twoRoundEMMs = Integer.parseInt(args[1]);
-        final var dataSet = Integer.parseInt(args[2]);
+        final var emmType = 0; //Integer.parseInt(args[0]);
+        final var twoRoundEMMs = 1; //Integer.parseInt(args[1]);
+        final var dataSet = 0; //Integer.parseInt(args[2]);
 
         BenchmarkUtils.initializeData(dataSet);
 
@@ -43,10 +44,11 @@ public class BenchmarkRunner {
                             BenchmarkUtils.setMultimapAndRootForDataSize(dataSize, dataSet);
                             if (twoRoundEMMs == 0) {
                                 BenchmarkUtils.runBenchmarkForRangeScheme(emms, dataSize);
-                                BenchmarkUtils.runBenchmarkForParallelRangeScheme(emms, dataSize);
+                                // BenchmarkUtils.runBenchmarkForParallelRangeScheme(emms,
+                                // dataSize);
                             } else {
                                 BenchmarkUtils.runBenchmarkForDPRangeScheme(dataSize);
-                                BenchmarkUtils.runBenchmarkForParallelDPRangeScheme(dataSize);
+                                // BenchmarkUtils.runBenchmarkForParallelDPRangeScheme(dataSize);
                             }
                         });
 

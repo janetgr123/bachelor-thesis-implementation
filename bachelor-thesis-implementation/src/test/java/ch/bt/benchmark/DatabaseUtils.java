@@ -27,14 +27,13 @@ public class DatabaseUtils {
             final var recordList = new ArrayList<Node>();
             records.forEach(
                     record -> {
-                        if (recordList.size() <= 10) { // change domain size
+                        if (recordList.size() <= 200) { // change domain size
                             if (record.size() > 2 && !record.get(2).isEmpty()) {
                                 recordList.add(
                                         new Node(
                                                 Integer.parseInt(record.get(0)),
                                                 Double.parseDouble(record.get(2)),
                                                 Double.parseDouble(record.get(1))));
-                                System.out.println(recordList.get(recordList.size() - 1));
                             }
                         }
                     });

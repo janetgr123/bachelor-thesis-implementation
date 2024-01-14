@@ -42,7 +42,10 @@ public class RangeBRCSchemeUtils {
                         .map(multiMap::get)
                         .flatMap(Collection::stream)
                         .collect(Collectors.toSet());
-        map.put(CastingHelpers.toLabel(v.range()), values);
+        // ignore empty entries (otherwise the table size of the cuckoo hashing is too small)
+        if (!values.isEmpty()) {
+            map.put(CastingHelpers.toLabel(v.range()), values);
+        }
         final var successors = RangeCoverUtils.getSuccessorsOf(v);
         if (!successors.isEmpty()) {
             successors.forEach(el -> addVertex(el, map, keys, multiMap));
