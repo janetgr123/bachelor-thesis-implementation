@@ -182,7 +182,7 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
                 (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
         // adapt correction factor in a reasonable interval if necessary
         while (numberOfValuesWithNoise < 0) {
-            correctionFactor += (int) (Math.random() * 10);
+            correctionFactor += (int) (Math.random() * 20);
             numberOfValuesWithNoise =
                     (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
         }
