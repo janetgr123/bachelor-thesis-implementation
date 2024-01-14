@@ -27,7 +27,7 @@ import javax.crypto.SecretKey;
  */
 public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
     /** correction factor for the laplace distribution sampling */
-    private static final int correctionFactor = 5610;
+    private static int correctionFactor = 0; // 5610; SEEMS VERY LARGE 0.0
 
     /** the privacy budget for differential privacy */
     private final double epsilon;
@@ -178,8 +178,14 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
         final var beta = 2 / epsilon;
         final var laplaceDistribution = new LaplaceDistribution(mu, beta);
         final var noise = laplaceDistribution.sample();
-        final var numberOfValuesWithNoise =
+        var numberOfValuesWithNoise =
                 (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
+        // adapt correction factor in a reasonable interval if necessary
+        while (numberOfValuesWithNoise < 0) {
+            correctionFactor += (int) (Math.random() * 10);
+            numberOfValuesWithNoise =
+                    (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
+        }
         final var token = DPRF.generateToken(prfKey, label);
         return new SearchTokenIntBytes(numberOfValuesWithNoise, token);
     }

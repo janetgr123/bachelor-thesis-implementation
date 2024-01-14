@@ -203,8 +203,7 @@ public class BenchmarkUtils {
             final int dataSize,
             final int rangeSize,
             final EncryptedIndex encryptedIndex,
-            final String mode,
-            final boolean isWarmUp)
+            final String mode)
             throws IOException, GeneralSecurityException {
         final String emm = scheme.getClassOfEMM();
         /*
@@ -215,14 +214,17 @@ public class BenchmarkUtils {
                 (int) (Math.random() * (root.range().getMaximum() - rangeSize))
                         + root.range().getMinimum();
         final var range = new CustomRange(from, from + rangeSize - 1);
+
+        // individual warm-up
+        for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
+            scheme.trapdoor(range);
+        }
         final var startTrapdoor = System.nanoTime();
         final var token = scheme.trapdoor(range);
         final var endTrapdoor = System.nanoTime();
         try {
-            if (!isWarmUp) {
-                printTrapdoor.printToCsv(
-                        emm, mode, endTrapdoor - startTrapdoor, dataSize, rangeSize, from);
-            }
+            printTrapdoor.printToCsv(
+                    emm, mode, endTrapdoor - startTrapdoor, dataSize, rangeSize, from);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -233,14 +235,15 @@ public class BenchmarkUtils {
         ResultPrinter2 printSearch = new ResultPrinter2("search");
         ResultPrinter4 printPadding = new ResultPrinter4("searchPadding");
 
+        // individual warm-up
+        for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
+            scheme.search(token, encryptedIndex);
+        }
         final var startSearch = System.nanoTime();
         final var cipherTexts = scheme.search(token, encryptedIndex);
         final var endSearch = System.nanoTime();
         try {
-            if (!isWarmUp) {
-                printSearch.printToCsv(
-                        emm, mode, endSearch - startSearch, dataSize, rangeSize, from);
-            }
+            printSearch.printToCsv(emm, mode, endSearch - startSearch, dataSize, rangeSize, from);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -263,15 +266,18 @@ public class BenchmarkUtils {
         /*
         TRAPDOOR 2
          */
-        ResultPrinter2 printTrapdoor2 = new ResultPrinter2("trapdoor2");
+        ResultPrinter2 printTrapdoor2 = new ResultPrinter2("trapdoor2"); // individual warm-up
+
+        // individual warm-up
+        for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
+            scheme.trapdoor(range, cipherTexts);
+        }
         final var startTrapdoor2 = System.nanoTime();
         final var token2 = scheme.trapdoor(range, cipherTexts);
         final var endTrapdoor2 = System.nanoTime();
         try {
-            if (!isWarmUp) {
-                printTrapdoor2.printToCsv(
-                        emm, mode, endTrapdoor2 - startTrapdoor2, dataSize, rangeSize, from);
-            }
+            printTrapdoor2.printToCsv(
+                    emm, mode, endTrapdoor2 - startTrapdoor2, dataSize, rangeSize, from);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -282,14 +288,16 @@ public class BenchmarkUtils {
         ResultPrinter2 printSearch2 = new ResultPrinter2("search2");
         ResultPrinter4 printPadding2 = new ResultPrinter4("searchPadding2");
 
+        // individual warm-up
+        for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
+            scheme.search2(token2, encryptedIndex);
+        }
         final var startSearch2 = System.nanoTime();
         final var cipherTexts2 = scheme.search2(token2, encryptedIndex);
         final var endSearch2 = System.nanoTime();
         try {
-            if (!isWarmUp) {
-                printSearch2.printToCsv(
-                        emm, mode, endSearch2 - startSearch2, dataSize, rangeSize, from);
-            }
+            printSearch2.printToCsv(
+                    emm, mode, endSearch2 - startSearch2, dataSize, rangeSize, from);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -365,8 +373,7 @@ public class BenchmarkUtils {
             final int dataSize,
             final int rangeSize,
             final EncryptedIndex encryptedIndex,
-            final String mode,
-            final boolean isWarmUp)
+            final String mode)
             throws IOException {
         final String emm = scheme.getClassOfEMM();
         /*
@@ -377,14 +384,17 @@ public class BenchmarkUtils {
                 (int) (Math.random() * (root.range().getMaximum() - rangeSize))
                         + root.range().getMinimum();
         final var range = new CustomRange(from, from + rangeSize - 1);
+
+        // individual warm-up
+        for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
+            scheme.trapdoor(range);
+        }
         final var startTrapdoor = System.nanoTime();
         final var token = scheme.trapdoor(range);
         final var endTrapdoor = System.nanoTime();
         try {
-            if (!isWarmUp) {
-                printTrapdoor.printToCsv(
-                        emm, mode, endTrapdoor - startTrapdoor, dataSize, rangeSize, from);
-            }
+            printTrapdoor.printToCsv(
+                    emm, mode, endTrapdoor - startTrapdoor, dataSize, rangeSize, from);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -395,14 +405,15 @@ public class BenchmarkUtils {
         ResultPrinter2 printSearch = new ResultPrinter2("search");
         ResultPrinter4 printPadding = new ResultPrinter4("searchPadding");
 
+        // individual warm-up
+        for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
+            scheme.search(token, encryptedIndex);
+        }
         final var startSearch = System.nanoTime();
         final var cipherTexts = scheme.search(token, encryptedIndex);
         final var endSearch = System.nanoTime();
         try {
-            if (!isWarmUp) {
-                printSearch.printToCsv(
-                        emm, mode, endSearch - startSearch, dataSize, rangeSize, from);
-            }
+            printSearch.printToCsv(emm, mode, endSearch - startSearch, dataSize, rangeSize, from);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -435,26 +446,27 @@ public class BenchmarkUtils {
         for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
             runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true);
         }
-        for (int iteration = 0; iteration < BenchmarkSettings.NUMBER_OF_QUERIES; iteration++) {
-            EncryptedIndex encryptedIndex;
-            try {
-                System.out.println(
-                        "Running build index for data size "
-                                + dataSize
-                                + " and scheme "
-                                + scheme.getEMM()
-                                + " with EMM "
-                                + scheme.getClassOfEMM());
+        EncryptedIndex encryptedIndex;
+        try {
+            System.out.println(
+                    "Running build index for data size "
+                            + dataSize
+                            + " and scheme "
+                            + scheme.getEMM()
+                            + " with EMM "
+                            + scheme.getClassOfEMM());
 
-                encryptedIndex = runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, false);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            encryptedIndex = runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-            final var potenitalStep = dataSize / 20;
-            final var step = potenitalStep == 0 ? 1 : potenitalStep;
+        final var potenitalStep = dataSize / 20;
+        final var step = potenitalStep == 0 ? 1 : potenitalStep;
 
-            for (int rangeSize = step; rangeSize <= dataSize; rangeSize += step) {
+        for (int rangeSize = step; rangeSize <= dataSize; rangeSize += step) {
+            for (int iteration = 0; iteration < BenchmarkSettings.NUMBER_OF_QUERIES; iteration++) {
+                System.out.println("Iteration: " + iteration);
                 System.out.println(
                         "Running trapdoor and search for range size "
                                 + rangeSize
@@ -466,12 +478,8 @@ public class BenchmarkUtils {
                                 + scheme.getClassOfEMM());
 
                 try {
-                    for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
-                        runTrapdoorAndSearchForSchemeDataSizeAndRangeSize(
-                                scheme, dataSize, rangeSize, encryptedIndex, mode, true);
-                    }
                     runTrapdoorAndSearchForSchemeDataSizeAndRangeSize(
-                            scheme, dataSize, rangeSize, encryptedIndex, mode, false);
+                            scheme, dataSize, rangeSize, encryptedIndex, mode);
                 } catch (IOException | GeneralSecurityException e) {
                     throw new RuntimeException(e);
                 }
@@ -482,30 +490,31 @@ public class BenchmarkUtils {
     private static void runBenchmarkForSchemeAndDataSize(
             final GenericRSScheme scheme, final int dataSize, final String mode)
             throws IOException {
-        for (int iteration = 0; iteration < BenchmarkSettings.NUMBER_OF_QUERIES; iteration++) {
-            EncryptedIndex encryptedIndex;
-            try {
-                for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
-                    runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true);
-                }
-                System.out.println("Iteration: " + iteration);
-                System.out.println(
-                        "Running build index for data size "
-                                + dataSize
-                                + " and scheme "
-                                + scheme.getEMM()
-                                + " with EMM "
-                                + scheme.getClassOfEMM());
-
-                encryptedIndex = runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, false);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        EncryptedIndex encryptedIndex;
+        try {
+            for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
+                runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true);
             }
+            System.out.println(
+                    "Running build index for data size "
+                            + dataSize
+                            + " and scheme "
+                            + scheme.getEMM()
+                            + " with EMM "
+                            + scheme.getClassOfEMM());
 
-            final var potenitalStep = dataSize / 20;
-            final var step = potenitalStep == 0 ? 1 : potenitalStep;
+            encryptedIndex = runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-            for (int rangeSize = step; rangeSize <= dataSize; rangeSize += step) {
+        final var potenitalStep = dataSize / 20;
+        final var step = potenitalStep == 0 ? 1 : potenitalStep;
+
+        for (int rangeSize = step; rangeSize <= dataSize; rangeSize += step) {
+            for (int iteration = 0; iteration < BenchmarkSettings.NUMBER_OF_QUERIES; iteration++) {
+
+                System.out.println("Iteration: " + iteration);
                 System.out.println(
                         "Running trapdoor and search for range size "
                                 + rangeSize
@@ -517,12 +526,8 @@ public class BenchmarkUtils {
                                 + scheme.getClassOfEMM());
 
                 try {
-                    for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
-                        runTrapdoorAndSearchForSchemeDataSizeAndRangeSize(
-                                scheme, dataSize, rangeSize, encryptedIndex, mode, true);
-                    }
                     runTrapdoorAndSearchForSchemeDataSizeAndRangeSize(
-                            scheme, dataSize, rangeSize, encryptedIndex, mode, false);
+                            scheme, dataSize, rangeSize, encryptedIndex, mode);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

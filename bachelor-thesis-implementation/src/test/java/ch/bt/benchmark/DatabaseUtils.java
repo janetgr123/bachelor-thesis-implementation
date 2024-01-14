@@ -27,7 +27,10 @@ public class DatabaseUtils {
             final var recordList = new ArrayList<Node>();
             records.forEach(
                     record -> {
-                        if (recordList.size() <= 200) { // change domain size
+                        if (recordList.size()
+                                <= 1.5
+                                        * BenchmarkSettings
+                                                .MAX_NUMBER_OF_DATA_SAMPLES) { // change domain size
                             if (record.size() > 2 && !record.get(2).isEmpty()) {
                                 recordList.add(
                                         new Node(
