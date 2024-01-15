@@ -21,8 +21,8 @@ public class DataExtractor {
             List.of(
                     "ch.bt.emm.basic.BasicEMM",
                     "ch.bt.emm.volumeHiding.VolumeHidingEMM",
-                    "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised");
-    // "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM");
+                    "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised",
+                    "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM");
 
     private static final List<String> MODES = List.of("seq", "par");
     private static final Map<String, List<String>> HEADERS = new HashMap<>();
@@ -114,13 +114,12 @@ public class DataExtractor {
                                                         "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
                                                 .doubleValue())
                                 .replace("%", "\\%"),
-                        "-1"
-                        /*nf.format(
-                                averagePercentagePadding
-                                        .get(
-                                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
-                                        .doubleValue())
-                        .replace("%", "\\%")*/ );
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get(
+                                                        "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
+                                                .doubleValue())
+                                .replace("%", "\\%"));
             }
         }
         writer.printer.close();
@@ -216,13 +215,12 @@ public class DataExtractor {
                                                         "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
                                                 .doubleValue())
                                 .replace("%", "\\%"),
-                        "-1"
-                        /*nf.format(
-                                averagePercentagePadding
-                                        .get(
-                                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
-                                        .doubleValue())
-                        .replace("%", "\\%")*/ );
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get(
+                                                        "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
+                                                .doubleValue())
+                                .replace("%", "\\%"));
                 writer2.printToCsv(
                         rangeSize,
                         nf.format(
@@ -241,13 +239,12 @@ public class DataExtractor {
                                                         "ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised")
                                                 .doubleValue())
                                 .replace("%", ""),
-                        "-1"
-                        /*nf.format(
-                                averagePercentagePadding
-                                        .get(
-                                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
-                                        .doubleValue())
-                        .replace("%", "")*/ );
+                        nf.format(
+                                        averagePercentagePadding
+                                                .get(
+                                                        "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM")
+                                                .doubleValue())
+                                .replace("%", ""));
             }
         }
         writer.printer.close();
@@ -322,12 +319,10 @@ public class DataExtractor {
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-par"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-seq"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"),
-                        -1,
-                        -1
-                        /*averageTimes.get(
+                        averageTimes.get(
                                 "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-seq"),
                         averageTimes.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par")*/ );
+                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par"));
             }
         }
         writer.printer.close();
@@ -392,12 +387,10 @@ public class DataExtractor {
                         averageSizes.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-par"),
                         averageSizes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-seq"),
                         averageSizes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"),
-                        -1,
-                        -1
-                        /*averageSizes.get(
+                        averageSizes.get(
                                 "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-seq"),
                         averageSizes.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par")*/ );
+                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par"));
             }
         }
         writer.printer.close();
@@ -460,12 +453,10 @@ public class DataExtractor {
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMM-par"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-seq"),
                         averageTimes.get("ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised-par"),
-                        -1,
-                        -1
-                        /*averageTimes.get(
+                        averageTimes.get(
                                 "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-seq"),
                         averageTimes.get(
-                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par")*/ );
+                                "ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM-par"));
             }
         }
         writer.printer.close();
