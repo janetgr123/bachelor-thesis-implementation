@@ -178,14 +178,9 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
         final var beta = 2 / epsilon;
         final var laplaceDistribution = new LaplaceDistribution(mu, beta);
         final var noise = laplaceDistribution.sample();
+        correctionFactor = (int) noise;
         var numberOfValuesWithNoise =
                 (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
-        // adapt correction factor in a reasonable interval if necessary
-        while (numberOfValuesWithNoise < 0) {
-            correctionFactor += (int) (Math.random() * 20);
-            numberOfValuesWithNoise =
-                    (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
-        }
         final var token = DPRF.generateToken(prfKey, label);
         return new SearchTokenIntBytes(numberOfValuesWithNoise, token);
     }
