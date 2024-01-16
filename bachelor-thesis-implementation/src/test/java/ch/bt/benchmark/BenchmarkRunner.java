@@ -24,7 +24,7 @@ public class BenchmarkRunner {
 
         int emmType = 0;
         int hasTwoRounds = 0;
-        int dataSet = 1;
+        int dataSet = 2;
 
         if (!START_ALL) {
             // command line args
