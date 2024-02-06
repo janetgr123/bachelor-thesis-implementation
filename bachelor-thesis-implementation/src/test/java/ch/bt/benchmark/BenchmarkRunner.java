@@ -20,11 +20,11 @@ public class BenchmarkRunner {
 
     public static void main(String[] args) throws SQLException, IOException {
         final long start = System.currentTimeMillis();
-        final var START_ALL = true;
+        final var START_ALL = false;
 
         int emmType = 0;
         int hasTwoRounds = 0;
-        int dataSet = 2;
+        int dataSet = 0;
 
         if (!START_ALL) {
             // command line args
@@ -52,7 +52,7 @@ public class BenchmarkRunner {
             System.out.println("STARTING BENCHMARKS");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             IntStream.iterate(
-                            10, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i + 10)
+                            10, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i * 10)
                     .forEach(
                             dataSize -> {
                                 BenchmarkUtils.setMultimapAndRootForDataSize(dataSize, dataSet);
