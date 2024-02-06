@@ -27,17 +27,16 @@ public class DatabaseUtils {
             final var recordList = new ArrayList<Node>();
             records.forEach(
                     record -> {
-                        if (recordList.size()
-                                <= 1.5
-                                        * BenchmarkSettings
-                                                .MAX_NUMBER_OF_DATA_SAMPLES) { // change domain size
-                            if (record.size() > 2 && !record.get(2).isEmpty()) {
-                                recordList.add(
-                                        new Node(
-                                                Integer.parseInt(record.get(0)),
-                                                Double.parseDouble(record.get(2)),
-                                                Double.parseDouble(record.get(1))));
+                        if (record.size() > 2 && !record.get(2).isEmpty()) {
+                            final var key = Integer.parseInt(record.get(0));
+                            if (key > BenchmarkSettings.DOMAIN_SIZE) {
+                                return;
                             }
+                            recordList.add(
+                                    new Node(
+                                            key,
+                                            Double.parseDouble(record.get(2)),
+                                            Double.parseDouble(record.get(1))));
                         }
                     });
 
@@ -79,19 +78,18 @@ public class DatabaseUtils {
             final var recordList = new ArrayList<Node>();
             records.forEach(
                     record -> {
-                        if (recordList.size()
-                                <= 1.5
-                                        * BenchmarkSettings
-                                                .MAX_NUMBER_OF_DATA_SAMPLES) { // change domain size
-                            if (record.size() > 4
-                                    && !record.get(5).equals("Breite")
-                                    && !record.get(5).isEmpty()) {
-                                recordList.add(
-                                        new Node(
-                                                (int) record.getRecordNumber(),
-                                                Double.parseDouble(record.get(5)),
-                                                Double.parseDouble(record.get(4))));
+                        if (record.size() > 4
+                                && !record.get(5).equals("Breite")
+                                && !record.get(5).isEmpty()) {
+                            final var key = (int) record.getRecordNumber();
+                            if (key > BenchmarkSettings.DOMAIN_SIZE) {
+                                return;
                             }
+                            recordList.add(
+                                    new Node(
+                                            key,
+                                            Double.parseDouble(record.get(5)),
+                                            Double.parseDouble(record.get(4))));
                         }
                     });
 
@@ -131,17 +129,16 @@ public class DatabaseUtils {
             final var recordList = new ArrayList<Node>();
             records.forEach(
                     record -> {
-                        if (recordList.size()
-                                <= 1.5
-                                        * BenchmarkSettings
-                                                .MAX_NUMBER_OF_DATA_SAMPLES) { // change domain size
-                            if (record.size() > 4 && !record.get(3).isEmpty()) {
-                                recordList.add(
-                                        new Node(
-                                                (int) record.getRecordNumber(),
-                                                Double.parseDouble(record.get(2)),
-                                                Double.parseDouble(record.get(3))));
+                        if (record.size() > 4 && !record.get(3).isEmpty()) {
+                            final var key = (int) record.getRecordNumber();
+                            if (key > BenchmarkSettings.DOMAIN_SIZE) {
+                                return;
                             }
+                            recordList.add(
+                                    new Node(
+                                            key,
+                                            Double.parseDouble(record.get(2)),
+                                            Double.parseDouble(record.get(3))));
                         }
                     });
 
