@@ -177,6 +177,9 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
                         .filter(el -> el.label().equals(label))
                         .count();
         final var noise = laplaceDistribution.sample(label.label());
+        if (correctionFactor + noise <= 0) {
+            throw new RuntimeException("truncation error with noise " + noise);
+        }
         var numberOfValuesWithNoise =
                 (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
         final var token = DPRF.generateToken(prfKey, label);
