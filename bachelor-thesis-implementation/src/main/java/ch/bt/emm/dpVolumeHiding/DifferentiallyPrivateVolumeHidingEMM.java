@@ -11,8 +11,6 @@ import ch.bt.model.searchtoken.SearchToken;
 import ch.bt.model.searchtoken.SearchTokenBytes;
 import ch.bt.model.searchtoken.SearchTokenIntBytes;
 
-import org.apache.commons.math3.distribution.LaplaceDistribution;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
@@ -27,7 +25,7 @@ import javax.crypto.SecretKey;
  */
 public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
     /** correction factor for the laplace distribution sampling */
-    private static final int correctionFactor = 50; // 5610; SEEMS VERY LARGE 0.0
+    private static final int correctionFactor = 50;
 
     /** the privacy budget for differential privacy */
     private final double epsilon;
@@ -59,6 +57,9 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
     /** the number of dummy entries in the encrypted counter tables */
     private int numberOfDummyCT;
 
+    /** the key dependent laplacian distribution */
+    private final KeyDependentLaplaceDistribution laplaceDistribution;
+
     public DifferentiallyPrivateVolumeHidingEMM(
             final int securityParameter, final double epsilon, final double alpha)
             throws GeneralSecurityException {
@@ -67,6 +68,7 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
         this.seScheme = new AESSEScheme(keys.get(1));
         this.alpha = alpha;
         this.epsilon = epsilon;
+        this.laplaceDistribution = new KeyDependentLaplaceDistribution(0, 2 / epsilon);
     }
 
     /**
@@ -174,10 +176,7 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
                         .map(PairLabelPlaintext.class::cast)
                         .filter(el -> el.label().equals(label))
                         .count();
-        final var mu = 0;
-        final var beta = 2 / epsilon;
-        final var laplaceDistribution = new LaplaceDistribution(mu, beta);
-        final var noise = laplaceDistribution.sample();
+        final var noise = laplaceDistribution.sample(label.label());
         var numberOfValuesWithNoise =
                 (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
         final var token = DPRF.generateToken(prfKey, label);
