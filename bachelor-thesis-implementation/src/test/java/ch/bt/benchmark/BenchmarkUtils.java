@@ -12,9 +12,9 @@ import ch.bt.model.rc.Vertex;
 import ch.bt.rc.BestRangeCover;
 import ch.bt.rc.RangeCoverUtils;
 
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
@@ -39,11 +39,12 @@ public class BenchmarkUtils {
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer =
-                new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
-                        .withEnv("TESTCONTAINERS_HOST_OVERRIDE", "unix://${XDG_RUNTIME_DIR}/podman/podman.sock")
-                        //.withEnv("TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE", "unix://${XDG_RUNTIME_DIR}/podman/podman.sock")
-			.withEnv("TESTCONTAINERS_RYUK_DISABLED", "true")
-                        .withInitScript("init.sql");
+            new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
+                    .withEnv(
+                            "TESTCONTAINERS_HOST_OVERRIDE",
+                            "unix://${XDG_RUNTIME_DIR}/podman/podman.sock")
+                    .withEnv("TESTCONTAINERS_RYUK_DISABLED", "true")
+                    .withInitScript("init.sql");
 
     public static void runBenchmarkForRangeScheme(final List<EMM> emms, final int dataSize) {
         List<GenericRSScheme> rangeSchemes = new ArrayList<>();
@@ -132,22 +133,12 @@ public class BenchmarkUtils {
     }
 
     public static void initializeData(final int dataSet) throws SQLException, IOException {
-        /*
-        Initializes a test container with a postgres database.
-        The data set is inserted into the database.
-        The first numberOfDataSamples data points are extracted from the database and build the multimap.
-         */
-	/*	
-        PostgreSQLContainer<?> postgreSQLContainer =
-                new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
-                        .withEnv("TESTCONTAINERS_HOST_OVERRIDE", "unix://${XDG_RUNTIME_DIR}/podman/podman.sock")
-                        //.withEnv("TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE", "unix://${XDG_RUNTIME_DIR}/podman/podman.sock")
-			.withEnv("TESTCONTAINERS_RYUK_DISABLED", "true")
-			.withReuse(false)
-                        .withInitScript("init.sql");
         postgreSQLContainer.start();
-	*/
-	System.out.println(postgreSQLContainer.getEnv());
+        System.out.println(postgreSQLContainer.getEnv());
+        System.out.println(postgreSQLContainer.getContainerInfo());
+        System.out.println(postgreSQLContainer.getDockerClient());
+        System.out.println(postgreSQLContainer.getHost());
+        System.out.println(postgreSQLContainer.getLogs());
         String jdbcUrl = postgreSQLContainer.getJdbcUrl();
         String username = postgreSQLContainer.getUsername();
         String password = postgreSQLContainer.getPassword();

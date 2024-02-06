@@ -20,7 +20,7 @@ public class BenchmarkRunner {
 
     public static void main(String[] args) throws SQLException, IOException {
         final long start = System.currentTimeMillis();
-        final var START_ALL = false;
+        final var START_ALL = true;
 
         int emmType = 0;
         int hasTwoRounds = 0;
