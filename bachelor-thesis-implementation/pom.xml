@@ -54,6 +54,13 @@
             <version>1.19.2</version>
         </dependency>
 
+	<dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>1.18.3</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Generating methods -->
         <dependency>
             <groupId>org.apache.commons</groupId>

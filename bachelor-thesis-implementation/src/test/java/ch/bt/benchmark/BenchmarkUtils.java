@@ -12,6 +12,8 @@ import ch.bt.model.rc.Vertex;
 import ch.bt.rc.BestRangeCover;
 import ch.bt.rc.RangeCoverUtils;
 
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
@@ -29,10 +31,19 @@ import java.util.*;
  *
  * @author Janet Greutmann
  */
+@Testcontainers
 public class BenchmarkUtils {
     private static Connection connection;
     private static Map<Label, Set<Plaintext>> multimap;
     private static Vertex root;
+
+    @Container
+    public static PostgreSQLContainer<?> postgreSQLContainer =
+                new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
+                        .withEnv("TESTCONTAINERS_HOST_OVERRIDE", "unix://${XDG_RUNTIME_DIR}/podman/podman.sock")
+                        //.withEnv("TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE", "unix://${XDG_RUNTIME_DIR}/podman/podman.sock")
+			.withEnv("TESTCONTAINERS_RYUK_DISABLED", "true")
+                        .withInitScript("init.sql");
 
     public static void runBenchmarkForRangeScheme(final List<EMM> emms, final int dataSize) {
         List<GenericRSScheme> rangeSchemes = new ArrayList<>();
@@ -126,12 +137,17 @@ public class BenchmarkUtils {
         The data set is inserted into the database.
         The first numberOfDataSamples data points are extracted from the database and build the multimap.
          */
+	/*	
         PostgreSQLContainer<?> postgreSQLContainer =
                 new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
-                        .withReuse(true)
+                        .withEnv("TESTCONTAINERS_HOST_OVERRIDE", "unix://${XDG_RUNTIME_DIR}/podman/podman.sock")
+                        //.withEnv("TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE", "unix://${XDG_RUNTIME_DIR}/podman/podman.sock")
+			.withEnv("TESTCONTAINERS_RYUK_DISABLED", "true")
+			.withReuse(false)
                         .withInitScript("init.sql");
-        System.out.println(postgreSQLContainer);
         postgreSQLContainer.start();
+	*/
+	System.out.println(postgreSQLContainer.getEnv());
         String jdbcUrl = postgreSQLContainer.getJdbcUrl();
         String username = postgreSQLContainer.getUsername();
         String password = postgreSQLContainer.getPassword();
