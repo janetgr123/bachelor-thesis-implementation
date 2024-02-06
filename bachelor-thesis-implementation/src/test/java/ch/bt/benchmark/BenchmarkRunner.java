@@ -24,15 +24,16 @@ public class BenchmarkRunner {
 
         int emmType = 0;
         int hasTwoRounds = 0;
-        int dataSet = 0;
+        int dataSetChoice = 0;
 
         if (!START_ALL) {
             // command line args
             emmType = Integer.parseInt(args[0]);
             hasTwoRounds = Integer.parseInt(args[1]);
-            dataSet = Integer.parseInt(args[2]);
+            dataSetChoice = Integer.parseInt(args[2]);
         }
 
+        final var dataSet = dataSetChoice;
         BenchmarkUtils.initializeData(dataSet);
 
         while (START_ALL && emmType < 4) {
