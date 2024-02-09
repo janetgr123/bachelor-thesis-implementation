@@ -135,6 +135,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM2 implements EMM 
                     (int) (multiMap.get(label).size() + correctionFactor + noise);
             lookupTable.put(label.label(), numberOfValuesWithNoise);
         }
+        lookupTable.put(VolumeHidingEMMUtils.DUMMY, 0);
 
         return new DifferentiallyPrivateEncryptedIndexTables(encryptedIndex, null);
     }
@@ -148,7 +149,12 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM2 implements EMM 
     @Override
     public SearchToken trapdoor(final Label label) throws GeneralSecurityException, IOException {
         final var token = DPRF.generateToken(prfKey, label);
-        return new SearchTokenIntBytes(lookupTable.get(label.label()), token);
+        final var key =
+                lookupTable.keySet().stream()
+                        .filter(el -> Arrays.equals(el, label.label()))
+                        .findFirst()
+                        .orElse(VolumeHidingEMMUtils.DUMMY);
+        return new SearchTokenIntBytes(lookupTable.get(key), token);
     }
 
     /**
