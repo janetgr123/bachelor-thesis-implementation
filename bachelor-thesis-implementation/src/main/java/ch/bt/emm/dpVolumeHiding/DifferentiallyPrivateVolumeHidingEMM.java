@@ -25,7 +25,7 @@ import javax.crypto.SecretKey;
  */
 public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
     /** correction factor for the laplace distribution sampling */
-    private static final int correctionFactor = 160; // t = 16
+    private static final int correctionFactor = EMMSettings.EPSILON * 2 * EMMSettings.T; 
 
     /** the privacy budget for differential privacy */
     private final double epsilon;

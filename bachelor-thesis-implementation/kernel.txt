@@ -1,0 +1,1 @@
+Linux daisen.inf.ethz.ch 5.4.0-170-generic #188-Ubuntu SMP Wed Jan 10 09:51:01 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
