@@ -4,8 +4,9 @@ import pandas as pd
 import numpy as np
 from scipy import sparse
 
+DOMAIN_SIZE = 2**21
 PATH = "~/ETH/Bachelor Thesis/bachelor-thesis-implementation/bachelor-thesis-implementation/src/main/resources/data/"
-ACCURANCY = [1, 1, 3]
+ACCURANCY = [1, 1, 1]
 files = ["data.csv", "VDS_MS_310809_27_0210.csv", "Gowalla_totalCheckins.txt"]
 data_sets = [pd.read_csv(PATH + files[0], delimiter=' ').to_numpy(), 
              pd.read_csv(PATH + files[1], delimiter=',').to_numpy(), 
@@ -16,6 +17,7 @@ for i in range(3):
     print("PLOT ", i)
     data = data_sets[i]
     x = [k for k in data[:, x_s[i]] if not np.isnan(k)]
+    x = x[0:DOMAIN_SIZE*10**ACCURANCY[i]]
     print(np.mean(x))
     
     x_min = min(x) - 1
