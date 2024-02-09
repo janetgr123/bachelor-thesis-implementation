@@ -46,7 +46,10 @@ public class DPRangeBRCSchemeTest {
                             try {
                                 final var emm =
                                         new DifferentiallyPrivateVolumeHidingEMM(
-                                                securityParameter, EPSILON, TestUtils.ALPHA);
+                                                securityParameter,
+                                                EPSILON,
+                                                TestUtils.ALPHA,
+                                                TestUtils.T);
                                 differentiallyPrivateVolumeHidingEMMs.put(securityParameter, emm);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);

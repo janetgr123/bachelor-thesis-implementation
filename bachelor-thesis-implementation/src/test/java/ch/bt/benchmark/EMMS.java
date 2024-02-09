@@ -63,7 +63,8 @@ public class EMMS {
                             new DifferentiallyPrivateVolumeHidingEMM(
                                     EMMSettings.SECURITY_PARAMETER,
                                     EMMSettings.EPSILON,
-                                    EMMSettings.ALPHA));
+                                    EMMSettings.ALPHA,
+                                    EMMSettings.T));
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }

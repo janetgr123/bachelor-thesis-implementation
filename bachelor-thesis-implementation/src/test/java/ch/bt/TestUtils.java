@@ -20,6 +20,8 @@ public class TestUtils {
     public static final int TEST_DATA = 0;
     public static final double ALPHA = 0.3;
 
+    public static final double T = 50;
+
     public static final List<Integer> VALID_SECURITY_PARAMETERS_FOR_AES = List.of(128, 256);
 
     public static final List<Integer> INVALID_SECURITY_PARAMETERS_FOR_AES = List.of(512);

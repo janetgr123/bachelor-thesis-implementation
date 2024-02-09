@@ -40,7 +40,10 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
                             try {
                                 final var emm =
                                         new DifferentiallyPrivateVolumeHidingEMM(
-                                                securityParameter, EPSILON, TestUtils.ALPHA);
+                                                securityParameter,
+                                                EPSILON,
+                                                TestUtils.ALPHA,
+                                                TestUtils.T);
                                 differentiallyPrivateVolumeHidingEMMs.put(securityParameter, emm);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
@@ -126,7 +129,7 @@ public class DifferentiallyPrivateVolumeHidingEMMTest {
                         IllegalArgumentException.class,
                         () ->
                                 new DifferentiallyPrivateVolumeHidingEMM(
-                                        securityParameter, EPSILON, TestUtils.ALPHA));
+                                        securityParameter, EPSILON, TestUtils.ALPHA, TestUtils.T));
         assertEquals(
                 "Attempt to create key with invalid key size [" + securityParameter + "]: AES",
                 exception.getMessage());
