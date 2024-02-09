@@ -53,7 +53,7 @@ public class BenchmarkRunner {
             System.out.println("STARTING BENCHMARKS");
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             IntStream.iterate(
-                            10, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i * 10)
+                            2, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i * 2)
                     .forEach(
                             dataSize -> {
                                 BenchmarkUtils.setMultimapAndRootForDataSize(dataSize, dataSet);
