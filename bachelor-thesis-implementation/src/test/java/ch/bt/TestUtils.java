@@ -22,6 +22,8 @@ public class TestUtils {
 
     public static final double T = 50;
 
+    public static int DOMAIN_SIZE;
+
     public static final List<Integer> VALID_SECURITY_PARAMETERS_FOR_AES = List.of(128, 256);
 
     public static final List<Integer> INVALID_SECURITY_PARAMETERS_FOR_AES = List.of(512);
@@ -77,6 +79,7 @@ public class TestUtils {
         rs0.next();
         final var min = rs0.getInt("min");
         final var max = rs0.getInt("max");
+        DOMAIN_SIZE = max;
         final var indices = new ArrayList<Integer>();
         while (indices.size() < size + PUFFER) {
             indices.add((int) Math.round(Math.random() * max + min));

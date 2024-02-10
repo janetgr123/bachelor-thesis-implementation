@@ -78,19 +78,22 @@ Lecture Notes in Computer Science, vol. 3633. , Berlin, Heidelberg: Springer Ber
 [[17]](https://doi.org/10.15783/C71P4C)
 Malte Spitz, ‘CRAWDAD spitz/cellular’. IEEE Dataport, Apr. 05, 2011. doi: 10.15783/C71P4C.
 
-[[18]](https://www.baeldung.com/maven-java-main-method)
+[[18]](https://doi.org/10.1007/978-3-030-30215-3_12)
+E. A. Markatou and R. Tamassia, ‘Mitigation Techniques for Attacks on 1-Dimensional Databases that Support Range Queries’, in Information Security, vol. 11723, Z. Lin, C. Papamanthou, and M. Polychronakis, Eds., in Lecture Notes in Computer Science, vol. 11723. , Cham: Springer International Publishing, 2019, pp. 231–251. doi: 10.1007/978-3-030-30215-3_12.
+
+[[19]](https://www.baeldung.com/maven-java-main-method)
 M. Mohamadinia, ‘Run a Java Main Method in Maven | Baeldung’. Accessed: Jan. 04, 2024. [Online].
 Available: https://www.baeldung.com/maven-java-main-method
 
-[[19]](https://doi.org/10.1145/3319535.3354213)
+[[20]](https://doi.org/10.1145/3319535.3354213)
 S. Patel, G. Persiano, K. Yeo, and M. Yung, ‘Mitigating Leakage in Secure Cloud-Hosted Data Structures: Volume-Hiding
 for Multi-Maps via Hashing’, in Proceedings of the 2019 ACM SIGSAC Conference on Computer and Communications Security,
 London United Kingdom: ACM, Nov. 2019, pp. 79–93. doi: 10.1145/3319535.3354213.
 
-[[20]](https://stackoverflow.com/a/4062003)
+[[21]](https://stackoverflow.com/a/4062003)
 P. Thivent, ‘Answer to “From Maven, how do I run a class that lives under src/test/java?”’, Stack Overflow. Accessed:
 Jan. 04, 2024. [Online]. Available: https://stackoverflow.com/a/4062003
 
-[[21]](https://users.cs.utah.edu/~lifeifei/SpatialDataset.html)
+[[22]](https://users.cs.utah.edu/~lifeifei/SpatialDataset.html)
 ‘Real Datasets for Spatial Databases: Road Networks and Category Points’. Accessed: Nov. 24, 2023. [Online].
 Available: https://users.cs.utah.edu/~lifeifei/SpatialDataset.html
