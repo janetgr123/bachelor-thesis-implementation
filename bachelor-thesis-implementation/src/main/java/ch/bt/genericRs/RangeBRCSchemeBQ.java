@@ -38,7 +38,7 @@ public class RangeBRCSchemeBQ implements GenericRSScheme {
     private final Vertex root;
 
     /** database reconstruction error */
-    private int k;
+    private final int k;
 
     public RangeBRCSchemeBQ(
             final int securityParameter,
