@@ -6,6 +6,8 @@ import ch.bt.TestConfigurationsWithDB;
 import ch.bt.TestUtils;
 import ch.bt.crypto.CastingHelpers;
 import ch.bt.emm.basic.BasicEMM;
+import ch.bt.emm.dpVolumeHiding.NonInteractiveDifferentiallyPrivateVolumeHidingEMM;
+import ch.bt.emm.dpVolumeHiding.NonInteractiveDifferentiallyPrivateVolumeHidingEMM2;
 import ch.bt.emm.volumeHiding.VolumeHidingEMM;
 import ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised;
 import ch.bt.model.multimap.Label;
@@ -26,18 +28,22 @@ import java.util.stream.Collectors;
 
 @ExtendWith({TestConfigurationsWithDB.class})
 public class RangeBRCSchemeTest {
-
+    private static final double EPSILON = 0.3;
     private static final Map<Integer, BasicEMM> basicEMMs = new HashMap<>();
     private static final Map<Integer, VolumeHidingEMM> volumeHidingEMMs = new HashMap<>();
 
     private static final Map<Integer, VolumeHidingEMMOptimised> volumeHidingOptimisedEMMs =
             new HashMap<>();
+    private static final Map<Integer, NonInteractiveDifferentiallyPrivateVolumeHidingEMM>
+            nonInteractiveDPVHEMMs = new HashMap<>();
+    private static final Map<Integer, NonInteractiveDifferentiallyPrivateVolumeHidingEMM2>
+            nonInteractiveDPVHEMM2s = new HashMap<>();
 
     private static Map<Label, Set<Plaintext>> multimap;
 
     private static Vertex root;
 
-    private static final CustomRange range = new CustomRange(2,11);
+    private static final CustomRange range = new CustomRange(2, 11);
 
     @BeforeAll
     public static void init() {
@@ -56,6 +62,20 @@ public class RangeBRCSchemeTest {
                                         new VolumeHidingEMMOptimised(
                                                 securityParameter, TestUtils.ALPHA);
                                 volumeHidingOptimisedEMMs.put(securityParameter, vhOEmm);
+                                final var dpvhEmm =
+                                        new NonInteractiveDifferentiallyPrivateVolumeHidingEMM(
+                                                securityParameter,
+                                                EPSILON,
+                                                TestUtils.ALPHA,
+                                                TestUtils.T);
+                                nonInteractiveDPVHEMMs.put(securityParameter, dpvhEmm);
+                                final var dpvhEmm2 =
+                                        new NonInteractiveDifferentiallyPrivateVolumeHidingEMM2(
+                                                securityParameter,
+                                                EPSILON,
+                                                TestUtils.ALPHA,
+                                                TestUtils.T);
+                                nonInteractiveDPVHEMM2s.put(securityParameter, dpvhEmm2);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -111,6 +131,26 @@ public class RangeBRCSchemeTest {
         final var volumeHidingOEMM = volumeHidingOptimisedEMMs.get(securityParameter);
         final var rangeScheme =
                 new RangeBRCScheme(securityParameter, volumeHidingOEMM, new BestRangeCover(), root);
+        testRangeSchemeWithEMM(rangeScheme);
+    }
+
+    @ParameterizedTest
+    @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
+    public void testCorrectnessWithDPVHEMM(final int securityParameter)
+            throws GeneralSecurityException, IOException {
+        final var emm = nonInteractiveDPVHEMMs.get(securityParameter);
+        final var rangeScheme =
+                new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
+        testRangeSchemeWithEMM(rangeScheme);
+    }
+
+    @ParameterizedTest
+    @MethodSource("ch.bt.TestUtils#getValidSecurityParametersForAES")
+    public void testCorrectnessWithDPVHEMM2(final int securityParameter)
+            throws GeneralSecurityException, IOException {
+        final var emm = nonInteractiveDPVHEMM2s.get(securityParameter);
+        final var rangeScheme =
+                new RangeBRCScheme(securityParameter, emm, new BestRangeCover(), root);
         testRangeSchemeWithEMM(rangeScheme);
     }
 

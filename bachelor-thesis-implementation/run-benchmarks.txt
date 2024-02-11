@@ -1,14 +1,43 @@
-# number of emm (0 = basic, 1 = vh, 2 = vho), isTwoRound, dataset (0 = cali, 1 = spitz, 2 = gowalla)
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=1,0,0
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=2,0,0
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,1,0
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=1,0,1
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=2,0,1
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,1,1
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,2
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=1,0,2
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=2,0,2
-mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,1,2
+# number of emm (0 = basic, 1 = vh, 2 = vho, 3 = non-interactive dp, 4 = non-interactive dp2), 
+# isTwoRound, 
+# dataset (0 = cali, 1 = spitz, 2 = gowalla), 
+# epsilon (default: 0.2), 
+# truncation probability (default: 32), 
+# k (file index), 
+# par (0 = seq, 1 = par)
+# bq (0 = no blocked queries, 1 = blocked queries)
+# wq (0 = no wrap around queries, 1 = wrap around queries)
+# error for bq
+
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0,0.2,32,0,0,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0,0.2,32,1,1,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0,0.2,32,2,0,1,0,3
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0,0.2,32,3,0,0,1,0
+
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0,0.4,32,4,0,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0,0.4,32,5,1,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0,0.4,32,6,0,1,0,3
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0,0.4,32,7,0,0,1,0
+
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.2,32,8,0,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.2,32,9,1,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.2,32,10,0,1,0,3
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.2,32,11,0,0,1,0
+
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.4,32,12,0,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.4,32,13,1,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.4,32,14,0,1,0,3
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.4,32,15,0,0,1,0
+
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.2,32,16,0,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.2,32,17,1,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.2,32,18,0,1,0,3
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.2,32,19,0,0,1,0
+
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.4,32,20,0,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.4,32,21,1,0,0,0
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.4,32,22,0,1,0,3
+mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.4,32,23,0,0,1,0
+
+
 

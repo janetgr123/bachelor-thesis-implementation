@@ -19,8 +19,8 @@ public class ResultPrinter2 {
     CSVFormat csvFormat;
     CSVPrinter printer;
 
-    public ResultPrinter2(final String method) throws IOException {
-        final String file = String.join(".", method, "csv");
+    public ResultPrinter2(final String method, final int k) throws IOException {
+        final String file = String.join(".", (method + "-" + k), "csv");
         fileWriter =
                 Files.newBufferedWriter(
                         Paths.get(String.join("/", "src/test/resources/data", file)),

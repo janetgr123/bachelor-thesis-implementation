@@ -4,8 +4,10 @@ ch.bt.crypto
 ch.bt.cuckoHashing
 ch.bt.emm
 ch.bt.emm.basic
+ch.bt.emm.blocked
 ch.bt.emm.dpVolumeHiding
 ch.bt.emm.volumeHiding
+ch.bt.emm.wrapAround
 ch.bt.genericRs
 ch.bt.model
 ch.bt.model.db
