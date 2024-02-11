@@ -157,12 +157,17 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
         </plugins>
         <resources>
             <resource>
                 <directory>src/test/resources/data</directory>
                 <excludes>
-                    <exclude>/*.csv</exclude>
+                    <exclude>*.csv</exclude>
                 </excludes>
             </resource>
         </resources>
