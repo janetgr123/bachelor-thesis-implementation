@@ -160,7 +160,7 @@
         </plugins>
         <resources>
             <resource>
-                <directory>src/test/data</directory>
+                <directory>src/test/resources/data</directory>
                 <excludes>
                     <exclude>*.csv</exclude>
                 </excludes>
