@@ -163,14 +163,22 @@
                 <version>3.3.1</version>
                 <configuration>
                     <outputDirectory>
-                        target/test-classes/data
+                        target/test-classes
                     </outputDirectory>
                     <resources>
                         <resource>
-                            <directory>src/test/resources/data</directory>
+                            <directory>src/test/resources</directory>
                             <excludes>
-                                <exclude>*.csv</exclude>
+                                <exclude>data/*.csv</exclude>
                             </excludes>
+                            <includes>
+                                <include>
+                                    init.sql
+                                </include>
+                                <include>
+                                    logger-config.xml
+                                </include>
+                            </includes>
                             <filtering>
                                 true
                             </filtering>
