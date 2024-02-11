@@ -162,7 +162,7 @@
             <resource>
                 <directory>src/test/resources/data</directory>
                 <excludes>
-                    <exclude>*.csv</exclude>
+                    <exclude>/*.csv</exclude>
                 </excludes>
             </resource>
         </resources>
