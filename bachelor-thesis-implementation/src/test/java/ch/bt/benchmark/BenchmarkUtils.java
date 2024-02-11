@@ -46,7 +46,8 @@ public class BenchmarkUtils {
                     .withEnv("TESTCONTAINERS_RYUK_DISABLED", "true")
                     .withInitScript("init.sql");
 
-    public static void runBenchmarkForRangeScheme(final List<EMM> emms, final int dataSize) {
+    public static void runBenchmarkForRangeScheme(
+            final List<EMM> emms, final int dataSize, final int k) {
         List<GenericRSScheme> rangeSchemes = new ArrayList<>();
         for (final var emm : emms) {
             try {
@@ -60,7 +61,60 @@ public class BenchmarkUtils {
         rangeSchemes.forEach(
                 el -> {
                     try {
-                        runBenchmarkForSchemeAndDataSize(el, dataSize, "seq");
+                        runBenchmarkForSchemeAndDataSize(el, dataSize, "seq", k);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
+
+    public static void runBenchmarkForRangeSchemeBQ(
+            final List<EMM> emms, final int dataSize, final int k, final int error) {
+        List<GenericRSScheme> rangeSchemes = new ArrayList<>();
+        for (final var emm : emms) {
+            try {
+                rangeSchemes.add(
+                        new RangeBRCSchemeBQ(
+                                EMMSettings.SECURITY_PARAMETER,
+                                emm,
+                                new BestRangeCover(),
+                                root,
+                                error));
+            } catch (GeneralSecurityException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        rangeSchemes.forEach(
+                el -> {
+                    try {
+                        runBenchmarkForSchemeAndDataSize(el, dataSize, "seq", k);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
+
+    public static void runBenchmarkForRangeSchemeWQ(
+            final List<EMM> emms, final int dataSize, final int k, final int t) {
+        List<GenericRSScheme> rangeSchemes = new ArrayList<>();
+        for (final var emm : emms) {
+            try {
+                rangeSchemes.add(
+                        new RangeBRCSchemeWQ(
+                                EMMSettings.SECURITY_PARAMETER,
+                                emm,
+                                new BestRangeCover(),
+                                root,
+                                t,
+                                BenchmarkSettings.DOMAIN_SIZE));
+            } catch (GeneralSecurityException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        rangeSchemes.forEach(
+                el -> {
+                    try {
+                        runBenchmarkForSchemeAndDataSize(el, dataSize, "seq", k);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -68,7 +122,7 @@ public class BenchmarkUtils {
     }
 
     public static void runBenchmarkForParallelRangeScheme(
-            final List<EMM> emms, final int dataSize) {
+            final List<EMM> emms, final int dataSize, final int k) {
         List<GenericRSScheme> rangeSchemesPar = new ArrayList<>();
         for (final var emm : emms) {
             try {
@@ -82,14 +136,14 @@ public class BenchmarkUtils {
         rangeSchemesPar.forEach(
                 el -> {
                     try {
-                        runBenchmarkForSchemeAndDataSize(el, dataSize, "par");
+                        runBenchmarkForSchemeAndDataSize(el, dataSize, "par", k);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 });
     }
 
-    public static void runBenchmarkForDPRangeScheme(final int dataSize) {
+    public static void runBenchmarkForDPRangeScheme(final int dataSize, final int k) {
         List<TwoRoundGenericRSScheme> dpRangeSchemes = new ArrayList<>();
         for (final var emm : EMMS.twoRoundEMMS) {
             try {
@@ -103,14 +157,14 @@ public class BenchmarkUtils {
         dpRangeSchemes.forEach(
                 el -> {
                     try {
-                        runBenchmarkForSchemeAndDataSize(el, dataSize, "seq");
+                        runBenchmarkForSchemeAndDataSize(el, dataSize, "seq", k);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 });
     }
 
-    public static void runBenchmarkForParallelDPRangeScheme(final int dataSize) {
+    public static void runBenchmarkForParallelDPRangeScheme(final int dataSize, final int k) {
         List<TwoRoundGenericRSScheme> dpRangeSchemesPar = new ArrayList<>();
         for (final var emm : EMMS.twoRoundEMMS) {
             try {
@@ -125,7 +179,7 @@ public class BenchmarkUtils {
         dpRangeSchemesPar.forEach(
                 el -> {
                     try {
-                        runBenchmarkForSchemeAndDataSize(el, dataSize, "par");
+                        runBenchmarkForSchemeAndDataSize(el, dataSize, "par", k);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -165,7 +219,8 @@ public class BenchmarkUtils {
             final TwoRoundGenericRSScheme scheme,
             final int dataSize,
             final String mode,
-            final boolean isWarmUp)
+            final boolean isWarmUp,
+            final int k)
             throws IOException {
         /*
         BUILD INDEX
@@ -174,8 +229,8 @@ public class BenchmarkUtils {
         System.out.println();
         System.out.println("Running build index for " + emm + " " + " with data size " + dataSize);
 
-        ResultPrinter2 printBuildIndex = new ResultPrinter2("buildIndex");
-        ResultPrinter3 printOverhead = new ResultPrinter3("overheadEncryptedIndex");
+        ResultPrinter2 printBuildIndex = new ResultPrinter2("buildIndex", k);
+        ResultPrinter3 printOverhead = new ResultPrinter3("overheadEncryptedIndex", k);
 
         final var startBuildIndex = System.nanoTime();
         EncryptedIndex encryptedIndex;
@@ -210,13 +265,14 @@ public class BenchmarkUtils {
             final int dataSize,
             final int rangeSize,
             final EncryptedIndex encryptedIndex,
-            final String mode)
+            final String mode,
+            final int k)
             throws IOException, GeneralSecurityException {
         final String emm = scheme.getClassOfEMM();
         /*
         TRAPDOOR
          */
-        ResultPrinter2 printTrapdoor = new ResultPrinter2("trapdoor");
+        ResultPrinter2 printTrapdoor = new ResultPrinter2("trapdoor", k);
         final int from =
                 (int) (Math.random() * (root.range().getMaximum() - rangeSize))
                         + root.range().getMinimum();
@@ -239,8 +295,8 @@ public class BenchmarkUtils {
         /*
         SEARCH
          */
-        ResultPrinter2 printSearch = new ResultPrinter2("search");
-        ResultPrinter4 printPadding = new ResultPrinter4("searchPadding");
+        ResultPrinter2 printSearch = new ResultPrinter2("search", k);
+        ResultPrinter4 printPadding = new ResultPrinter4("searchPadding", k);
 
         // individual warm-up
         for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
@@ -273,7 +329,7 @@ public class BenchmarkUtils {
         /*
         TRAPDOOR 2
          */
-        ResultPrinter2 printTrapdoor2 = new ResultPrinter2("trapdoor2"); // individual warm-up
+        ResultPrinter2 printTrapdoor2 = new ResultPrinter2("trapdoor2", k); // individual warm-up
 
         // individual warm-up
         for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
@@ -292,8 +348,8 @@ public class BenchmarkUtils {
         /*
         SEARCH
          */
-        ResultPrinter2 printSearch2 = new ResultPrinter2("search2");
-        ResultPrinter4 printPadding2 = new ResultPrinter4("searchPadding2");
+        ResultPrinter2 printSearch2 = new ResultPrinter2("search2", k);
+        ResultPrinter4 printPadding2 = new ResultPrinter4("searchPadding2", k);
 
         // individual warm-up
         for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
@@ -335,7 +391,8 @@ public class BenchmarkUtils {
             final GenericRSScheme scheme,
             final int dataSize,
             final String mode,
-            final boolean isWarmUp)
+            final boolean isWarmUp,
+            final int k)
             throws IOException {
         /*
         BUILD INDEX
@@ -344,8 +401,8 @@ public class BenchmarkUtils {
         System.out.println();
         System.out.println("Running build index for " + emm + " " + " with data size " + dataSize);
 
-        ResultPrinter2 printBuildIndex = new ResultPrinter2("buildIndex");
-        ResultPrinter3 printOverhead = new ResultPrinter3("overheadEncryptedIndex");
+        ResultPrinter2 printBuildIndex = new ResultPrinter2("buildIndex", k);
+        ResultPrinter3 printOverhead = new ResultPrinter3("overheadEncryptedIndex", k);
 
         final var startBuildIndex = System.nanoTime();
         EncryptedIndex encryptedIndex;
@@ -380,13 +437,14 @@ public class BenchmarkUtils {
             final int dataSize,
             final int rangeSize,
             final EncryptedIndex encryptedIndex,
-            final String mode)
+            final String mode,
+            final int k)
             throws IOException {
         final String emm = scheme.getClassOfEMM();
         /*
         TRAPDOOR
          */
-        ResultPrinter2 printTrapdoor = new ResultPrinter2("trapdoor");
+        ResultPrinter2 printTrapdoor = new ResultPrinter2("trapdoor", k);
         final int from =
                 (int) (Math.random() * (root.range().getMaximum() - rangeSize))
                         + root.range().getMinimum();
@@ -409,8 +467,8 @@ public class BenchmarkUtils {
         /*
         SEARCH
          */
-        ResultPrinter2 printSearch = new ResultPrinter2("search");
-        ResultPrinter4 printPadding = new ResultPrinter4("searchPadding");
+        ResultPrinter2 printSearch = new ResultPrinter2("search", k);
+        ResultPrinter4 printPadding = new ResultPrinter4("searchPadding", k);
 
         // individual warm-up
         for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
@@ -448,10 +506,13 @@ public class BenchmarkUtils {
     }
 
     private static void runBenchmarkForSchemeAndDataSize(
-            final TwoRoundGenericRSScheme scheme, final int dataSize, final String mode)
+            final TwoRoundGenericRSScheme scheme,
+            final int dataSize,
+            final String mode,
+            final int k)
             throws IOException {
         for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
-            runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true);
+            runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true, k);
         }
         EncryptedIndex encryptedIndex;
         try {
@@ -463,7 +524,7 @@ public class BenchmarkUtils {
                             + " with EMM "
                             + scheme.getClassOfEMM());
 
-            encryptedIndex = runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, false);
+            encryptedIndex = runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, false, k);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -486,7 +547,7 @@ public class BenchmarkUtils {
 
                 try {
                     runTrapdoorAndSearchForSchemeDataSizeAndRangeSize(
-                            scheme, dataSize, rangeSize, encryptedIndex, mode);
+                            scheme, dataSize, rangeSize, encryptedIndex, mode, k);
                 } catch (IOException | GeneralSecurityException e) {
                     throw new RuntimeException(e);
                 }
@@ -495,12 +556,12 @@ public class BenchmarkUtils {
     }
 
     private static void runBenchmarkForSchemeAndDataSize(
-            final GenericRSScheme scheme, final int dataSize, final String mode)
+            final GenericRSScheme scheme, final int dataSize, final String mode, final int k)
             throws IOException {
         EncryptedIndex encryptedIndex;
         try {
             for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
-                runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true);
+                runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true, k);
             }
             System.out.println(
                     "Running build index for data size "
@@ -510,7 +571,7 @@ public class BenchmarkUtils {
                             + " with EMM "
                             + scheme.getClassOfEMM());
 
-            encryptedIndex = runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, false);
+            encryptedIndex = runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, false, k);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -534,7 +595,7 @@ public class BenchmarkUtils {
 
                 try {
                     runTrapdoorAndSearchForSchemeDataSizeAndRangeSize(
-                            scheme, dataSize, rangeSize, encryptedIndex, mode);
+                            scheme, dataSize, rangeSize, encryptedIndex, mode, k);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

@@ -4,6 +4,8 @@ import ch.bt.emm.EMM;
 import ch.bt.emm.TwoRoundEMM;
 import ch.bt.emm.basic.BasicEMM;
 import ch.bt.emm.dpVolumeHiding.DifferentiallyPrivateVolumeHidingEMM;
+import ch.bt.emm.dpVolumeHiding.NonInteractiveDifferentiallyPrivateVolumeHidingEMM;
+import ch.bt.emm.dpVolumeHiding.NonInteractiveDifferentiallyPrivateVolumeHidingEMM2;
 import ch.bt.emm.volumeHiding.VolumeHidingEMM;
 import ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised;
 
@@ -23,6 +25,9 @@ public class EMMS {
     public static final List<EMM> vhEmms;
     public static final List<EMM> vhOEmms;
     public static final List<TwoRoundEMM> twoRoundEMMS;
+
+    public static final List<EMM> oneRoundEMMs;
+    public static final List<EMM> oneRoundEMM2s;
 
     static {
         Security.addProvider(new BouncyCastleFipsProvider());
@@ -61,6 +66,34 @@ public class EMMS {
             twoRoundEMMS =
                     List.of(
                             new DifferentiallyPrivateVolumeHidingEMM(
+                                    EMMSettings.SECURITY_PARAMETER,
+                                    EMMSettings.EPSILON,
+                                    EMMSettings.ALPHA,
+                                    EMMSettings.T));
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static {
+        try {
+            oneRoundEMMs =
+                    List.of(
+                            new NonInteractiveDifferentiallyPrivateVolumeHidingEMM(
+                                    EMMSettings.SECURITY_PARAMETER,
+                                    EMMSettings.EPSILON,
+                                    EMMSettings.ALPHA,
+                                    EMMSettings.T));
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static {
+        try {
+            oneRoundEMM2s =
+                    List.of(
+                            new NonInteractiveDifferentiallyPrivateVolumeHidingEMM2(
                                     EMMSettings.SECURITY_PARAMETER,
                                     EMMSettings.EPSILON,
                                     EMMSettings.ALPHA,
