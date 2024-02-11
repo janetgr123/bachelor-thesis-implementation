@@ -37,8 +37,14 @@ public class RangeBRCSchemeBQ implements GenericRSScheme {
     /** the root vertex of the graph */
     private final Vertex root;
 
+    /** the set of vertices that covers the range */
+    private Set<Vertex> rangeCover;
+
     /** database reconstruction error */
     private final int k;
+
+    /** multimp according to range tree */
+    private Map<Label, Set<Plaintext>> multimap;
 
     public RangeBRCSchemeBQ(
             final int securityParameter,
@@ -82,6 +88,7 @@ public class RangeBRCSchemeBQ implements GenericRSScheme {
                         .toList();
         final var rootVertex = RangeCoverUtils.getRoot(multiMap);
         RangeBRCSchemeUtils.addVertex(rootVertex, multiMapAccordingToGraph, keys, multiMap);
+        this.multimap = multiMapAccordingToGraph;
         return emmScheme.buildIndex(multiMapAccordingToGraph);
     }
 
@@ -93,9 +100,9 @@ public class RangeBRCSchemeBQ implements GenericRSScheme {
     @Override
     public List<SearchToken> trapdoor(CustomRange q) {
         final var rangeWithNoise = BlockedQueries.blockedQuery(q, k);
-        final var rangeCoverWithNoise = rangeCoveringAlgorithm.getRangeCover(rangeWithNoise, root);
+        this.rangeCover = rangeCoveringAlgorithm.getRangeCover(rangeWithNoise, root);
         final var token =
-                rangeCoverWithNoise.stream()
+                rangeCover.stream()
                         .map(Vertex::range)
                         .map(CastingHelpers::toLabel)
                         .map(
@@ -141,20 +148,37 @@ public class RangeBRCSchemeBQ implements GenericRSScheme {
     @Override
     public Set<Plaintext> result(Set<Ciphertext> ciphertexts, final CustomRange q)
             throws GeneralSecurityException {
-        final var rangeCover = rangeCoveringAlgorithm.getRangeCover(q, root);
-        return rangeCover.stream()
-                .map(Vertex::range)
-                .map(CastingHelpers::toLabel)
-                .map(
-                        el -> {
-                            try {
-                                return emmScheme.result(ciphertexts, el);
-                            } catch (GeneralSecurityException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+        final var values =
+                rangeCover.stream()
+                        .map(Vertex::range)
+                        .map(CastingHelpers::toLabel)
+                        .map(
+                                el -> {
+                                    try {
+                                        return emmScheme.result(ciphertexts, el);
+                                    } catch (GeneralSecurityException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                })
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toSet());
+        // De-Obfuscate
+        final var rangeCoverOfQ = rangeCoveringAlgorithm.getRangeCover(q, root);
+        final var expectedValues =
+                rangeCoverOfQ.stream()
+                        .map(Vertex::range)
+                        .map(CastingHelpers::toLabel)
+                        .map(
+                                el ->
+                                        multimap.keySet().stream()
+                                                .filter(e -> Arrays.equals(e.label(), el.label()))
+                                                .findFirst())
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .map(multimap::get)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toSet());
+        return values.stream().filter(expectedValues::contains).collect(Collectors.toSet());
     }
 
     /**
