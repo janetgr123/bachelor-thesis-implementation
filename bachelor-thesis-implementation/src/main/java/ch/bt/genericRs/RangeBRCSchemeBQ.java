@@ -23,7 +23,7 @@ import javax.crypto.SecretKey;
 /**
  * This class implements a one round RangeBRCScheme based on the work from <a
  * href="https://doi.org/10.14778/3574245.3574247">Falzon et al.</a> using the blocked queries
- * technique from <a * href="https://doi.org/10.1007/978-3-030-30215-3_12">Markatou et al.</a>
+ * technique from <a href="https://doi.org/10.1007/978-3-030-30215-3_12">Markatou et al.</a>
  *
  * @author Janet Greutmann
  */

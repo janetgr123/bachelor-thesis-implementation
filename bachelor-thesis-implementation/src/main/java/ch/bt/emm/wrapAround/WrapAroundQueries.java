@@ -6,7 +6,7 @@ import ch.bt.model.rc.CustomRange;
 import java.util.*;
 
 /**
- * This class implements the wrap around queries * technique from <a *
+ * This class implements the wrap around queries * technique from <a
  * href="https://doi.org/10.1007/978-3-030-30215-3_12">Markatou et al.</a>
  *
  * @author Janet Greutmann
