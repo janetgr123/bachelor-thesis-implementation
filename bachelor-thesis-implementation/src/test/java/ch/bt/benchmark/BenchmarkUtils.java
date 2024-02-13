@@ -232,29 +232,31 @@ public class BenchmarkUtils {
         ResultPrinter2 printBuildIndex = new ResultPrinter2("buildIndex", k);
         ResultPrinter3 printOverhead = new ResultPrinter3("overheadEncryptedIndex", k);
 
-        final var startBuildIndex = System.nanoTime();
-        EncryptedIndex encryptedIndex;
-        try {
-            encryptedIndex = scheme.buildIndex(multimap);
-        } catch (GeneralSecurityException | IOException e) {
-            throw new RuntimeException(e);
-        }
-        final var endBuildIndex = System.nanoTime();
-        try {
-            if (!isWarmUp) {
-                printBuildIndex.printToCsv(
-                        emm, mode, endBuildIndex - startBuildIndex, dataSize, -1, -1);
+        EncryptedIndex encryptedIndex = null;
+        for (int j = 0; j < BenchmarkSettings.ITERATIONS_BUILD_INDEX; j++) {
+            final var startBuildIndex = System.nanoTime();
+            try {
+                encryptedIndex = scheme.buildIndex(multimap);
+            } catch (GeneralSecurityException | IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            final var endBuildIndex = System.nanoTime();
+            try {
+                if (!isWarmUp) {
+                    printBuildIndex.printToCsv(
+                            emm, mode, endBuildIndex - startBuildIndex, dataSize, -1, -1);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            printOverhead.printToCsv(
+                    emm,
+                    mode,
+                    dataSize,
+                    multimap.size(),
+                    encryptedIndex.size(),
+                    scheme.getIndexDummies());
         }
-        printOverhead.printToCsv(
-                emm,
-                mode,
-                dataSize,
-                multimap.size(),
-                encryptedIndex.size(),
-                scheme.getIndexDummies());
         printBuildIndex.printer.close();
         printOverhead.printer.close();
         return encryptedIndex;
@@ -402,29 +404,31 @@ public class BenchmarkUtils {
         ResultPrinter2 printBuildIndex = new ResultPrinter2("buildIndex", k);
         ResultPrinter3 printOverhead = new ResultPrinter3("overheadEncryptedIndex", k);
 
-        final var startBuildIndex = System.nanoTime();
-        EncryptedIndex encryptedIndex;
-        try {
-            encryptedIndex = scheme.buildIndex(multimap);
-        } catch (GeneralSecurityException | IOException e) {
-            throw new RuntimeException(e);
-        }
-        final var endBuildIndex = System.nanoTime();
-        try {
-            if (!isWarmUp) {
-                printBuildIndex.printToCsv(
-                        emm, mode, endBuildIndex - startBuildIndex, dataSize, -1, -1);
+        EncryptedIndex encryptedIndex = null;
+        for (int j = 0; j < BenchmarkSettings.ITERATIONS_BUILD_INDEX; j++) {
+            final var startBuildIndex = System.nanoTime();
+            try {
+                encryptedIndex = scheme.buildIndex(multimap);
+            } catch (GeneralSecurityException | IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            final var endBuildIndex = System.nanoTime();
+            try {
+                if (!isWarmUp) {
+                    printBuildIndex.printToCsv(
+                            emm, mode, endBuildIndex - startBuildIndex, dataSize, -1, -1);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            printOverhead.printToCsv(
+                    emm,
+                    mode,
+                    dataSize,
+                    multimap.size(),
+                    encryptedIndex.size(),
+                    scheme.getIndexDummies());
         }
-        printOverhead.printToCsv(
-                emm,
-                mode,
-                dataSize,
-                multimap.size(),
-                encryptedIndex.size(),
-                scheme.getIndexDummies());
         printBuildIndex.printer.close();
         printOverhead.printer.close();
         return encryptedIndex;
