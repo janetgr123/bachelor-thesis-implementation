@@ -273,9 +273,7 @@ public class BenchmarkUtils {
         TRAPDOOR
          */
         ResultPrinter2 printTrapdoor = new ResultPrinter2("trapdoor", k);
-        final int from =
-                (int) (Math.random() * (root.range().getMaximum() - rangeSize))
-                        + root.range().getMinimum();
+        final int from = sampleFrom();
         final var range = new CustomRange(from, from + rangeSize - 1);
 
         // individual warm-up
@@ -445,9 +443,7 @@ public class BenchmarkUtils {
         TRAPDOOR
          */
         ResultPrinter2 printTrapdoor = new ResultPrinter2("trapdoor", k);
-        final int from =
-                (int) (Math.random() * (root.range().getMaximum() - rangeSize))
-                        + root.range().getMinimum();
+        final int from = sampleFrom();
         final var range = new CustomRange(from, from + rangeSize - 1);
 
         // individual warm-up
@@ -601,5 +597,10 @@ public class BenchmarkUtils {
                 }
             }
         }
+    }
+
+    private static int sampleFrom() {
+        return (int) (Math.random() * (root.range().getMaximum() - root.range().getMinimum()))
+                + root.range().getMinimum();
     }
 }
