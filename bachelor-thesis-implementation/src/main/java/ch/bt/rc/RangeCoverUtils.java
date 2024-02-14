@@ -106,9 +106,12 @@ public class RangeCoverUtils {
                         .sorted()
                         .toList();
         final var size = keys.size();
-        final var min = keys.get(0);
-        final var max = keys.get(size - 1);
-        final var root = new CustomRange(min, max);
-        return new Vertex(String.join("-", String.valueOf(min), String.valueOf(max)), root);
+        if (!keys.isEmpty()) {
+            final var min = keys.get(0);
+            final var max = keys.get(size - 1);
+            final var root = new CustomRange(min, max);
+            return new Vertex(String.join("-", String.valueOf(min), String.valueOf(max)), root);
+        }
+        return null;
     }
 }
