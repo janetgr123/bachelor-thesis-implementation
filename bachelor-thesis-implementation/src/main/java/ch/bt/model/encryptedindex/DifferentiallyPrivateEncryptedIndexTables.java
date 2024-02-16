@@ -15,6 +15,7 @@ public record DifferentiallyPrivateEncryptedIndexTables(
      */
     @Override
     public int size() {
-        return encryptedIndex.size() + encryptedIndexCT.size();
+        return (encryptedIndex == null ? 0 : encryptedIndex.size())
+                + (encryptedIndexCT == null ? 0 : encryptedIndexCT.size());
     }
 }
