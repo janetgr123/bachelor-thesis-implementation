@@ -12,6 +12,8 @@ import ch.bt.model.rc.Vertex;
 import ch.bt.rc.BestRangeCover;
 import ch.bt.rc.RangeCoverUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -33,6 +35,7 @@ import java.util.*;
  */
 @Testcontainers
 public class BenchmarkUtils {
+    private static final Logger logger = LoggerFactory.getLogger(BenchmarkUtils.class);
     private static Connection connection;
     private static Map<Label, Set<Plaintext>> multimap;
     private static Vertex root;
@@ -188,11 +191,11 @@ public class BenchmarkUtils {
 
     public static void initializeData(final int dataSet) throws SQLException, IOException {
         postgreSQLContainer.start();
-        System.out.println(postgreSQLContainer.getEnv());
-        System.out.println(postgreSQLContainer.getContainerInfo());
-        System.out.println(postgreSQLContainer.getDockerClient());
-        System.out.println(postgreSQLContainer.getHost());
-        System.out.println(postgreSQLContainer.getLogs());
+        // logger.info(postgreSQLContainer.getEnv());
+        // logger.info(postgreSQLContainer.getContainerInfo());
+        // logger.info(postgreSQLContainer.getDockerClient());
+        logger.info(postgreSQLContainer.getHost());
+        logger.info(postgreSQLContainer.getLogs());
         String jdbcUrl = postgreSQLContainer.getJdbcUrl();
         String username = postgreSQLContainer.getUsername();
         String password = postgreSQLContainer.getPassword();
@@ -226,8 +229,7 @@ public class BenchmarkUtils {
         BUILD INDEX
          */
         final String emm = scheme.getClassOfEMM();
-        System.out.println();
-        System.out.println("Running build index for " + emm + " " + " with data size " + dataSize);
+        logger.info("Running build index for " + emm + " " + " with data size " + dataSize);
 
         ResultPrinter2 printBuildIndex = new ResultPrinter2("buildIndex", k);
         ResultPrinter3 printOverhead = new ResultPrinter3("overheadEncryptedIndex", k);
@@ -398,8 +400,7 @@ public class BenchmarkUtils {
         BUILD INDEX
          */
         final String emm = scheme.getClassOfEMM();
-        System.out.println();
-        System.out.println("Running build index for " + emm + " " + " with data size " + dataSize);
+        logger.info("Running build index for " + emm + " " + " with data size " + dataSize);
 
         ResultPrinter2 printBuildIndex = new ResultPrinter2("buildIndex", k);
         ResultPrinter3 printOverhead = new ResultPrinter3("overheadEncryptedIndex", k);
@@ -516,7 +517,7 @@ public class BenchmarkUtils {
         }
         EncryptedIndex encryptedIndex;
         try {
-            System.out.println(
+            logger.info(
                     "Running build index for data size "
                             + dataSize
                             + " and scheme "
@@ -534,8 +535,8 @@ public class BenchmarkUtils {
 
         for (int rangeSize = step; rangeSize <= dataSize; rangeSize += step) {
             for (int iteration = 0; iteration < BenchmarkSettings.NUMBER_OF_QUERIES; iteration++) {
-                System.out.println("Iteration: " + iteration);
-                System.out.println(
+                logger.info("Iteration: " + iteration);
+                logger.info(
                         "Running trapdoor and search for range size "
                                 + rangeSize
                                 + " and data size "
@@ -563,7 +564,7 @@ public class BenchmarkUtils {
             for (int j = 0; j < BenchmarkSettings.WARM_UPS; j++) {
                 runBuildIndexForSchemeAndDataSize(scheme, dataSize, mode, true, k);
             }
-            System.out.println(
+            logger.info(
                     "Running build index for data size "
                             + dataSize
                             + " and scheme "
@@ -582,8 +583,8 @@ public class BenchmarkUtils {
         for (int rangeSize = step; rangeSize <= dataSize; rangeSize += step) {
             for (int iteration = 0; iteration < BenchmarkSettings.NUMBER_OF_QUERIES; iteration++) {
 
-                System.out.println("Iteration: " + iteration);
-                System.out.println(
+                logger.info("Iteration: " + iteration);
+                logger.info(
                         "Running trapdoor and search for range size "
                                 + rangeSize
                                 + " and data size "

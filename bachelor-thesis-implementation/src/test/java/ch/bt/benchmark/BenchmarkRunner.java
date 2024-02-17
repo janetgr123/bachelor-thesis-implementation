@@ -1,6 +1,8 @@
 package ch.bt.benchmark;
 
 import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.Security;
@@ -13,6 +15,7 @@ import java.util.stream.IntStream;
  * @author Janet Greutmann
  */
 public class BenchmarkRunner {
+    public static final Logger logger = LoggerFactory.getLogger(BenchmarkRunner.class);
 
     static {
         Security.addProvider(new BouncyCastleFipsProvider());
@@ -46,8 +49,7 @@ public class BenchmarkRunner {
                     default -> EMMS.basicEmms;
                 };
 
-        System.out.println("STARTING BENCHMARKS");
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        logger.info("STARTING BENCHMARKS");
         IntStream.iterate(2, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i * 2)
                 .forEach(
                         dataSize -> {
@@ -86,9 +88,8 @@ public class BenchmarkRunner {
                                 }
                             }
                         });
-        System.out.println();
-        System.out.println("DONE");
-        System.out.println(
+        logger.info("DONE");
+        logger.info(
                 "Experiment time: " + ((System.currentTimeMillis() - start) / 1000) + " seconds.");
     }
 }
