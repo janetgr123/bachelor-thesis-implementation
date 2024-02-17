@@ -1,12 +1,14 @@
 package ch.bt.benchmark;
 
 import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.Security;
 import java.sql.SQLException;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 /**
@@ -15,7 +17,15 @@ import java.util.stream.IntStream;
  * @author Janet Greutmann
  */
 public class BenchmarkRunner {
-    public static final Logger logger = LoggerFactory.getLogger(BenchmarkRunner.class);
+    private static final Logger logger = Logger.getLogger(BenchmarkRunner.class.getName());
+
+    static {
+        Handler handlerObj = new ConsoleHandler();
+        handlerObj.setLevel(Level.ALL);
+        logger.addHandler(handlerObj);
+        logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
+    }
 
     static {
         Security.addProvider(new BouncyCastleFipsProvider());

@@ -12,8 +12,6 @@ import ch.bt.model.rc.Vertex;
 import ch.bt.rc.BestRangeCover;
 import ch.bt.rc.RangeCoverUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -25,6 +23,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class is a collection of static helper methods for the benchmark runs. The time is measured
@@ -35,7 +37,16 @@ import java.util.*;
  */
 @Testcontainers
 public class BenchmarkUtils {
-    private static final Logger logger = LoggerFactory.getLogger(BenchmarkUtils.class);
+    private static final Logger logger = Logger.getLogger(BenchmarkRunner.class.getName());
+
+    static {
+        Handler handlerObj = new ConsoleHandler();
+        handlerObj.setLevel(Level.ALL);
+        logger.addHandler(handlerObj);
+        logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
+    }
+
     private static Connection connection;
     private static Map<Label, Set<Plaintext>> multimap;
     private static Vertex root;
@@ -535,16 +546,18 @@ public class BenchmarkUtils {
 
         for (int rangeSize = step; rangeSize <= dataSize; rangeSize += step) {
             for (int iteration = 0; iteration < BenchmarkSettings.NUMBER_OF_QUERIES; iteration++) {
-                logger.info("Iteration: " + iteration);
-                logger.info(
-                        "Running trapdoor and search for range size "
-                                + rangeSize
-                                + " and data size "
-                                + dataSize
-                                + " and scheme "
-                                + scheme.getClass()
-                                + " with EMM "
-                                + scheme.getClassOfEMM());
+                if (iteration % 10 == 0) {
+                    logger.info("Iteration: " + iteration);
+                    logger.info(
+                            "Running trapdoor and search for range size "
+                                    + rangeSize
+                                    + " and data size "
+                                    + dataSize
+                                    + " and scheme "
+                                    + scheme.getClass()
+                                    + " with EMM "
+                                    + scheme.getClassOfEMM());
+                }
 
                 try {
                     runTrapdoorAndSearchForSchemeDataSizeAndRangeSize(
@@ -582,17 +595,18 @@ public class BenchmarkUtils {
 
         for (int rangeSize = step; rangeSize <= dataSize; rangeSize += step) {
             for (int iteration = 0; iteration < BenchmarkSettings.NUMBER_OF_QUERIES; iteration++) {
-
-                logger.info("Iteration: " + iteration);
-                logger.info(
-                        "Running trapdoor and search for range size "
-                                + rangeSize
-                                + " and data size "
-                                + dataSize
-                                + " and scheme "
-                                + scheme.getClass()
-                                + " with EMM "
-                                + scheme.getClassOfEMM());
+                if (iteration % 10 == 0) {
+                    logger.info("Iteration: " + iteration);
+                    logger.info(
+                            "Running trapdoor and search for range size "
+                                    + rangeSize
+                                    + " and data size "
+                                    + dataSize
+                                    + " and scheme "
+                                    + scheme.getClass()
+                                    + " with EMM "
+                                    + scheme.getClassOfEMM());
+                }
 
                 try {
                     runTrapdoorAndSearchForSchemeDataSizeAndRangeSize(
