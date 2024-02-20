@@ -16,6 +16,6 @@ public record LookupTable(Map<byte[], Integer> map) implements EncryptedIndex {
      */
     @Override
     public int size() {
-        return map.size();
+        return map.size() * (32 + 4); // label AES encrypted to 32 bytes, integer of 4 bytes
     }
 }

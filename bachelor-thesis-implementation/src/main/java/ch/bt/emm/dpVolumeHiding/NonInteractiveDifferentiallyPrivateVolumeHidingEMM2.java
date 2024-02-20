@@ -47,7 +47,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM2 implements EMM 
     /** the maximum number of values per label (used for padding) */
     private int maxNumberOfValuesPerLabel = 0;
 
-    /** the number of dummy entries in the encrypted tables */
+    /** the size of dummy entries in bytes in the encrypted tables */
     private int numberOfDummyValues;
 
     /** the key dependent laplacian distribution */
@@ -120,7 +120,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM2 implements EMM 
 
         final var encryptedIndex = encryptedIndexWithStash.encryptedIndex();
         this.stash = encryptedIndexWithStash.stash();
-        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues();
+        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues() * 32 * 2;
 
         /*
          * Lookup Table (Client Side)

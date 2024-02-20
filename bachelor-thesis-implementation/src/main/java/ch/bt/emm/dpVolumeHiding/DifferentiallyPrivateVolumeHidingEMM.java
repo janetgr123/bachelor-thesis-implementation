@@ -51,10 +51,10 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
     /** the maximum number of values per label (used for padding) */
     private int maxNumberOfValuesPerLabel = 0;
 
-    /** the number of dummy entries in the encrypted tables */
+    /** the size of dummy entries in bytes in the encrypted tables */
     private int numberOfDummyValues;
 
-    /** the number of dummy entries in the encrypted counter tables */
+    /** the size of dummy entries in bytes in the encrypted counter tables */
     private int numberOfDummyCT;
 
     /** the key dependent laplacian distribution */
@@ -123,7 +123,7 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
 
         final var encryptedIndex = encryptedIndexWithStash.encryptedIndex();
         this.stash = encryptedIndexWithStash.stash();
-        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues();
+        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues() * 32 * 2;
 
         /*
          * Cuckoo Hashing for counter tables
@@ -133,7 +133,7 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
                         tableSize, numberOfValues, multiMap, prfKey, seScheme);
         final var encryptedCTIndex = encryptedCTIndexWithStash.encryptedIndex();
         this.counterStash = encryptedCTIndexWithStash.stash();
-        this.numberOfDummyCT = encryptedCTIndexWithStash.numberOfDummyValues();
+        this.numberOfDummyCT = encryptedCTIndexWithStash.numberOfDummyValues() * 32 * 2;
 
         return new DifferentiallyPrivateEncryptedIndexTables(encryptedIndex, encryptedCTIndex);
     }

@@ -34,6 +34,7 @@ public class EncryptedIndexTables implements EncryptedIndex {
      */
     @Override
     public int size() {
-        return table1.length + table2.length;
+        return (table1.length + table2.length)
+                * (32 * 2); // AES generates label-value pair of each 32 bytes
     }
 }

@@ -41,7 +41,7 @@ public class VolumeHidingEMM implements EMM {
     /** the maximum number of values per label (used for padding) */
     private int maxNumberOfValuesPerLabel = 0;
 
-    /** the number of dummy entries in the encrypted tables */
+    /** the size of dummy entries in bytes in the encrypted tables */
     private int numberOfDummyValues;
 
     public VolumeHidingEMM(final int securityParameter, final double alpha)
@@ -101,7 +101,7 @@ public class VolumeHidingEMM implements EMM {
                         tableSize, numberOfValues, multiMap, prfKey, seScheme);
 
         this.stash = encryptedIndexWithStash.stash();
-        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues();
+        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues() * 32 * 2;
         return encryptedIndexWithStash.encryptedIndex();
     }
 

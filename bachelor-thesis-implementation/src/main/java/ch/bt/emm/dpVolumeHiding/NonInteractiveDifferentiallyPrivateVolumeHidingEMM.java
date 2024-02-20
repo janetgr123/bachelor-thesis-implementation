@@ -114,7 +114,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
 
         final var encryptedIndex = encryptedIndexWithStash.encryptedIndex();
         this.stash = encryptedIndexWithStash.stash();
-        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues();
+        this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues() * 32 * 2;
 
         /*
          * lookup table
@@ -148,6 +148,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
             if (count == 0) {
                 lookup.put(token, numberOfValuesWithNoise);
             }
+            this.numberOfDummyValues += 32 + 4;
         }
 
         return new DifferentiallyPrivateEncryptedIndexTables(

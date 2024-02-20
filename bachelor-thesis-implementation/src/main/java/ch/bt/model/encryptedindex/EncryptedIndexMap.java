@@ -17,6 +17,6 @@ public record EncryptedIndexMap(Map<Label, CiphertextWithIV> map) implements Enc
      */
     @Override
     public int size() {
-        return map.size();
+        return map.size() * (64 + 32); // SHA512 generates label of 64 bytes, AES value of 32 bytes (data 16, iv 16)
     }
 }
