@@ -541,7 +541,7 @@ public class BenchmarkUtils {
             throw new RuntimeException(e);
         }
 
-        final var potenitalStep = dataSize / 20;
+        final var potenitalStep = dataSize / 16;
         final var step = potenitalStep == 0 ? 1 : potenitalStep;
 
         for (int rangeSize = step; rangeSize <= dataSize; rangeSize += step) {
@@ -590,7 +590,7 @@ public class BenchmarkUtils {
             throw new RuntimeException(e);
         }
 
-        final var potenitalStep = dataSize / 20;
+        final var potenitalStep = dataSize / 16;
         final var step = potenitalStep == 0 ? 1 : potenitalStep;
 
         for (int rangeSize = step; rangeSize <= dataSize; rangeSize += step) {
