@@ -48,7 +48,7 @@ public class WrapAroundQueries {
         if (coin.flipCoin() == 1) {
             next = new ArrayList<>(normalQueries).get(drawRandomItemFrom(normalQueries));
         } else {
-            next = new ArrayList<>(normalQueries).get(drawRandomItemFrom(wrapAroundQueries));
+            next = new ArrayList<>(wrapAroundQueries).get(drawRandomItemFrom(wrapAroundQueries));
         }
         pair.addAll(createShuffledSingletons(next));
         Collections.shuffle(pair);
