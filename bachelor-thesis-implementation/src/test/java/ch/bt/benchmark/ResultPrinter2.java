@@ -29,7 +29,7 @@ public class ResultPrinter2 {
         csvFormat =
                 CSVFormat.DEFAULT
                         .builder()
-                        // .setHeader("emm", "mode", "data size", "from", "range size", "time [ns]")
+                        .setHeader("emm", "mode", "data size", "from", "range size", "time [ns]")
                         .build();
         printer = new CSVPrinter(fileWriter, csvFormat);
     }

@@ -29,7 +29,6 @@ public class ResultPrinter4 {
         csvFormat =
                 CSVFormat.DEFAULT
                         .builder()
-                        /*
                         .setHeader(
                                 "emm",
                                 "mode",
@@ -38,7 +37,6 @@ public class ResultPrinter4 {
                                 "range size",
                                 "size of response",
                                 "number of dummy values")
-                         */
                         .build();
         printer = new CSVPrinter(fileWriter, csvFormat);
     }

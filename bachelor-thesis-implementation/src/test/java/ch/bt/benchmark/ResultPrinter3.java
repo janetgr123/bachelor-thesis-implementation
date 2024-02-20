@@ -29,7 +29,6 @@ public class ResultPrinter3 {
         csvFormat =
                 CSVFormat.DEFAULT
                         .builder()
-                        /*
                         .setHeader(
                                 "emm",
                                 "mode",
@@ -37,7 +36,6 @@ public class ResultPrinter3 {
                                 "size multimap",
                                 "size encrypted index",
                                 "number of dummy values")
-                         */
                         .build();
         printer = new CSVPrinter(fileWriter, csvFormat);
     }
