@@ -1,0 +1,23 @@
+# number of emm (0 = basic, 1 = vh, 2 = vho, 3 = non-interactive dp, 4 = non-interactive dp2), 
+# isTwoRound, 
+# dataset (0 = cali, 1 = spitz, 2 = gowalla), 
+# epsilon (default: 0.2),
+# truncation probability (default: 32),
+# k (file index),
+# par (0 = seq, 1 = par),
+# bq (0 = no blocked queries, 1 = blocked queries)
+# wq (0 = no wrap around queries, 1 = wrap around queries)
+# error for bq
+ 
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0,0.2,32,0,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,0,0.4,32,1,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.2,32,2,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,1,0.4,32,3,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,2,0.2,32,4,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,0,2,0.4,32,5,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,1,0,0.2,32,6,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,1,0,0.4,32,7,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,1,1,0.2,32,8,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,1,1,0.4,32,9,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,1,2,0.2,32,10,0,0,0,0
+taskset -c 0-31,56-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,1,2,0.4,32,11,0,0,0,0
