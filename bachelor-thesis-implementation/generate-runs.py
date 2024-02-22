@@ -12,11 +12,11 @@ file.write("# bq (0 = no blocked queries, 1 = blocked queries)\n")
 file.write("# wq (0 = no wrap around queries, 1 = wrap around queries)\n")
 file.write("# error for bq\n \n")
 
-emms = [0,1,2,3,4]
+emms = [0]#,1,2,3,4]
 datasets = [0,1,2]
 epsilon = [0.2, 0.4]
 truncation = [32]
-twoRounds = [0,1]
+twoRounds = [1]
 bqwq = ["10","01"]
 par = [0]
 error = 3
@@ -40,7 +40,7 @@ for dataset in datasets:
                 s += str(0) + "," 
                 s += str(0) + "," 
                 s += str(0) + "\n"
-                file.write(TASK + str(k % 56) + "," + str((k % 56)+56) + " " + STRING + s)
+                file.write(TASK + "0-31" + "," + "56-87" + " " + STRING + s)
                 k = k + 1
 
 for dataset in datasets:
@@ -59,7 +59,7 @@ for dataset in datasets:
                     s += str(0) + "," 
                     s += str(0) + "," 
                     s += str(0) + "\n"
-                    file.write(TASK + str(k % 56) + "," + str((k % 56)+56) + " " + STRING + s)
+                    file.write(TASK + "0-31" + "," + "56-87" + " " + STRING + s)
                     k = k + 1
 
 """ for dataset in datasets:
