@@ -1,0 +1,112 @@
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,2,-1,-1,7547272
+ch.bt.emm.basic.BasicEMM,seq,2,-1,-1,6993776
+ch.bt.emm.basic.BasicEMM,seq,2,-1,-1,13290092
+ch.bt.emm.basic.BasicEMM,seq,2,-1,-1,5491052
+ch.bt.emm.basic.BasicEMM,seq,2,-1,-1,7728316
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,4,-1,-1,7256222
+ch.bt.emm.basic.BasicEMM,seq,4,-1,-1,12324433
+ch.bt.emm.basic.BasicEMM,seq,4,-1,-1,18423948
+ch.bt.emm.basic.BasicEMM,seq,4,-1,-1,12730135
+ch.bt.emm.basic.BasicEMM,seq,4,-1,-1,12832306
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,8,-1,-1,15450729
+ch.bt.emm.basic.BasicEMM,seq,8,-1,-1,15629502
+ch.bt.emm.basic.BasicEMM,seq,8,-1,-1,15293427
+ch.bt.emm.basic.BasicEMM,seq,8,-1,-1,15525845
+ch.bt.emm.basic.BasicEMM,seq,8,-1,-1,15051111
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,16,-1,-1,30433014
+ch.bt.emm.basic.BasicEMM,seq,16,-1,-1,17318074
+ch.bt.emm.basic.BasicEMM,seq,16,-1,-1,17417621
+ch.bt.emm.basic.BasicEMM,seq,16,-1,-1,18095059
+ch.bt.emm.basic.BasicEMM,seq,16,-1,-1,21038751
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,32,-1,-1,27361041
+ch.bt.emm.basic.BasicEMM,seq,32,-1,-1,27659108
+ch.bt.emm.basic.BasicEMM,seq,32,-1,-1,27233010
+ch.bt.emm.basic.BasicEMM,seq,32,-1,-1,26864167
+ch.bt.emm.basic.BasicEMM,seq,32,-1,-1,26668164
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,64,-1,-1,47191505
+ch.bt.emm.basic.BasicEMM,seq,64,-1,-1,47823168
+ch.bt.emm.basic.BasicEMM,seq,64,-1,-1,47284889
+ch.bt.emm.basic.BasicEMM,seq,64,-1,-1,48103160
+ch.bt.emm.basic.BasicEMM,seq,64,-1,-1,71834405
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,128,-1,-1,86280784
+ch.bt.emm.basic.BasicEMM,seq,128,-1,-1,86422014
+ch.bt.emm.basic.BasicEMM,seq,128,-1,-1,87011983
+ch.bt.emm.basic.BasicEMM,seq,128,-1,-1,86522347
+ch.bt.emm.basic.BasicEMM,seq,128,-1,-1,118327621
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,256,-1,-1,162516521
+ch.bt.emm.basic.BasicEMM,seq,256,-1,-1,165822091
+ch.bt.emm.basic.BasicEMM,seq,256,-1,-1,157900446
+ch.bt.emm.basic.BasicEMM,seq,256,-1,-1,143950121
+ch.bt.emm.basic.BasicEMM,seq,256,-1,-1,144504324
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,512,-1,-1,268126471
+ch.bt.emm.basic.BasicEMM,seq,512,-1,-1,266673751
+ch.bt.emm.basic.BasicEMM,seq,512,-1,-1,338436649
+ch.bt.emm.basic.BasicEMM,seq,512,-1,-1,266728012
+ch.bt.emm.basic.BasicEMM,seq,512,-1,-1,266042673
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,1024,-1,-1,464919463
+ch.bt.emm.basic.BasicEMM,seq,1024,-1,-1,466107025
+ch.bt.emm.basic.BasicEMM,seq,1024,-1,-1,510821316
+ch.bt.emm.basic.BasicEMM,seq,1024,-1,-1,553955149
+ch.bt.emm.basic.BasicEMM,seq,1024,-1,-1,551406356
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,2048,-1,-1,850751366
+ch.bt.emm.basic.BasicEMM,seq,2048,-1,-1,873695703
+ch.bt.emm.basic.BasicEMM,seq,2048,-1,-1,1004866318
+ch.bt.emm.basic.BasicEMM,seq,2048,-1,-1,934479959
+ch.bt.emm.basic.BasicEMM,seq,2048,-1,-1,859861247
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,4096,-1,-1,1608448101
+ch.bt.emm.basic.BasicEMM,seq,4096,-1,-1,1533746268
+ch.bt.emm.basic.BasicEMM,seq,4096,-1,-1,1579096687
+ch.bt.emm.basic.BasicEMM,seq,4096,-1,-1,1533061840
+ch.bt.emm.basic.BasicEMM,seq,4096,-1,-1,1588955001
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,8192,-1,-1,2377856859
+ch.bt.emm.basic.BasicEMM,seq,8192,-1,-1,2295189437
+ch.bt.emm.basic.BasicEMM,seq,8192,-1,-1,2355265682
+ch.bt.emm.basic.BasicEMM,seq,8192,-1,-1,2299789609
+ch.bt.emm.basic.BasicEMM,seq,8192,-1,-1,2395184991
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.basic.BasicEMM,seq,16384,-1,-1,3193244909
+ch.bt.emm.basic.BasicEMM,seq,16384,-1,-1,3133022961
+ch.bt.emm.basic.BasicEMM,seq,16384,-1,-1,3183031348
+ch.bt.emm.basic.BasicEMM,seq,16384,-1,-1,3065217310
+ch.bt.emm.basic.BasicEMM,seq,16384,-1,-1,3169099296
