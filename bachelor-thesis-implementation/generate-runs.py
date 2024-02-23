@@ -12,14 +12,14 @@ file.write("# bq (0 = no blocked queries, 1 = blocked queries)\n")
 file.write("# wq (0 = no wrap around queries, 1 = wrap around queries)\n")
 file.write("# error for bq\n \n")
 
-emms = [0]#,1,2,3,4]
+emms = [0,2]#,3,4]
 datasets = [0,1,2]
 epsilon = [0.2, 0.4]
 truncation = [32]
 twoRounds = [1]
 bqwq = ["10","01"]
-par = [0]
-error = 3
+par = [1]
+error = 16
 
 TASK = "taskset -c "
 STRING = "mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments="
@@ -81,6 +81,42 @@ for dataset in datasets:
                 k = k + 4
 """
                 
+for dataset in datasets:
+    for t in truncation:
+        for eps in epsilon:
+            for emm in emms:
+                s = ""
+                s += str(emm) + "," 
+                s += str(0) + "," 
+                s += str(dataset) + "," 
+                s += str(eps) + "," 
+                s += str(t) + "," 
+                s += str(k) + "," 
+                s += str(1) + ","
+                s += str(0) + "," 
+                s += str(0) + "," 
+                s += str(0) + "\n"
+                file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
+                k = k + 4
+
+for dataset in datasets:
+    for t in truncation:
+        for eps in epsilon:
+            for p in par:
+                for round in twoRounds:
+                    s = ""
+                    s += str(0) + "," 
+                    s += str(round) + "," 
+                    s += str(dataset) + "," 
+                    s += str(eps) + "," 
+                    s += str(t) + "," 
+                    s += str(k) + "," 
+                    s += str(p) + ","
+                    s += str(0) + "," 
+                    s += str(0) + "," 
+                    s += str(0) + "\n"
+                    file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
+                    k = k + 4
 
 for dataset in datasets:
     for t in truncation:
