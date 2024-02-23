@@ -3,13 +3,7 @@ from os.path import exists
 
 PATH = "src/test/resources/data/" 
 SUBFOLDER = "dataForPlots/"
-indices = list(range(0, 45, 4))
-indices.append(56)
-indices.append(60)
-indices.append(72)
-indices.append(76)
-indices.append(104)
-indices.append(108)
+indices = [88,92]
 
 # data size vs. time
 methods = ["buildIndex", "trapdoor", "search", "trapdoor2", "search2"]
