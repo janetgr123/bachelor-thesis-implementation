@@ -54,7 +54,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM2 implements EMM 
     private final KeyDependentLaplaceDistribution laplaceDistribution;
 
     /** the lookup table on client side */
-    private final Map<byte[], Integer> lookupTable;
+    private final Map<Label, Integer> lookupTable;
 
     public NonInteractiveDifferentiallyPrivateVolumeHidingEMM2(
             final int securityParameter, final double epsilon, final double alpha, final double t)
@@ -133,9 +133,9 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM2 implements EMM 
             }
             var numberOfValuesWithNoise =
                     (int) (multiMap.get(label).size() + correctionFactor + noise);
-            lookupTable.put(label.label(), numberOfValuesWithNoise);
+            lookupTable.put(label, numberOfValuesWithNoise);
         }
-        lookupTable.put(VolumeHidingEMMUtils.DUMMY, 0);
+        lookupTable.put(new Label(VolumeHidingEMMUtils.DUMMY), 0);
 
         return new DifferentiallyPrivateEncryptedIndexTables(encryptedIndex, null);
     }
@@ -149,12 +149,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM2 implements EMM 
     @Override
     public SearchToken trapdoor(final Label label) throws GeneralSecurityException, IOException {
         final var token = DPRF.generateToken(prfKey, label);
-        final var key =
-                lookupTable.keySet().stream()
-                        .filter(el -> Arrays.equals(el, label.label()))
-                        .findFirst()
-                        .orElse(VolumeHidingEMMUtils.DUMMY);
-        return new SearchTokenIntBytes(lookupTable.get(key), token);
+        return new SearchTokenIntBytes(lookupTable.get(label), token);
     }
 
     /**

@@ -1,6 +1,6 @@
 package ch.bt.model.encryptedindex;
 
-import ch.bt.model.searchtoken.SearchTokenBytes;
+import ch.bt.model.multimap.Label;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import java.util.Map;
  * @param map the encrypted index as a multimap
  * @author Janet Greutmann
  */
-public record LookupTable(Map<byte[], Integer> map) implements EncryptedIndex {
+public record LookupTable(Map<Label, Integer> map) implements EncryptedIndex {
     /**
      * @return the size of the multimap
      */

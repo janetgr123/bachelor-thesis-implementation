@@ -119,7 +119,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
         /*
          * lookup table
          */
-        final var lookup = new HashMap<byte[], Integer>();
+        final var lookup = new HashMap<Label, Integer>();
         final var keys = multiMap.keySet();
         for (final var label : keys) {
             final var noise = laplaceDistribution.sample(label.label());
@@ -129,7 +129,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
             var numberOfValuesWithNoise =
                     (int) (multiMap.get(label).size() + correctionFactor + noise);
             final var token = DPRF.generateToken(prfKey, label);
-            lookup.put(token, numberOfValuesWithNoise);
+            lookup.put(new Label(token), numberOfValuesWithNoise);
         }
         // padding
         final var rand = new Random();
@@ -143,12 +143,11 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
             final var values = (int) (Math.random() + 1) * maxNumberOfValuesPerLabel;
             var numberOfValuesWithNoise = (int) (values + correctionFactor + noise);
             final var token = DPRF.generateToken(prfKey, new Label(label));
-            final var count =
-                    lookup.keySet().stream().filter(el -> Arrays.equals(el, token)).count();
-            if (count == 0) {
-                lookup.put(token, numberOfValuesWithNoise);
+            final var key = new Label(token);
+            if (!lookup.containsKey(key)) {
+                lookup.put(key, numberOfValuesWithNoise);
+                this.numberOfDummyValues += 32 + 4;
             }
-            this.numberOfDummyValues += 32 + 4;
         }
 
         return new DifferentiallyPrivateEncryptedIndexTables(
@@ -191,13 +190,12 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
                                 ((DifferentiallyPrivateEncryptedIndexTables) encryptedIndex)
                                         .encryptedIndexCT())
                         .map();
-        final var key =
-                lookupTable.keySet().stream()
-                        .filter(el -> Arrays.equals(token.token(), el))
-                        .findFirst()
-                        .orElse(VolumeHidingEMMUtils.DUMMY);
-        final var lookup = lookupTable.get(key);
-        final var numberOfValues = lookup == null ? 0 : lookup;
+        int lookup = 0;
+        final var key = new Label(token.token());
+        if (lookupTable.containsKey(key)) {
+            lookup = lookupTable.get(key);
+        }
+        final var numberOfValues = lookup;
         int i = 0;
         while (i < numberOfValues) {
             final var expand1 =
