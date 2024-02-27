@@ -3,9 +3,9 @@ from os.path import exists
 
 PATH = "src/test/resources/data/" 
 SUBFOLDER = "dataForPlots/"
-indices = list(range(0, 21, 4))
-indices2 = list(range(48, 141, 4))
-indices += indices2
+indices = [8]
+#indices2 = list(range(48, 141, 4))
+#indices += indices2
 
 # data size vs. time
 methods = ["trapdoor", "search"]
