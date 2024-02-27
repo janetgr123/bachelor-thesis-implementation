@@ -12,7 +12,7 @@ file.write("# bq (0 = no blocked queries, 1 = blocked queries)\n")
 file.write("# wq (0 = no wrap around queries, 1 = wrap around queries)\n")
 file.write("# error for bq\n \n")
 
-emms = [0,2]#,3,4]
+emms = [3,4]
 datasets = [0,1,2]
 epsilon = [0.2, 0.4]
 truncation = [32]
@@ -24,7 +24,7 @@ error = 16
 TASK = "taskset -c "
 STRING = "mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments="
 
-k = 144
+k = 228
 """
 for dataset in datasets:
     for t in truncation:
@@ -80,7 +80,8 @@ for dataset in datasets:
                 file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
                 k = k + 4
 """
-                
+
+"""                
 for dataset in datasets:
     for t in truncation:
         for eps in epsilon:
@@ -98,6 +99,7 @@ for dataset in datasets:
                 s += str(0) + "\n"
                 file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
                 k = k + 4
+        
 
 for dataset in datasets:
     for t in truncation:
@@ -117,6 +119,7 @@ for dataset in datasets:
                     s += str(0) + "\n"
                     file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
                     k = k + 4
+                    """
 
 for dataset in datasets:
     for t in truncation:
