@@ -110,11 +110,16 @@ public class BasicEMM implements EMM {
             final var tokenAndCounter =
                     getTokenAndCounter(counter, ((SearchTokenBytes) searchToken).token());
             final var encryptedLabel = new Label(CryptoUtils.calculateSha3Digest(tokenAndCounter));
+            if(encryptedIndexMap.containsKey(encryptedLabel)) {
+               encryptedValues.add(encryptedIndexMap.get(encryptedLabel));
+            /*
             final var matchingLabels =
                     encryptedIndexMap.keySet().stream().filter(encryptedLabel::equals).toList();
             if (matchingLabels.size() == 1) {
                 final var matchingValue = encryptedIndexMap.get(matchingLabels.get(0));
                 encryptedValues.add(matchingValue);
+
+             */
             } else {
                 break;
             }
