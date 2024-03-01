@@ -51,6 +51,8 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
     /** the key dependent laplacian distribution */
     private final KeyDependentLaplaceDistribution laplaceDistribution;
 
+    private Integer responsePadding;
+
     public NonInteractiveDifferentiallyPrivateVolumeHidingEMM(
             final int securityParameter, final double epsilon, final double alpha, final double t)
             throws GeneralSecurityException {
@@ -222,7 +224,13 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
     @Override
     public Set<Plaintext> result(Set<Ciphertext> ciphertexts, Label searchLabel)
             throws GeneralSecurityException {
-        return VolumeHidingEMMUtils.getPlaintexts(ciphertexts, seScheme, searchLabel, stash);
+        responsePadding = 0;
+        final var dummies = new int[1];
+        final var result =
+                VolumeHidingEMMUtils.getPlaintexts(
+                        ciphertexts, seScheme, searchLabel, stash, dummies);
+        responsePadding = dummies[0];
+        return result;
     }
 
     /**
@@ -248,5 +256,10 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
     @Override
     public int getNumberOfDummyValues() {
         return numberOfDummyValues;
+    }
+
+    @Override
+    public int getResponsePadding() {
+        return responsePadding;
     }
 }

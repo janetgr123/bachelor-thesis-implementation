@@ -83,4 +83,6 @@ public interface EMM {
      * @return the encryption scheme instance
      */
     SEScheme getSeScheme();
+
+    int getResponsePadding();
 }

@@ -46,6 +46,8 @@ public class RangeBRCSchemeBQ implements GenericRSScheme {
     /** multimp according to range tree */
     private Map<Label, Set<Plaintext>> multimap;
 
+    private int responsePadding;
+
     public RangeBRCSchemeBQ(
             final int securityParameter,
             final EMM emmScheme,
@@ -178,6 +180,7 @@ public class RangeBRCSchemeBQ implements GenericRSScheme {
                         .map(multimap::get)
                         .flatMap(Collection::stream)
                         .collect(Collectors.toSet());
+        responsePadding = values.size() - expectedValues.size();
         return values.stream().filter(expectedValues::contains).collect(Collectors.toSet());
     }
 
@@ -199,6 +202,11 @@ public class RangeBRCSchemeBQ implements GenericRSScheme {
     @Override
     public EMM getEMM() {
         return emmScheme;
+    }
+
+    @Override
+    public int getResponsePadding() {
+        return responsePadding;
     }
 
     /**

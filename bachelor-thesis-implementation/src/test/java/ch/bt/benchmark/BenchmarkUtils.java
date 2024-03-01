@@ -309,7 +309,6 @@ public class BenchmarkUtils {
         SEARCH
          */
         ResultPrinter2 printSearch = new ResultPrinter2("search", k);
-        ResultPrinter4 printPadding = new ResultPrinter4("searchPadding", k);
 
         // individual warm-up
         for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
@@ -323,21 +322,6 @@ public class BenchmarkUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        final long dummies =
-                cipherTexts.stream()
-                        .map(PairLabelCiphertext.class::cast)
-                        .map(PairLabelCiphertext::label)
-                        .map(
-                                el -> {
-                                    try {
-                                        return scheme.getEMM().getSeScheme().decryptLabel(el);
-                                    } catch (GeneralSecurityException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                })
-                        .filter(p -> Arrays.equals(p.label(), new byte[0]))
-                        .count();
-        printPadding.printToCsv(emm, mode, dataSize, rangeSize, cipherTexts.size(), dummies);
 
         /*
         TRAPDOOR 2
@@ -377,24 +361,10 @@ public class BenchmarkUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        final long dummies2 =
-                cipherTexts.stream()
-                        .map(PairLabelCiphertext.class::cast)
-                        .map(PairLabelCiphertext::label)
-                        .map(
-                                el -> {
-                                    try {
-                                        return scheme.getEMM().getSeScheme().decryptLabel(el);
-                                    } catch (GeneralSecurityException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                })
-                        .filter(p -> Arrays.equals(p.label(), new byte[0]))
-                        .count();
-        printPadding2.printToCsv(emm, mode, dataSize, rangeSize, cipherTexts2.size(), dummies2);
+
+        printPadding2.printToCsv(emm, mode, dataSize, rangeSize, cipherTexts2.size(), scheme.getResponsePadding());
         printTrapdoor.printer.close();
         printSearch.printer.close();
-        printPadding.printer.close();
         printTrapdoor2.printer.close();
         printSearch2.printer.close();
         printPadding2.printer.close();
@@ -494,24 +464,9 @@ public class BenchmarkUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        final long dummies =
-                switch (emm) {
-                    case "ch.bt.emm.basic.BasicEMM" -> 0;
-                    default -> cipherTexts.stream()
-                            .map(PairLabelCiphertext.class::cast)
-                            .map(PairLabelCiphertext::label)
-                            .map(
-                                    el -> {
-                                        try {
-                                            return scheme.getEMM().getSeScheme().decryptLabel(el);
-                                        } catch (GeneralSecurityException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    })
-                            .filter(p -> Arrays.equals(p.label(), new byte[0]))
-                            .count();
-                };
-        printPadding.printToCsv(emm, mode, dataSize, rangeSize, cipherTexts.size(), dummies);
+
+        printPadding.printToCsv(
+                emm, mode, dataSize, rangeSize, cipherTexts.size(), scheme.getResponsePadding());
         printTrapdoor.printer.close();
         printSearch.printer.close();
         printPadding.printer.close();

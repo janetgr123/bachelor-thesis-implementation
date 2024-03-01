@@ -38,6 +38,8 @@ public class RangeBRCScheme implements GenericRSScheme {
     /** the set of vertices that covers the range */
     private Set<Vertex> rangeCover;
 
+    private int responsePadding;
+
     public RangeBRCScheme(
             final int securityParameter,
             final EMM emmScheme,
@@ -136,13 +138,16 @@ public class RangeBRCScheme implements GenericRSScheme {
     @Override
     public Set<Plaintext> result(Set<Ciphertext> ciphertexts, final CustomRange q)
             throws GeneralSecurityException {
+        responsePadding = 0;
         return rangeCover.stream()
                 .map(Vertex::range)
                 .map(CastingHelpers::toLabel)
                 .map(
                         el -> {
                             try {
-                                return emmScheme.result(ciphertexts, el);
+                                final var result = emmScheme.result(ciphertexts, el);
+                                responsePadding += emmScheme.getResponsePadding();
+                                return result;
                             } catch (GeneralSecurityException e) {
                                 throw new RuntimeException(e);
                             }
@@ -179,5 +184,10 @@ public class RangeBRCScheme implements GenericRSScheme {
     @Override
     public String getClassOfEMM() {
         return emmScheme.getClass().getName();
+    }
+
+    @Override
+    public int getResponsePadding() {
+        return responsePadding;
     }
 }

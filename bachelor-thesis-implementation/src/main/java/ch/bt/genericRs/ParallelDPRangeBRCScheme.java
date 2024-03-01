@@ -45,6 +45,8 @@ public class ParallelDPRangeBRCScheme implements TwoRoundGenericRSScheme {
     /** the set of vertices that covers the range */
     private Set<Vertex> rangeCover;
 
+    private int responsePadding;
+
     public ParallelDPRangeBRCScheme(
             final int securityParameter,
             final TwoRoundEMM emmScheme,
@@ -212,6 +214,7 @@ public class ParallelDPRangeBRCScheme implements TwoRoundGenericRSScheme {
     @Override
     public Set<Plaintext> result(Set<Ciphertext> ciphertexts, final CustomRange q)
             throws GeneralSecurityException {
+        responsePadding = 0;
         return FORK_JOIN_POOL
                 .submit(
                         () ->
@@ -221,7 +224,11 @@ public class ParallelDPRangeBRCScheme implements TwoRoundGenericRSScheme {
                                         .map(
                                                 el -> {
                                                     try {
-                                                        return emmScheme.result(ciphertexts, el);
+                                                        final var result =
+                                                                emmScheme.result(ciphertexts, el);
+                                                        responsePadding +=
+                                                                emmScheme.getResponsePadding();
+                                                        return result;
                                                     } catch (GeneralSecurityException e) {
                                                         throw new RuntimeException(e);
                                                     }
@@ -259,5 +266,10 @@ public class ParallelDPRangeBRCScheme implements TwoRoundGenericRSScheme {
     @Override
     public TwoRoundEMM getEMM() {
         return emmScheme;
+    }
+
+    @Override
+    public int getResponsePadding() {
+        return responsePadding;
     }
 }

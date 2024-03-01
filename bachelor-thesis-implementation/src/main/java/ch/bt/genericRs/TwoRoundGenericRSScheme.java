@@ -101,4 +101,6 @@ public interface TwoRoundGenericRSScheme {
      * @return the EMM scheme instance
      */
     TwoRoundEMM getEMM();
+
+    int getResponsePadding();
 }

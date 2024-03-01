@@ -184,4 +184,9 @@ public class BasicEMM implements EMM {
     public SecretKey getPrfKey() {
         return hmacKey;
     }
+
+    @Override
+    public int getResponsePadding() {
+        return 0;
+    }
 }

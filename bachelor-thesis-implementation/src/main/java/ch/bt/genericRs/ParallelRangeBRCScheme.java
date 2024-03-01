@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
@@ -43,6 +44,8 @@ public class ParallelRangeBRCScheme implements GenericRSScheme {
 
     /** the set of vertices that covers the range */
     private Set<Vertex> rangeCover;
+
+    private final AtomicInteger responsePadding = new AtomicInteger(0);
 
     public ParallelRangeBRCScheme(
             final int securityParameter,
@@ -152,6 +155,7 @@ public class ParallelRangeBRCScheme implements GenericRSScheme {
     @Override
     public Set<Plaintext> result(Set<Ciphertext> ciphertexts, final CustomRange q)
             throws GeneralSecurityException {
+        responsePadding.set(0);
         return FORK_JOIN_POOL
                 .submit(
                         () ->
@@ -161,7 +165,11 @@ public class ParallelRangeBRCScheme implements GenericRSScheme {
                                         .map(
                                                 el -> {
                                                     try {
-                                                        return emmScheme.result(ciphertexts, el);
+                                                        final var result =
+                                                                emmScheme.result(ciphertexts, el);
+                                                        responsePadding.getAndAdd(
+                                                                emmScheme.getResponsePadding());
+                                                        return result;
                                                     } catch (GeneralSecurityException e) {
                                                         throw new RuntimeException(e);
                                                     }
@@ -199,5 +207,10 @@ public class ParallelRangeBRCScheme implements GenericRSScheme {
     @Override
     public EMM getEMM() {
         return emmScheme;
+    }
+
+    @Override
+    public int getResponsePadding() {
+        return responsePadding.get();
     }
 }

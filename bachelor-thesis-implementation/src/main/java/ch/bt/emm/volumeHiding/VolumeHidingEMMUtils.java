@@ -86,7 +86,8 @@ public class VolumeHidingEMMUtils {
             final Set<Ciphertext> ciphertexts,
             final SEScheme seScheme,
             final Label searchLabel,
-            final Stack<Ciphertext> stash) {
+            final Stack<Ciphertext> stash,
+            int[] dummies) {
         /*
          * decrypt ciphertexts and match labels with the search label
          */
@@ -108,6 +109,8 @@ public class VolumeHidingEMMUtils {
                         .filter(el -> searchLabel.equals(el.label()))
                         .map(PairLabelPlaintext::value)
                         .collect(Collectors.toSet());
+
+        dummies[0] = ciphertexts.size() - plaintexts.size();
 
         /*
          * extract matching plaintexts from unencrypted stash

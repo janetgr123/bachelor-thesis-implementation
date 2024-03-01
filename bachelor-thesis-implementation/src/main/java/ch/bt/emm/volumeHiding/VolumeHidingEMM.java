@@ -44,6 +44,8 @@ public class VolumeHidingEMM implements EMM {
     /** the size of dummy entries in bytes in the encrypted tables */
     private int numberOfDummyValues;
 
+    private Integer responsePadding;
+
     public VolumeHidingEMM(final int securityParameter, final double alpha)
             throws GeneralSecurityException {
         final var keys = this.setup(securityParameter);
@@ -162,7 +164,12 @@ public class VolumeHidingEMM implements EMM {
     @Override
     public Set<Plaintext> result(final Set<Ciphertext> ciphertexts, final Label searchLabel)
             throws GeneralSecurityException {
-        return VolumeHidingEMMUtils.getPlaintexts(ciphertexts, seScheme, searchLabel, stash);
+        responsePadding = 0;
+        final var dummies = new int[1];
+        final var result = VolumeHidingEMMUtils.getPlaintexts(
+                ciphertexts, seScheme, searchLabel, stash, dummies);
+        responsePadding = dummies[0];
+        return result;
     }
 
     /**
@@ -210,5 +217,10 @@ public class VolumeHidingEMM implements EMM {
     @Override
     public int getNumberOfDummyValues() {
         return numberOfDummyValues;
+    }
+
+    @Override
+    public int getResponsePadding() {
+        return responsePadding;
     }
 }

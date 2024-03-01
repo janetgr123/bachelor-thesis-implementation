@@ -104,4 +104,6 @@ public interface TwoRoundEMM {
      * @return the encryption scheme instance
      */
     SEScheme getSeScheme();
+
+    int getResponsePadding();
 }

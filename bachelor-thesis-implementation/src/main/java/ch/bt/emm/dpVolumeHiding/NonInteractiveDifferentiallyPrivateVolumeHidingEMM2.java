@@ -56,6 +56,8 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM2 implements EMM 
     /** the lookup table on client side */
     private final Map<Label, Integer> lookupTable;
 
+    private Integer responsePadding;
+
     public NonInteractiveDifferentiallyPrivateVolumeHidingEMM2(
             final int securityParameter, final double epsilon, final double alpha, final double t)
             throws GeneralSecurityException {
@@ -209,7 +211,13 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM2 implements EMM 
     @Override
     public Set<Plaintext> result(Set<Ciphertext> ciphertexts, Label searchLabel)
             throws GeneralSecurityException {
-        return VolumeHidingEMMUtils.getPlaintexts(ciphertexts, seScheme, searchLabel, stash);
+        responsePadding = 0;
+        final var dummies = new int[1];
+        final var result =
+                VolumeHidingEMMUtils.getPlaintexts(
+                        ciphertexts, seScheme, searchLabel, stash, dummies);
+        responsePadding = dummies[0];
+        return result;
     }
 
     /**
@@ -235,5 +243,10 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM2 implements EMM 
     @Override
     public SecretKey getPrfKey() {
         return prfKey;
+    }
+
+    @Override
+    public int getResponsePadding() {
+        return responsePadding;
     }
 }

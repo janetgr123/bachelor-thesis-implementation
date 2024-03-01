@@ -81,4 +81,6 @@ public interface GenericRSScheme {
      * @return the EMM scheme instance
      */
     EMM getEMM();
+
+    int getResponsePadding();
 }
