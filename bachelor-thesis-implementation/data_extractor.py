@@ -3,7 +3,8 @@ from os.path import exists
 
 PATH = "src/test/resources/data/" 
 SUBFOLDER = "dataForPlots/" 
-indices = [7]
+indices = [24, 28, 32, 36, 40, 44, 1, 168]
+interactive = 1
 
 # data size vs. time
 methods = ["buildIndex", "trapdoor", "search", "trapdoor2", "search2"]
@@ -51,7 +52,10 @@ for method in methods:
 
 
         # response size (entries) and percentage padding
-        df = pd.read_csv(PATH + "searchPadding-" + str(index) + ".csv")
+        file = PATH + "searchPadding-" + str(index) + ".csv"
+        if interactive == 1:
+            file = PATH + "searchPadding2-" + str(index) + ".csv"
+        df = pd.read_csv(file)
         df = df[df['emm'] != 'emm']
         data_sizes = df['data size'].unique()
         data_size = data_sizes[-1]
