@@ -5,7 +5,6 @@ import ch.bt.emm.EMM;
 import ch.bt.genericRs.*;
 import ch.bt.model.encryptedindex.EncryptedIndex;
 import ch.bt.model.multimap.Label;
-import ch.bt.model.multimap.PairLabelCiphertext;
 import ch.bt.model.multimap.Plaintext;
 import ch.bt.model.rc.CustomRange;
 import ch.bt.model.rc.Vertex;
@@ -309,6 +308,7 @@ public class BenchmarkUtils {
         SEARCH
          */
         ResultPrinter2 printSearch = new ResultPrinter2("search", k);
+        ResultPrinter2 printResult = new ResultPrinter2("result", k);
 
         // individual warm-up
         for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
@@ -362,11 +362,27 @@ public class BenchmarkUtils {
             throw new RuntimeException(e);
         }
 
-        printPadding2.printToCsv(emm, mode, dataSize, rangeSize, cipherTexts2.size(), scheme.getResponsePadding());
+        printPadding2.printToCsv(
+                emm, mode, dataSize, rangeSize, cipherTexts2.size(), scheme.getResponsePadding());
+
+        // individual warm-up
+        for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
+            scheme.result(cipherTexts2, range);
+        }
+        final var startResult = System.nanoTime();
+        final var plaintexts = scheme.result(cipherTexts2, range);
+        final var endResult = System.nanoTime();
+        try {
+            printResult.printToCsv(emm, mode, endResult - startResult, dataSize, rangeSize, from);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         printTrapdoor.printer.close();
         printSearch.printer.close();
         printTrapdoor2.printer.close();
         printSearch2.printer.close();
+        printResult.printer.close();
         printPadding2.printer.close();
     }
 
@@ -423,7 +439,7 @@ public class BenchmarkUtils {
             final EncryptedIndex encryptedIndex,
             final String mode,
             final int k)
-            throws IOException {
+            throws IOException, GeneralSecurityException {
         final String emm = scheme.getClassOfEMM();
         /*
         TRAPDOOR
@@ -450,6 +466,7 @@ public class BenchmarkUtils {
         SEARCH
          */
         ResultPrinter2 printSearch = new ResultPrinter2("search", k);
+        ResultPrinter2 printResult = new ResultPrinter2("result", k);
         ResultPrinter4 printPadding = new ResultPrinter4("searchPadding", k);
 
         // individual warm-up
@@ -467,8 +484,23 @@ public class BenchmarkUtils {
 
         printPadding.printToCsv(
                 emm, mode, dataSize, rangeSize, cipherTexts.size(), scheme.getResponsePadding());
+
+        // individual warm-up
+        for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
+            scheme.result(cipherTexts, range);
+        }
+        final var startResult = System.nanoTime();
+        final var plaintexts = scheme.result(cipherTexts, range);
+        final var endResult = System.nanoTime();
+        try {
+            printResult.printToCsv(emm, mode, endResult - startResult, dataSize, rangeSize, from);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         printTrapdoor.printer.close();
         printSearch.printer.close();
+        printResult.printer.close();
         printPadding.printer.close();
     }
 
@@ -566,7 +598,7 @@ public class BenchmarkUtils {
                 try {
                     runTrapdoorAndSearchForSchemeDataSizeAndRangeSize(
                             scheme, dataSize, rangeSize, encryptedIndex, mode, k);
-                } catch (IOException e) {
+                } catch (IOException | GeneralSecurityException e) {
                     throw new RuntimeException(e);
                 }
             }
