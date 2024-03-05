@@ -131,7 +131,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
             var numberOfValuesWithNoise =
                     (int) (multiMap.get(label).size() + correctionFactor + noise);
             final var token = DPRF.generateToken(prfKey, label);
-            lookup.put(new Label(token), numberOfValuesWithNoise);
+            lookup.put(new Label(CryptoUtils.calculateSha3Digest(token)), numberOfValuesWithNoise);
         }
         // padding
         final var rand = new Random();
@@ -145,7 +145,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
             final var values = (int) (Math.random() + 1) * maxNumberOfValuesPerLabel;
             var numberOfValuesWithNoise = (int) (values + correctionFactor + noise);
             final var token = DPRF.generateToken(prfKey, new Label(label));
-            final var key = new Label(token);
+            final var key = new Label(CryptoUtils.calculateSha3Digest(token));
             if (!lookup.containsKey(key)) {
                 lookup.put(key, numberOfValuesWithNoise);
                 this.numberOfDummyValues += 32 + 4;
@@ -174,7 +174,8 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
      */
     @Override
     public Set<Ciphertext> search(
-            final SearchToken searchToken, final EncryptedIndex encryptedIndex) throws IOException {
+            final SearchToken searchToken, final EncryptedIndex encryptedIndex)
+            throws IOException, GeneralSecurityException {
         if (!(encryptedIndex instanceof DifferentiallyPrivateEncryptedIndexTables)
                 || !(searchToken instanceof SearchTokenBytes token)) {
             throw new IllegalArgumentException(
@@ -193,7 +194,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
                                         .encryptedIndexCT())
                         .map();
         int lookup = 0;
-        final var key = new Label(token.token());
+        final var key = new Label(CryptoUtils.calculateSha3Digest(token.token()));
         if (lookupTable.containsKey(key)) {
             lookup = lookupTable.get(key);
         }
