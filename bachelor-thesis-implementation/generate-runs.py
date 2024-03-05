@@ -12,31 +12,31 @@ file.write("# bq (0 = no blocked queries, 1 = blocked queries)\n")
 file.write("# wq (0 = no wrap around queries, 1 = wrap around queries)\n")
 file.write("# error for bq\n \n")
 
-emms = [3,4]
+emms = [0,1,2]
+emmsDp = [3,4]
 datasets = [0,1,2]
 epsilon = [0.2, 0.4]
 truncation = [32]
 twoRounds = [1]
 bqwq = ["10","01"]
-par = [1]
-error = 16
+par = [0,1]
+error = [1024, 2048]
 
 TASK = "taskset -c "
 STRING = "mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments="
 
-k = 228
-"""
+k = 0
 for dataset in datasets:
     for t in truncation:
-        for eps in epsilon:
+        for p in par:
             s = ""
             s += str(0) + "," 
             s += str(0) + "," 
             s += str(dataset) + "," 
-            s += str(eps) + "," 
+            s += str(epsilon[0]) + "," 
             s += str(t) + "," 
-            s += str(k) + "," 
-            s += str(0) + ","
+            s += str(k / 4) + "," 
+            s += str(p) + ","
             s += str(0) + "," 
             s += str(0) + "," 
             s += str(0) + "\n"
@@ -45,16 +45,16 @@ for dataset in datasets:
 
 for dataset in datasets:
     for t in truncation:
-        for eps in epsilon:
-            for p in par:
-                for round in twoRounds:
+        for emm in emmsDp:
+            for eps in epsilon:
+                for p in par:
                     s = ""
                     s += str(0) + "," 
-                    s += str(round) + "," 
+                    s += str(0) + "," 
                     s += str(dataset) + "," 
                     s += str(eps) + "," 
                     s += str(t) + "," 
-                    s += str(k) + "," 
+                    s += str(k / 4) + "," 
                     s += str(p) + ","
                     s += str(0) + "," 
                     s += str(0) + "," 
@@ -65,82 +65,89 @@ for dataset in datasets:
 for dataset in datasets:
     for t in truncation:
         for eps in epsilon:
+            for p in par:
+                s = ""
+                s += str(0) + "," 
+                s += str(1) + "," 
+                s += str(dataset) + "," 
+                s += str(eps) + "," 
+                s += str(t) + "," 
+                s += str(k / 4) + "," 
+                s += str(p) + ","
+                s += str(0) + "," 
+                s += str(0) + "," 
+                s += str(0) + "\n"
+                file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
+                k = k + 4
+
+for dataset in datasets:
+    for t in truncation:
+        for err in error:
             for emm in emms:
                 s = ""
                 s += str(emm) + "," 
                 s += str(0) + "," 
-                s += str(dataset) + "," 
-                s += str(eps) + "," 
+                s += str(dataset) + ","
+                s += str(epsilon[0]) + "," 
                 s += str(t) + "," 
-                s += str(k) + "," 
+                s += str(k / 4) + "," 
                 s += str(0) + ","
-                s += str(0) + "," 
-                s += str(0) + "," 
-                s += str(0) + "\n"
+                s += str(1) + "," 
+                s += str(0) + ","
+                s += str(err) + "\n"
                 file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
                 k = k + 4
-"""
-
-"""                
-for dataset in datasets:
-    for t in truncation:
-        for eps in epsilon:
-            for emm in emms:
-                s = ""
-                s += str(emm) + "," 
-                s += str(0) + "," 
-                s += str(dataset) + "," 
-                s += str(eps) + "," 
-                s += str(t) + "," 
-                s += str(k) + "," 
-                s += str(1) + ","
-                s += str(0) + "," 
-                s += str(0) + "," 
-                s += str(0) + "\n"
-                file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
-                k = k + 4
-        
 
 for dataset in datasets:
     for t in truncation:
         for eps in epsilon:
-            for p in par:
-                for round in twoRounds:
-                    s = ""
-                    s += str(0) + "," 
-                    s += str(round) + "," 
-                    s += str(dataset) + "," 
-                    s += str(eps) + "," 
-                    s += str(t) + "," 
-                    s += str(k) + "," 
-                    s += str(p) + ","
-                    s += str(0) + "," 
-                    s += str(0) + "," 
-                    s += str(0) + "\n"
-                    file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
-                    k = k + 4
-                    """
-
-for dataset in datasets:
-    for t in truncation:
-        for eps in epsilon:
-            for emm in emms:
-                for b in bqwq:
+            for err in error:
+                for emm in emmsDp:
                     s = ""
                     s += str(emm) + "," 
                     s += str(0) + "," 
-                    s += str(dataset) + "," 
+                    s += str(dataset) + ","
                     s += str(eps) + "," 
                     s += str(t) + "," 
-                    s += str(k) + "," 
+                    s += str(k / 4) + "," 
                     s += str(0) + ","
-                    if (b == "10"):
-                        s += str(1) + "," 
-                        s += str(0) + ","
-                        s += str(error) + "\n"
-                    elif (b == "01"):
-                        s += str(0) + "," 
-                        s += str(1) + ","
-                        s += str(0) + "\n"
+                    s += str(1) + "," 
+                    s += str(0) + ","
+                    s += str(err) + "\n"
                     file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
                     k = k + 4
+
+for dataset in datasets:
+    for t in truncation:
+        for emm in emms:
+            s = ""
+            s += str(emm) + "," 
+            s += str(0) + ","
+            s += str(dataset) + "," 
+            s += str(epsilon[0]) + "," 
+            s += str(t) + "," 
+            s += str(k / 4) + "," 
+            s += str(0) + ","
+            s += str(0) + "," 
+            s += str(1) + ","
+            s += str(0) + "\n"
+            file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
+            k = k + 4
+
+for dataset in datasets:
+    for t in truncation:
+        for eps in epsilon:
+            for emm in emmsDp:
+                s = ""
+                s += str(emm) + "," 
+                s += str(0) + ","
+                s += str(dataset) + "," 
+                s += str(eps) + "," 
+                s += str(t) + "," 
+                s += str(k / 4) + "," 
+                s += str(0) + ","
+                s += str(0) + "," 
+                s += str(1) + ","
+                s += str(0) + "\n"
+                file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
+                k = k + 4
