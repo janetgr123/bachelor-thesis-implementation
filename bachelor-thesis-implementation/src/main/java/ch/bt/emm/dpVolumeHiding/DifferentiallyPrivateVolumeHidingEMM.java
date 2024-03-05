@@ -128,11 +128,15 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
         this.numberOfDummyValues = encryptedIndexWithStash.numberOfDummyValues() * 32 * 2;
 
         /*
-         * Cuckoo Hashing for counter tables
+         * Cuckoo Hashing for counter tables (number of keys for size)
          */
         final var encryptedCTIndexWithStash =
                 DPVolumeHidingEMMUtils.calculateEncryptedCTIndex(
-                        tableSize, numberOfValues, multiMap, prfKey, seScheme);
+                        (int) ((1 + alpha) * multiMap.size()),
+                        numberOfValues,
+                        multiMap,
+                        prfKey,
+                        seScheme);
         final var encryptedCTIndex = encryptedCTIndexWithStash.encryptedIndex();
         this.counterStash = encryptedCTIndexWithStash.stash();
         this.numberOfDummyCT = encryptedCTIndexWithStash.numberOfDummyValues() * 32 * 2;
