@@ -28,20 +28,21 @@ STRING = "mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkR
 k = 0
 for dataset in datasets:
     for t in truncation:
-        for p in par:
-            s = ""
-            s += str(0) + "," 
-            s += str(0) + "," 
-            s += str(dataset) + "," 
-            s += str(epsilon[0]) + "," 
-            s += str(t) + "," 
-            s += str(k / 4) + "," 
-            s += str(p) + ","
-            s += str(0) + "," 
-            s += str(0) + "," 
-            s += str(0) + "\n"
-            file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
-            k = k + 4
+        for emm in emms:
+            for p in par:
+                s = ""
+                s += str(emm) + "," 
+                s += str(0) + "," 
+                s += str(dataset) + "," 
+                s += str(epsilon[0]) + "," 
+                s += str(t) + "," 
+                s += str(int(k / 4)) + "," 
+                s += str(p) + ","
+                s += str(0) + "," 
+                s += str(0) + "," 
+                s += str(0) + "\n"
+                file.write(TASK + str(k % 32) + "-" + str((k + 3) % 32) + "," + str(56 + (k % 32)) + "-" + str(56 + ((k + 3) % 32)) + " " + STRING + s)
+                k = k + 4
 
 for dataset in datasets:
     for t in truncation:
@@ -49,12 +50,12 @@ for dataset in datasets:
             for eps in epsilon:
                 for p in par:
                     s = ""
-                    s += str(0) + "," 
+                    s += str(emm) + "," 
                     s += str(0) + "," 
                     s += str(dataset) + "," 
                     s += str(eps) + "," 
                     s += str(t) + "," 
-                    s += str(k / 4) + "," 
+                    s += str(int(k / 4)) + "," 
                     s += str(p) + ","
                     s += str(0) + "," 
                     s += str(0) + "," 
@@ -72,7 +73,7 @@ for dataset in datasets:
                 s += str(dataset) + "," 
                 s += str(eps) + "," 
                 s += str(t) + "," 
-                s += str(k / 4) + "," 
+                s += str(int(k / 4)) + "," 
                 s += str(p) + ","
                 s += str(0) + "," 
                 s += str(0) + "," 
@@ -90,7 +91,7 @@ for dataset in datasets:
                 s += str(dataset) + ","
                 s += str(epsilon[0]) + "," 
                 s += str(t) + "," 
-                s += str(k / 4) + "," 
+                s += str(int(k / 4)) + "," 
                 s += str(0) + ","
                 s += str(1) + "," 
                 s += str(0) + ","
@@ -109,7 +110,7 @@ for dataset in datasets:
                     s += str(dataset) + ","
                     s += str(eps) + "," 
                     s += str(t) + "," 
-                    s += str(k / 4) + "," 
+                    s += str(int(k / 4)) + "," 
                     s += str(0) + ","
                     s += str(1) + "," 
                     s += str(0) + ","
@@ -126,7 +127,7 @@ for dataset in datasets:
             s += str(dataset) + "," 
             s += str(epsilon[0]) + "," 
             s += str(t) + "," 
-            s += str(k / 4) + "," 
+            s += str(int(k / 4)) + "," 
             s += str(0) + ","
             s += str(0) + "," 
             s += str(1) + ","
@@ -144,7 +145,7 @@ for dataset in datasets:
                 s += str(dataset) + "," 
                 s += str(eps) + "," 
                 s += str(t) + "," 
-                s += str(k / 4) + "," 
+                s += str(int(k / 4)) + "," 
                 s += str(0) + ","
                 s += str(0) + "," 
                 s += str(1) + ","
