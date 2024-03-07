@@ -48,6 +48,9 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
     /** the size of the tables used for the Cuckoo Hashing */
     private int tableSize;
 
+    /** the size of the tables used for the Cuckoo Hashing */
+    private int tableSize2;
+
     /** the maximum number of values per label (used for padding) */
     private int maxNumberOfValuesPerLabel = 0;
 
@@ -112,6 +115,7 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
             throws GeneralSecurityException, IOException {
         final int numberOfValues = VolumeHidingEMMUtils.getNumberOfValues(multiMap);
         this.tableSize = (int) Math.round((1 + alpha) * numberOfValues);
+        this.tableSize2 = (int) Math.round((1 + alpha) * multiMap.size());
 
         // determine padding
         setMaxNumberOfValuesPerLabel(multiMap);
@@ -132,11 +136,7 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
          */
         final var encryptedCTIndexWithStash =
                 DPVolumeHidingEMMUtils.calculateEncryptedCTIndex(
-                        (int) ((1 + alpha) * multiMap.size()),
-                        numberOfValues,
-                        multiMap,
-                        prfKey,
-                        seScheme);
+                        tableSize2, tableSize2, multiMap, prfKey, seScheme);
         final var encryptedCTIndex = encryptedCTIndexWithStash.encryptedIndex();
         this.counterStash = encryptedCTIndexWithStash.stash();
         this.numberOfDummyCT = encryptedCTIndexWithStash.numberOfDummyValues() * 32 * 2;
@@ -216,9 +216,9 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
         final var encryptedCounterTable2 = encryptedCouterIndex.getTable(1);
         final var token = ((SearchTokenBytes) searchToken).token();
         final var expand1 =
-                CastingHelpers.fromByteArrayToHashModN(DPRF.evaluateDPRF(token, 0), tableSize);
+                CastingHelpers.fromByteArrayToHashModN(DPRF.evaluateDPRF(token, 0), tableSize2);
         final var expand2 =
-                CastingHelpers.fromByteArrayToHashModN(DPRF.evaluateDPRF(token, 1), tableSize);
+                CastingHelpers.fromByteArrayToHashModN(DPRF.evaluateDPRF(token, 1), tableSize2);
         final var ciphertext1 = encryptedCounterTable[expand1];
         final var ciphertext2 = encryptedCounterTable2[expand2];
         ciphertexts.add(ciphertext1);

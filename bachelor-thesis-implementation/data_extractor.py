@@ -3,8 +3,8 @@ from os.path import exists
 
 PATH = "src/test/resources/data/" 
 SUBFOLDER = "dataForPlots/" 
-indices = [24, 28, 32, 36, 40, 44, 1, 168]
-interactive = 1
+indices = [11,23,32,33]
+interactive = 0
 
 # data size vs. time
 methods = ["buildIndex", "trapdoor", "search", "trapdoor2", "search2"]
