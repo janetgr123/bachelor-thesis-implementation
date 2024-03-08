@@ -172,23 +172,44 @@ public class DifferentiallyPrivateVolumeHidingEMM implements TwoRoundEMM {
     @Override
     public SearchToken trapdoor(final Label label, final Set<Ciphertext> ciphertexts)
             throws GeneralSecurityException, IOException {
-        final var encryptedLabel = seScheme.encryptLabel(label);
-        final var matchingEntries =
+        final var plaintexts =
                 ciphertexts.stream()
                         .map(PairLabelCiphertext.class::cast)
-                        .filter(el -> el.label().equals(encryptedLabel))
-                        .count();
+                        .map(
+                                el -> {
+                                    try {
+                                        return new PairLabelPlaintext(
+                                                seScheme.decryptLabel(el.label()),
+                                                seScheme.decrypt(el.value()));
+                                    } catch (GeneralSecurityException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                })
+                        .toList();
+        final var matchingEntries =
+                plaintexts.stream().filter(el -> el.label().equals(label)).toList();
         final var matchingEntriesInStash =
                 counterStash.stream()
                         .map(PairLabelPlaintext.class::cast)
                         .filter(el -> el.label().equals(label))
-                        .count();
+                        .toList();
+        if (matchingEntries.size() > 1 || matchingEntriesInStash.size() > 1) {
+            throw new RuntimeException("too many matching entries");
+        }
+        final var volume =
+                !matchingEntries.isEmpty()
+                        ? CastingHelpers.fromByteArrayToInt(matchingEntries.get(0).value().data())
+                        : 0;
+        final var volumeStash =
+                !matchingEntriesInStash.isEmpty()
+                        ? CastingHelpers.fromByteArrayToInt(
+                                matchingEntriesInStash.get(0).value().data())
+                        : 0;
         final var noise = laplaceDistribution.sample(label.label());
         if (correctionFactor + noise <= 0) {
             throw new RuntimeException("truncation error with noise " + noise);
         }
-        var numberOfValuesWithNoise =
-                (int) (matchingEntries + matchingEntriesInStash + correctionFactor + noise);
+        var numberOfValuesWithNoise = (int) (volume + volumeStash + correctionFactor + noise);
         final var token = DPRF.generateToken(prfKey, label);
         return new SearchTokenIntBytes(numberOfValuesWithNoise, token);
     }
