@@ -1,0 +1,88 @@
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,2,-1,-1,29737838
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,2,-1,-1,37761449
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,2,-1,-1,30078086
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,2,-1,-1,42838316
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,2,-1,-1,42878964
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,4,-1,-1,40571480
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,4,-1,-1,40167821
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,4,-1,-1,39589197
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,4,-1,-1,39792473
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,4,-1,-1,39950026
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,8,-1,-1,80266581
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,8,-1,-1,80108186
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,8,-1,-1,80093312
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,8,-1,-1,80182177
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,8,-1,-1,80466318
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,16,-1,-1,168278218
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,16,-1,-1,167613517
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,16,-1,-1,168639293
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,16,-1,-1,167499914
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,16,-1,-1,167497349
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,32,-1,-1,330207069
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,32,-1,-1,330429093
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,32,-1,-1,330324786
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,32,-1,-1,330356356
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,32,-1,-1,364440870
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,64,-1,-1,634815555
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,64,-1,-1,659800640
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,64,-1,-1,634937344
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,64,-1,-1,634518796
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,64,-1,-1,756663892
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,128,-1,-1,1326856247
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,128,-1,-1,1292578161
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,128,-1,-1,1415805002
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,128,-1,-1,1323231115
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,128,-1,-1,1330544508
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,256,-1,-1,2628202098
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,256,-1,-1,2640382819
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,256,-1,-1,2598327034
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,256,-1,-1,2813316135
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,256,-1,-1,2632017784
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,512,-1,-1,5134267902
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,512,-1,-1,5210755426
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,512,-1,-1,5126987792
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,512,-1,-1,5111477439
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,512,-1,-1,5107981778
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,1024,-1,-1,10254449089
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,1024,-1,-1,10606502356
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,1024,-1,-1,10305416586
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,1024,-1,-1,10379183399
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,1024,-1,-1,10244987762
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,2048,-1,-1,19673349247
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,2048,-1,-1,19716024795
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,2048,-1,-1,19832463670
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,2048,-1,-1,19660195365
+ch.bt.emm.volumeHiding.VolumeHidingEMM,seq,2048,-1,-1,19563999958
