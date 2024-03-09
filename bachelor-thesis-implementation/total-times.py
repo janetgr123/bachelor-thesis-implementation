@@ -3,8 +3,8 @@ from os.path import exists
 
 PATH = "src/test/resources/data/" 
 SUBFOLDER = "dataForPlots/"
-indices = [39]
-interactive = 0
+indices = [42, 47]
+interactive = 1
 #indices2 = list(range(48, 141, 4))
 #indices += indices2
 
