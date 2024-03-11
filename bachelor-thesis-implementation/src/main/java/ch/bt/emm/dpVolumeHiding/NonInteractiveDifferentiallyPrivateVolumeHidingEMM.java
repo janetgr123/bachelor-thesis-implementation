@@ -219,15 +219,20 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
                         .map();
         final var token = t.tokenBytes();
         final var keys = t.tokenKeys();
-        final var encryptedValue =
-                lookupTable.get(
-                        new Label(
-                                CryptoUtils.calculateHmac256(
-                                        keys.key1(), CastingHelpers.fromIntToByteArray(0))));
-
-        final var numberOfValues =
-                CastingHelpers.fromByteArrayToInt(
-                        schemes.get(keys.key2()).decrypt((CiphertextWithIV) encryptedValue).data());
+        final var l =
+                new Label(
+                        CryptoUtils.calculateHmac256(
+                                keys.key1(), CastingHelpers.fromIntToByteArray(0)));
+        int lookup = 0;
+        if (lookupTable.containsKey(l)) {
+            final var encryptedValue = lookupTable.get(l);
+            lookup =
+                    CastingHelpers.fromByteArrayToInt(
+                            schemes.get(keys.key2())
+                                    .decrypt((CiphertextWithIV) encryptedValue)
+                                    .data());
+        }
+        final var numberOfValues = lookup;
         int i = 0;
         while (i < numberOfValues) {
             final var expand1 =
