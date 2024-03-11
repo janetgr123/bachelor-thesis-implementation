@@ -7,12 +7,17 @@ import ch.bt.model.encryptedindex.*;
 import ch.bt.model.multimap.*;
 import ch.bt.model.searchtoken.SearchToken;
 import ch.bt.model.searchtoken.SearchTokenBytes;
+import ch.bt.model.searchtoken.SearchTokenBytesKeys;
+import ch.bt.model.searchtoken.SearchTokenKeys;
+
+import org.bouncycastle.util.Arrays;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * This class implements a Non-Interactive Differentially Private Volume-Hiding EMM scheme that
@@ -53,11 +58,16 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
 
     private Integer responsePadding;
 
+    private final SecretKey lookupTableKey;
+
+    private final Map<SecretKey, AESSEScheme> schemes = new HashMap<>();
+
     public NonInteractiveDifferentiallyPrivateVolumeHidingEMM(
             final int securityParameter, final double epsilon, final double alpha, final double t)
             throws GeneralSecurityException {
         final var keys = this.setup(securityParameter);
         this.prfKey = keys.get(0);
+        this.lookupTableKey = keys.get(2);
         this.seScheme = new AESSEScheme(keys.get(1));
         this.alpha = alpha;
         this.epsilon = epsilon;
@@ -89,13 +99,15 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
     public List<SecretKey> setup(int securityParameter) throws GeneralSecurityException {
         final var key1 = CryptoUtils.generateKeyWithHMac(securityParameter);
         final var key2 = CryptoUtils.generateKeyForAES(securityParameter);
-        return List.of(key1, key2);
+        final var key3 = CryptoUtils.generateKeyWithHMac(securityParameter);
+        return List.of(key1, key2, key3);
     }
 
     /**
      * @param multiMap the plaintext data stored in a multimap
-     * @return the encrypted index of the multimap according to the scheme specified in the
-     *     mentioned paper.
+     * @return the encrypted index of the multimap, including a lookup table for sanitized noise:
+     *     response-revealing emm scheme Pi_bas from <a
+     *     href="http://dx.doi.org/10.14722/ndss.2014.23264">Cash et al.</a>
      * @throws GeneralSecurityException
      */
     @Override
@@ -121,7 +133,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
         /*
          * lookup table
          */
-        final var lookup = new HashMap<Label, Integer>();
+        final var lookup = new HashMap<Label, Ciphertext>();
         final var keys = multiMap.keySet();
         for (final var label : keys) {
             final var noise = laplaceDistribution.sample(label.label());
@@ -130,26 +142,27 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
             }
             var numberOfValuesWithNoise =
                     (int) (multiMap.get(label).size() + correctionFactor + noise);
-            final var token = DPRF.generateToken(prfKey, label);
-            lookup.put(new Label(CryptoUtils.calculateSha3Digest(token)), numberOfValuesWithNoise);
-        }
-        // padding
-        final var rand = new Random();
-        while (lookup.size() <= (1 + alpha) * numberOfValues) {
-            final var label = new byte[Integer.BYTES];
-            rand.nextBytes(label);
-            final var noise = laplaceDistribution.sample(label);
-            if (correctionFactor + noise <= 0) {
-                throw new RuntimeException("truncation error with noise " + noise);
-            }
-            final var values = (int) (Math.random() + 1) * maxNumberOfValuesPerLabel;
-            var numberOfValuesWithNoise = (int) (values + correctionFactor + noise);
-            final var token = DPRF.generateToken(prfKey, new Label(label));
-            final var key = new Label(CryptoUtils.calculateSha3Digest(token));
-            if (!lookup.containsKey(key)) {
-                lookup.put(key, numberOfValuesWithNoise);
-                this.numberOfDummyValues += 32 + 4;
-            }
+            final var key1 =
+                    new SecretKeySpec(
+                            CryptoUtils.calculateHmac256(
+                                    lookupTableKey,
+                                    Arrays.concatenate(new byte[] {1}, label.label())),
+                            "HMacSHA256");
+            final var key2 =
+                    new SecretKeySpec(
+                            CryptoUtils.calculateHmac256(
+                                    lookupTableKey,
+                                    Arrays.concatenate(new byte[] {2}, label.label())),
+                            "HMacSHA256");
+            final var encryptionScheme = new AESSEScheme(key2);
+            schemes.put(key2, encryptionScheme);
+            lookup.put(
+                    new Label(
+                            CryptoUtils.calculateHmac256(
+                                    key1, CastingHelpers.fromIntToByteArray(0))),
+                    encryptionScheme.encrypt(
+                            new Plaintext(
+                                    CastingHelpers.fromIntToByteArray(numberOfValuesWithNoise))));
         }
 
         return new DifferentiallyPrivateEncryptedIndexTables(
@@ -158,13 +171,24 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
 
     /**
      * @param label the search label in plaintext
-     * @return a search token that enables access to the entry in the encrypted index that
-     *     corresponds to the search label.
+     * @return a search token that enables access to the entry in the encrypted index and the lookup
+     *     table that corresponds to the search label.
      * @throws GeneralSecurityException
      */
     @Override
     public SearchToken trapdoor(final Label label) throws GeneralSecurityException, IOException {
-        return new SearchTokenBytes(DPRF.generateToken(prfKey, label));
+        final var key1 =
+                new SecretKeySpec(
+                        CryptoUtils.calculateHmac256(
+                                lookupTableKey, Arrays.concatenate(new byte[] {1}, label.label())),
+                        "HMacSHA256");
+        final var key2 =
+                new SecretKeySpec(
+                        CryptoUtils.calculateHmac256(
+                                lookupTableKey, Arrays.concatenate(new byte[] {2}, label.label())),
+                        "HMacSHA256");
+        final var token = new SearchTokenBytes(DPRF.generateToken(prfKey, label));
+        return new SearchTokenBytesKeys(token, new SearchTokenKeys(key1, key2));
     }
 
     /**
@@ -177,7 +201,7 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
             final SearchToken searchToken, final EncryptedIndex encryptedIndex)
             throws IOException, GeneralSecurityException {
         if (!(encryptedIndex instanceof DifferentiallyPrivateEncryptedIndexTables)
-                || !(searchToken instanceof SearchTokenBytes token)) {
+                || !(searchToken instanceof SearchTokenBytesKeys t)) {
             throw new IllegalArgumentException(
                     "types of encrypted index or search token are not matching");
         }
@@ -193,12 +217,17 @@ public class NonInteractiveDifferentiallyPrivateVolumeHidingEMM implements EMM {
                                 ((DifferentiallyPrivateEncryptedIndexTables) encryptedIndex)
                                         .encryptedIndexCT())
                         .map();
-        int lookup = 0;
-        final var key = new Label(CryptoUtils.calculateSha3Digest(token.token()));
-        if (lookupTable.containsKey(key)) {
-            lookup = lookupTable.get(key);
-        }
-        final var numberOfValues = lookup;
+        final var token = t.tokenBytes();
+        final var keys = t.tokenKeys();
+        final var encryptedValue =
+                lookupTable.get(
+                        new Label(
+                                CryptoUtils.calculateHmac256(
+                                        keys.key1(), CastingHelpers.fromIntToByteArray(0))));
+
+        final var numberOfValues =
+                CastingHelpers.fromByteArrayToInt(
+                        schemes.get(keys.key2()).decrypt((CiphertextWithIV) encryptedValue).data());
         int i = 0;
         while (i < numberOfValues) {
             final var expand1 =

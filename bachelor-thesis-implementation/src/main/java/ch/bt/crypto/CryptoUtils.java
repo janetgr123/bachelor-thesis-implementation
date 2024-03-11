@@ -112,4 +112,19 @@ public class CryptoUtils {
         hmac.init(key);
         return hmac.doFinal(data); // fulfills the role of the digest() method
     }
+
+    /**
+     * Hashing with HMac SHA256
+     *
+     * @param key the secret key for hashing
+     * @param data the byte array to hash
+     * @return HmacSHA512 hash of the data
+     * @throws GeneralSecurityException
+     */
+    public static byte[] calculateHmac256(final SecretKey key, final byte[] data)
+            throws GeneralSecurityException {
+        Mac hmac = Mac.getInstance("HMacSHA256", "BCFIPS");
+        hmac.init(key);
+        return hmac.doFinal(data); // fulfills the role of the digest() method
+    }
 }

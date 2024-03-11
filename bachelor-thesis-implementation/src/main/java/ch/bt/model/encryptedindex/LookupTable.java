@@ -1,5 +1,6 @@
 package ch.bt.model.encryptedindex;
 
+import ch.bt.model.multimap.Ciphertext;
 import ch.bt.model.multimap.Label;
 
 import java.util.Map;
@@ -10,12 +11,12 @@ import java.util.Map;
  * @param map the encrypted index as a multimap
  * @author Janet Greutmann
  */
-public record LookupTable(Map<Label, Integer> map) implements EncryptedIndex {
+public record LookupTable(Map<Label, Ciphertext> map) implements EncryptedIndex {
     /**
      * @return the size of the multimap
      */
     @Override
     public int size() {
-        return map.size() * (32 + 4); // label AES encrypted to 32 bytes, integer of 4 bytes
+        return map.size() * (32 + 32); // label prf SHA256, value AES encrypted to 32 bytes
     }
 }
