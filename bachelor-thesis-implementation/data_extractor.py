@@ -3,7 +3,7 @@ from os.path import exists
 
 PATH = "src/test/resources/data/" 
 SUBFOLDER = "dataForPlots/" 
-indices = [40]
+indices = [17]
 interactive = 0
 
 # data size vs. time
