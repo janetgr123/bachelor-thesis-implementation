@@ -56,9 +56,13 @@ taskset -c 0-3,56-59 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark
 taskset -c 28-31,84-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=0,1,2,0.2,32,51,1,0,0,0
 taskset -c 24-27,80-83 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=4,0,2,0.4,32,40,0,0,0,0
 
+taskset -c 4-7,60-63 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=2,0,2,0.2,32,17,1,0,0,0
+
+taskset -c 28-31,84-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=3,0,1,0.2,32,27,1,0,0,0
+
+
 DONE
 ---------------
-taskset -c 4-7,60-63 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=2,0,2,0.2,32,17,1,0,0,0
 
 
 
@@ -71,12 +75,10 @@ taskset -c 12-15,68-71 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchma
 taskset -c 16-19,72-75 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=2,0,0,0.2,32,4,0,0,0,0
 taskset -c 20-23,76-79 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=3,0,0,0.4,32,20,0,0,0,0
 taskset -c 24-27,80-83 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=3,0,1,0.2,32,26,0,0,0,0
-taskset -c 28-31,84-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=3,0,1,0.2,32,27,1,0,0,0
+taskset -c 28-31,84-87 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=3,0,2,0.2,32,34,0,0,0,0
 
 
 WAITING
 -----------------
-
-taskset -c 16-19,72-75 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=3,0,2,0.2,32,34,0,0,0,0
 taskset -c 16-19,72-75 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=3,0,2,0.2,32,35,1,0,0,0
 taskset -c 16-19,72-75 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=3,0,2,0.4,32,36,0,0,0,0
