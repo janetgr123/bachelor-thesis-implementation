@@ -102,3 +102,11 @@ ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,8192,-1,-1,73360419932
 ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,8192,-1,-1,73826674184
 ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,8192,-1,-1,74125403910
 ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,8192,-1,-1,73373705376
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+emm,mode,data size,from,range size,time [ns]
+ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,16384,-1,-1,115347727074
+ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,16384,-1,-1,116741556172
+ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,16384,-1,-1,116971498924
+ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,16384,-1,-1,116549792091
+ch.bt.emm.volumeHiding.VolumeHidingEMMOptimised,seq,16384,-1,-1,115569884590
