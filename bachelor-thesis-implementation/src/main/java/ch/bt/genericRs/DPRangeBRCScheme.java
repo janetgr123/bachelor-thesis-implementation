@@ -195,7 +195,7 @@ public class DPRangeBRCScheme implements TwoRoundGenericRSScheme {
                         el -> {
                             try {
                                 final var result = emmScheme.result(ciphertexts, el);
-                                responsePadding += emmScheme.getResponsePadding();
+                                responsePadding += ciphertexts.size() - result.size();
                                 return result;
                             } catch (GeneralSecurityException e) {
                                 throw new RuntimeException(e);

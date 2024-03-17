@@ -227,7 +227,7 @@ public class ParallelDPRangeBRCScheme implements TwoRoundGenericRSScheme {
                                                         final var result =
                                                                 emmScheme.result(ciphertexts, el);
                                                         responsePadding +=
-                                                                emmScheme.getResponsePadding();
+                                                                ciphertexts.size() - result.size();
                                                         return result;
                                                     } catch (GeneralSecurityException e) {
                                                         throw new RuntimeException(e);

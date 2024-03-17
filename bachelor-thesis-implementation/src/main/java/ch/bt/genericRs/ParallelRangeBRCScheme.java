@@ -168,7 +168,7 @@ public class ParallelRangeBRCScheme implements GenericRSScheme {
                                                         final var result =
                                                                 emmScheme.result(ciphertexts, el);
                                                         responsePadding.getAndAdd(
-                                                                emmScheme.getResponsePadding());
+                                                                ciphertexts.size() - result.size());
                                                         return result;
                                                     } catch (GeneralSecurityException e) {
                                                         throw new RuntimeException(e);
