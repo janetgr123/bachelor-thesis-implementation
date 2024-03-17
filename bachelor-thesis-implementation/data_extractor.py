@@ -3,8 +3,8 @@ from os.path import exists
 
 PATH = "src/test/resources/data/" 
 SUBFOLDER = "dataForPlots/" 
-indices = [4]
-interactive = 0
+indices = [42,43,44,45,46,47,48,49,50,51,52,53]
+interactive = 1
 
 # data size vs. time
 methods = ["buildIndex", "trapdoor", "search", "trapdoor2", "search2"]
@@ -57,6 +57,7 @@ for method in methods:
             file = PATH + "searchPadding2-" + str(index) + ".csv"
         df = pd.read_csv(file)
         df = df[df['emm'] != 'emm']
+        emm = df['emm'].iloc[0]
         data_sizes = df['data size'].unique()
         data_size = data_sizes[-1]
         rows_data = df.loc[df['data size'] == data_size]
@@ -67,6 +68,7 @@ for method in methods:
             rows = rows_data.loc[rows_data['from'] == range_size]
             average = rows['range size'].astype(float).mean(axis=0)
             list.append((range_size, average))
+            average *= 64
             if average < 0.00001:
                 average2 = 0
                 list2.append((range_size, average2))
