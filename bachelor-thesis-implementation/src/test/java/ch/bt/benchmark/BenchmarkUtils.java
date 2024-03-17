@@ -362,8 +362,6 @@ public class BenchmarkUtils {
             throw new RuntimeException(e);
         }
 
-        printPadding2.printToCsv(
-                emm, mode, dataSize, rangeSize, cipherTexts2.size(), scheme.getResponsePadding());
 
         // individual warm-up
         for (int i = 0; i < BenchmarkSettings.WARM_UPS; i++) {
@@ -377,6 +375,9 @@ public class BenchmarkUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        printPadding2.printToCsv(
+                emm, mode, dataSize, rangeSize, cipherTexts2.size(), cipherTexts2.size() - plaintexts.size());
 
         printTrapdoor.printer.close();
         printSearch.printer.close();
@@ -496,7 +497,7 @@ public class BenchmarkUtils {
         }
 
         printPadding.printToCsv(
-                emm, mode, dataSize, rangeSize, cipherTexts.size(), scheme.getResponsePadding());
+                emm, mode, dataSize, rangeSize, cipherTexts.size(), cipherTexts.size() - plaintexts.size());
 
         printTrapdoor.printer.close();
         printSearch.printer.close();
