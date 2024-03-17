@@ -23,7 +23,7 @@ public class ResultPrinter3 {
         final String file = String.join(".", (method + "-" + k), "csv");
         fileWriter =
                 Files.newBufferedWriter(
-                        Paths.get(String.join("/", "src/test/resources/data", file)),
+                        Paths.get(String.join("/", "src/test/resources/data2", file)),
                         StandardOpenOption.APPEND,
                         StandardOpenOption.CREATE);
         csvFormat =

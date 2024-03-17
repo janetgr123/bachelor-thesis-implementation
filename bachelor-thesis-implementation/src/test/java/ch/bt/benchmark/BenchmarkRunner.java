@@ -60,7 +60,7 @@ public class BenchmarkRunner {
                 };
 
         logger.info("STARTING BENCHMARKS");
-        IntStream.iterate(2, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i * 2)
+        IntStream.iterate(BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i * 2)
                 .forEach(
                         dataSize -> {
                             BenchmarkUtils.setMultimapAndRootForDataSize(dataSize, dataSet);
