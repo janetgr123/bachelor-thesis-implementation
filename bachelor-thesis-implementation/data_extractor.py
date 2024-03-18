@@ -68,7 +68,6 @@ for method in methods:
             rows = rows_data.loc[rows_data['from'] == range_size]
             average = rows['range size'].astype(float).mean(axis=0)
             list.append((range_size, average))
-            average *= 64
             if average < 0.00001:
                 average2 = 0
                 list2.append((range_size, average2))
