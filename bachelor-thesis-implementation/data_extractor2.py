@@ -3,7 +3,7 @@ from os.path import exists
 
 PATH = "src/test/resources/data2/" 
 SUBFOLDER = "dataForPlots/" 
-indices = [0,6,22,24,38]
+indices = [34]
 interactive = 0
 
 # response size (entries) and percentage padding
