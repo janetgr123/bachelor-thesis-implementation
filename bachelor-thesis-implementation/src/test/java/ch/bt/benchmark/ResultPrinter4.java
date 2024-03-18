@@ -33,7 +33,6 @@ public class ResultPrinter4 {
                                 "emm",
                                 "mode",
                                 "data size",
-                                "from",
                                 "range size",
                                 "size of response",
                                 "number of dummy values")
