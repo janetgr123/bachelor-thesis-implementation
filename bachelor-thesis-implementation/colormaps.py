@@ -4,6 +4,9 @@ import pandas as pd
 import numpy as np
 from scipy import sparse
 
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["mathtext.fontset"] = "dejavuserif"
+
 DOMAIN_SIZE = 2**21
 PATH = "~/ETH/Bachelor Thesis/bachelor-thesis-implementation/bachelor-thesis-implementation/src/main/resources/data/"
 ACCURANCY = [1, 1, 1]
