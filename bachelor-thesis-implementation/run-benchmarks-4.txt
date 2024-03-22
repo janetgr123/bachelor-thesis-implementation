@@ -110,15 +110,14 @@ taskset -c 8-11,64-67 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmar
 
 DONE
 ---------------
+taskset -c 16-19,72-75 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=2,0,0,0.2,32,4,0,0,0,0
 
 
 
 PROCESSING
 ----------------
 taskset -c 4-7,60-63 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=2,0,2,0.2,32,16,0,0,0,0
-taskset -c 16-19,72-75 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=2,0,0,0.2,32,4,0,0,0,0
 
 
 WAITING
 -----------------
-taskset -c 4-7,60-63 mvn test-compile exec:java -Dexec.mainClass=ch.bt.benchmark.BenchmarkRunner -Dexec.classpathScope=test -Dexec.arguments=2,0,2,0.2,32,16,0,0,0,0
