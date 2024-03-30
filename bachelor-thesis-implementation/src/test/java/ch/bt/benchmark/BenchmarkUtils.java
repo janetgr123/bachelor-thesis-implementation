@@ -81,59 +81,6 @@ public class BenchmarkUtils {
                 });
     }
 
-    public static void runBenchmarkForRangeSchemeBQ(
-            final List<EMM> emms, final int dataSize, final int k, final int error) {
-        List<GenericRSScheme> rangeSchemes = new ArrayList<>();
-        for (final var emm : emms) {
-            try {
-                rangeSchemes.add(
-                        new RangeBRCSchemeBQ(
-                                EMMSettings.SECURITY_PARAMETER,
-                                emm,
-                                new BestRangeCover(),
-                                root,
-                                error));
-            } catch (GeneralSecurityException | IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        rangeSchemes.forEach(
-                el -> {
-                    try {
-                        runBenchmarkForSchemeAndDataSize(el, dataSize, "seq", k);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-    }
-
-    public static void runBenchmarkForRangeSchemeWQ(
-            final List<EMM> emms, final int dataSize, final int k, final int t) {
-        List<GenericRSScheme> rangeSchemes = new ArrayList<>();
-        for (final var emm : emms) {
-            try {
-                rangeSchemes.add(
-                        new RangeBRCSchemeWQ(
-                                EMMSettings.SECURITY_PARAMETER,
-                                emm,
-                                new BestRangeCover(),
-                                root,
-                                t,
-                                BenchmarkSettings.DOMAIN_SIZE));
-            } catch (GeneralSecurityException | IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        rangeSchemes.forEach(
-                el -> {
-                    try {
-                        runBenchmarkForSchemeAndDataSize(el, dataSize, "seq", k);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-    }
-
     public static void runBenchmarkForParallelRangeScheme(
             final List<EMM> emms, final int dataSize, final int k) {
         List<GenericRSScheme> rangeSchemesPar = new ArrayList<>();

@@ -42,8 +42,6 @@ public class BenchmarkRunner {
         final int truncationProbability = Integer.parseInt(args[4]);
         final int k = Integer.parseInt(args[5]);
         final int par = Integer.parseInt(args[6]);
-        final int bq = Integer.parseInt(args[7]);
-        final int wq = Integer.parseInt(args[8]);
 
         EMMSettings.setEPSILON(epsilon);
         EMMSettings.setTruncationProbability(truncationProbability);
@@ -60,36 +58,21 @@ public class BenchmarkRunner {
                 };
 
         logger.info("STARTING BENCHMARKS");
-        IntStream.iterate(BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES, i -> i * 2)
+        IntStream.iterate(
+                        BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES,
+                        i -> i <= BenchmarkSettings.MAX_NUMBER_OF_DATA_SAMPLES,
+                        i -> i * 2)
                 .forEach(
                         dataSize -> {
                             BenchmarkUtils.setMultimapAndRootForDataSize(dataSize, dataSet);
                             if (twoRoundEMMs == 0) {
                                 if (par == 0) {
-                                    if (bq == 1) {
-                                        final int error = Integer.parseInt(args[9]);
-                                        BenchmarkUtils.runBenchmarkForRangeSchemeBQ(
-                                                emms, dataSize, k, error);
-                                    } else if (wq == 1) {
-                                        BenchmarkUtils.runBenchmarkForRangeSchemeWQ(
-                                                emms, dataSize, k, dataSize);
-                                    } else {
-                                        BenchmarkUtils.runBenchmarkForRangeScheme(
-                                                emms, dataSize, k);
-                                    }
+                                    BenchmarkUtils.runBenchmarkForRangeScheme(emms, dataSize, k);
                                 } else {
-                                    if (bq == 1 || wq == 1) {
-                                        throw new IllegalArgumentException(
-                                                "BQ and WQ not available for parallel range schemes.");
-                                    }
                                     BenchmarkUtils.runBenchmarkForParallelRangeScheme(
                                             emms, dataSize, k);
                                 }
                             } else {
-                                if (bq == 1 || wq == 1) {
-                                    throw new IllegalArgumentException(
-                                            "BQ and WQ not available for two round range schemes.");
-                                }
                                 if (par == 0) {
                                     BenchmarkUtils.runBenchmarkForDPRangeScheme(dataSize, k);
                                 } else {
