@@ -148,9 +148,6 @@ public class BenchmarkUtils {
 
     public static void initializeData(final int dataSet) throws SQLException, IOException {
         postgreSQLContainer.start();
-        // logger.info(postgreSQLContainer.getEnv());
-        // logger.info(postgreSQLContainer.getContainerInfo());
-        // logger.info(postgreSQLContainer.getDockerClient());
         logger.info(postgreSQLContainer.getHost());
         logger.info(postgreSQLContainer.getLogs());
         String jdbcUrl = postgreSQLContainer.getJdbcUrl();
