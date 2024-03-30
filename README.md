@@ -1,7 +1,7 @@
 # Systematizing and Benchmarking Mitigation Techniques for Attacks Against Range Schemes (Experiment Code)
 
-## Bachelor's Thesis @ETH Zurich    
 <pre>
+Bachelor's Thesis @ETH Zurich
 Author:         Janet Greutmann   
 Supervisors:    Prof. Dr. Kenneth G. Paterson, Dr. Francesca Falzon
 </pre>
