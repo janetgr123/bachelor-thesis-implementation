@@ -1,10 +1,12 @@
 # Systematizing and Benchmarking Mitigation Techniques for Attacks Against Range Schemes (Experiment Code)
 
-Bachelor's Thesis @ETH Zurich    
+## Bachelor's Thesis @ETH Zurich    
+<pre>
 Author:         Janet Greutmann   
 Supervisors:    Prof. Dr. Kenneth G. Paterson, Dr. Francesca Falzon
+</pre>
 
-## References
+### References
 
 [[1]](https://www.baeldung.com/docker-test-containers)
 baeldung, ‘Docker Test Containers in Java Tests | Baeldung’. [Online].
